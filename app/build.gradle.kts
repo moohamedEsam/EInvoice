@@ -2,7 +2,7 @@ plugins {
     id(Plugins.androidApplication)
     id(Plugins.kotlinAndroid)
     id(Plugins.ksp) version Versions.ksp
-    kotlin(Plugins.kotlinSerialization) version "1.7.10"
+    kotlin(Plugins.kotlinSerialization) version Versions.kotlinSerialization
 }
 
 android {
@@ -59,28 +59,5 @@ dependencies {
 
     implementation(Dependencies.splashScreen)
 
-    implementation(Dependencies.koin)
-    implementation(Dependencies.koinCompose)
-
-    implementation(Dependencies.coroutinesCore)
-    implementation(Dependencies.coroutinesAndroid)
-
-    implementation(Dependencies.viewModelKtx)
-    implementation(Dependencies.viewModelCompose)
-
-    implementation(Dependencies.coil)
-    implementation(Dependencies.coilCompose)
-    implementation(Dependencies.coilGifs)
-
-    implementation(Dependencies.room)
-    annotationProcessor(Dependencies.roomCompiler)
-    ksp(Dependencies.roomKsp)
-    implementation(Dependencies.roomKtx)
-
-    implementation(Dependencies.ktorClientLogging)
-    implementation(Dependencies.ktorClient)
-    implementation(Dependencies.ktorCIO)
-    implementation(Dependencies.ktorKotlinSerialization)
-    implementation(Dependencies.ktorContentNegotiation)
-    implementation(Dependencies.ktorAuthentication)
+    implementation(project(":common"))
 }

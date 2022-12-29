@@ -1,4 +1,4 @@
-package com.example.einvoice.data.models
+package com.example.auth.models
 
 import kotlinx.serialization.Serializable
 

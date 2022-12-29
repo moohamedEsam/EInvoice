@@ -1,3 +1,6 @@
+import org.gradle.api.artifacts.dsl.DependencyHandler
+import org.gradle.kotlin.dsl.DependencyHandlerScope
+
 object Plugins {
     val androidApplication by lazy { "com.android.application" }
     val androidLibrary by lazy { "com.android.library" }

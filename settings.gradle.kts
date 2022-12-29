@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 rootProject.name = "EInvoice"
 include(":app")
 include(":features:auth")
+include(":common")

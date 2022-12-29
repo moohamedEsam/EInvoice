@@ -1,4 +1,4 @@
-package com.example.einvoice.models
+package com.example.common
 
 sealed interface Result<T> {
     data class Success<T>(val data: T) : Result<T>
@@ -19,6 +19,4 @@ sealed interface Result<T> {
         is Loading -> Loading()
         is Empty -> Empty()
     }
-
-
 }

@@ -3,6 +3,7 @@ object Versions {
     const val androidApplication = "7.3.1"
     const val androidX = "1.9.0"
     const val kotlin = "1.7.21"
+    const val kotlinSerialization = "1.7.20"
     const val appCompact = "1.4.1"
 
     const val composeVersion = "1.2.1"
