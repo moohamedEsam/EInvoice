@@ -46,6 +46,10 @@ object Dependencies {
     const val ktorContentNegotiation = "io.ktor:ktor-client-content-negotiation:${Versions.ktorVersion}"
     const val ktorKotlinSerialization = "io.ktor:ktor-serialization-kotlinx-json:${Versions.ktorVersion}"
     const val ktorAuthentication = "io.ktor:ktor-client-auth:${Versions.ktorVersion}"
+    const val ktorTesting = "io.ktor:ktor-client-mock:${Versions.ktorVersion}"
+
+
+
 
     const val junit = "junit:junit:${Versions.jUnit}"
     const val truth = "com.google.truth:truth:${Versions.truth}"

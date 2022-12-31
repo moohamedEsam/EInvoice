@@ -1,11 +1,9 @@
 package com.example.auth.presentation.screens.login
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -19,15 +17,19 @@ import coil.ImageLoader
 import coil.compose.AsyncImage
 import com.example.common.components.ValidationPasswordTextField
 import com.example.common.components.ValidationTextField
+import com.example.common.functions.handleSnackBarEvent
+import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.get
 import org.koin.androidx.compose.viewModel
 
 @Composable
 fun LoginScreen(
     logo: Any,
+    snackbarHostState: SnackbarHostState,
     onLoggedIn: () -> Unit,
     onRegisterClick: () -> Unit
 ) {
@@ -42,13 +44,20 @@ fun LoginScreen(
         passwordValidation = viewModel.passwordValidationResult,
         onPasswordValueChange = viewModel::setPassword,
         loginButtonEnable = viewModel.enableLogin,
-        onLoginButtonClick = { },
+        loading = viewModel.isLoading,
+        onLoginButtonClick = viewModel::login,
         onRegisterClick = onRegisterClick
     )
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.snackBar.collectLatest {
+            snackbarHostState.handleSnackBarEvent(it)
+        }
+    }
 }
 
 @Composable
- private fun LoginScreenContent(
+private fun LoginScreenContent(
     logo: Any,
     email: StateFlow<String>,
     emailValidation: StateFlow<ValidationResult>,
@@ -57,6 +66,7 @@ fun LoginScreen(
     passwordValidation: StateFlow<ValidationResult>,
     onPasswordValueChange: (String) -> Unit,
     loginButtonEnable: StateFlow<Boolean>,
+    loading: StateFlow<Boolean>,
     onLoginButtonClick: () -> Unit,
     onRegisterClick: () -> Unit,
     imageLoader: ImageLoader = get()
@@ -96,7 +106,8 @@ fun LoginScreen(
             LoginButton(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = loginButtonEnable,
-                onClick = onLoginButtonClick
+                onClick = onLoginButtonClick,
+                loading = loading
             )
 
             TextButton(onClick = onRegisterClick) {
@@ -107,20 +118,25 @@ fun LoginScreen(
 }
 
 @Composable
-private fun LoginButton(
+private fun ColumnScope.LoginButton(
     enabled: StateFlow<Boolean>,
+    loading: StateFlow<Boolean>,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {}
 ) {
     val isEnabled by enabled.collectAsState()
-    Button(
-        onClick = onClick,
-        enabled = isEnabled,
-        modifier = modifier,
-        shape = MaterialTheme.shapes.small
-    ) {
-        Text("Login", textAlign = TextAlign.Center)
-    }
+    val isLoading by loading.collectAsState()
+    if (isLoading)
+        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+    else
+        Button(
+            onClick = onClick,
+            enabled = isEnabled,
+            modifier = modifier,
+            shape = MaterialTheme.shapes.small
+        ) {
+            Text("Login", textAlign = TextAlign.Center)
+        }
 
 }
 
@@ -144,7 +160,8 @@ fun LoginScreenContentPreview() {
             loginButtonEnable = MutableStateFlow(true),
             onLoginButtonClick = {},
             onRegisterClick = {},
-            imageLoader = ImageLoader(LocalContext.current)
+            imageLoader = ImageLoader(LocalContext.current),
+            loading = MutableStateFlow(false)
         )
     }
 }

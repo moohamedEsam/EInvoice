@@ -47,4 +47,10 @@ dependencies {
     implementation(Dependencies.coroutinesCore)
     implementation(Dependencies.viewModelCompose)
     implementation(project(":common"))
+
+    testImplementation(Dependencies.junit)
+    testImplementation(Dependencies.truth)
+    testImplementation(Dependencies.turbine)
+    testImplementation(Dependencies.ktorTesting)
+    testImplementation(Dependencies.coroutinesTest)
 }

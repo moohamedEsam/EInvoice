@@ -1,9 +1,6 @@
 package com.example.auth.data
 
-import com.example.auth.models.ApiResponse
-import com.example.auth.models.Credentials
-import com.example.auth.models.Register
-import com.example.auth.models.Token
+import com.example.auth.models.*
 import com.example.common.models.Result
 import com.example.common.functions.tryWrapper
 import io.ktor.client.*
@@ -12,12 +9,14 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.auth.*
 import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.request.*
+import io.ktor.http.*
 
 class KtorAuthRepository(private val client: HttpClient) : AuthRepository {
 
     override suspend fun login(credentials: Credentials): Result<Token> = tryWrapper {
         val response = client.post(Urls.LOGIN) {
             setBody(credentials)
+            contentType(ContentType.Application.Json)
         }
         val apiResponse = response.body<ApiResponse<Token>>()
         apiResponse.asResult()
@@ -26,6 +25,7 @@ class KtorAuthRepository(private val client: HttpClient) : AuthRepository {
     override suspend fun register(register: Register): Result<Token> = tryWrapper {
         val response = client.post(Urls.REGISTER) {
             setBody(register)
+            contentType(ContentType.Application.Json)
         }
         val apiResponse = response.body<ApiResponse<Token>>()
         apiResponse.asResult()

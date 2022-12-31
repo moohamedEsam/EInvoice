@@ -19,4 +19,14 @@ sealed interface Result<T> {
         is Loading -> Loading()
         is Empty -> Empty()
     }
+    
+    suspend fun ifFailure(block: suspend (String?) -> Unit): Result<T> {
+        if (this is Error) block(exception)
+        return this
+    }
+    
+    suspend fun ifSuccess(block: suspend (T) -> Unit): Result<T> {
+        if (this is Success) block(data)
+        return this
+    }
 }

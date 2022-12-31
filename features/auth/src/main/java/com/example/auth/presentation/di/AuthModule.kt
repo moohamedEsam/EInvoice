@@ -10,9 +10,9 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val authModule = module {
-    single<AuthRepository> { parametersHolder -> KtorAuthRepository(parametersHolder[0]) }
+    single<AuthRepository> { KtorAuthRepository(get()) }
     single { LoginUseCase(get<AuthRepository>()::login) }
     single { LogoutUseCase(get<AuthRepository>()::logout) }
     single { RegisterUseCase(get<AuthRepository>()::register) }
-    viewModel { LoginViewModel() }
+    viewModel { LoginViewModel(get()) }
 }

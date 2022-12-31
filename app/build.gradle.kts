@@ -48,6 +48,7 @@ dependencies {
     debugImplementation(Dependencies.composeUiTooling)
     implementation(Dependencies.composeUiToolingPreview)
     implementation(Dependencies.activityCompose)
+    implementation(Dependencies.composeNavigation)
     implementation(Dependencies.extendedIcons)
     implementation(Dependencies.coil)
     implementation(Dependencies.coilCompose)
