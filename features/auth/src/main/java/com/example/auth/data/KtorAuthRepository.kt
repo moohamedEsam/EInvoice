@@ -4,8 +4,8 @@ import com.example.auth.models.ApiResponse
 import com.example.auth.models.Credentials
 import com.example.auth.models.Register
 import com.example.auth.models.Token
-import com.example.common.Result
-import com.example.common.tryWrapper
+import com.example.common.models.Result
+import com.example.common.functions.tryWrapper
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*

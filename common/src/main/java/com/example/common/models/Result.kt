@@ -1,4 +1,4 @@
-package com.example.common
+package com.example.common.models
 
 sealed interface Result<T> {
     data class Success<T>(val data: T) : Result<T>

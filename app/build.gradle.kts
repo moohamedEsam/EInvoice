@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.einvoice"
-        minSdk = 21
+        minSdk = Versions.minSdk
         targetSdk = Versions.compileSdk
         versionCode = 1
         versionName = "1.0"
@@ -35,7 +35,7 @@ android {
     }
     buildFeatures.compose = true
     kotlinOptions.jvmTarget = "1.8"
-    composeOptions.kotlinCompilerExtensionVersion = "1.3.1"
+    composeOptions.kotlinCompilerExtensionVersion = "1.3.2"
     packagingOptions {
         resources.excludes += "META-INF/atomicfu.kotlin_module"
     }
@@ -43,21 +43,30 @@ android {
 
 dependencies {
     implementation(Dependencies.appCompact)
-    implementation(Dependencies.coreKtx)
-    implementation(Dependencies.lifecycleRuntimeKtx)
-    implementation(Dependencies.activityCompose)
     implementation(Dependencies.composeUi)
-    implementation(Dependencies.composeUiToolingPreview)
     implementation(Dependencies.composeMaterial3)
-    testImplementation(Dependencies.junit)
     debugImplementation(Dependencies.composeUiTooling)
-    debugImplementation(Dependencies.composeUiTestManifest)
-
+    implementation(Dependencies.composeUiToolingPreview)
+    implementation(Dependencies.activityCompose)
     implementation(Dependencies.extendedIcons)
-
-    implementation(Dependencies.composeNavigation)
-
-    implementation(Dependencies.splashScreen)
+    implementation(Dependencies.coil)
+    implementation(Dependencies.coilCompose)
+    implementation(Dependencies.coilGifs)
+    implementation(Dependencies.ktorClient)
+    implementation(Dependencies.ktorAuthentication)
+    implementation(Dependencies.ktorCIO)
+    implementation(Dependencies.ktorClientLogging)
+    implementation(Dependencies.ktorContentNegotiation)
+    implementation(Dependencies.ktorKotlinSerialization)
+    implementation(Dependencies.koinCore)
+    implementation(Dependencies.koinAndroid)
+    implementation(Dependencies.koinCompose)
+    implementation(Dependencies.lifecycleRuntimeKtx)
+    implementation(Dependencies.viewModelKtx)
+    implementation(Dependencies.coroutinesAndroid)
+    implementation(Dependencies.coroutinesCore)
+    implementation(Dependencies.viewModelCompose)
 
     implementation(project(":common"))
+implementation(project(":features:auth"))
 }

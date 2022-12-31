@@ -1,6 +1,6 @@
 package com.example.auth.models
 
-import com.example.common.Result
+import com.example.common.models.Result
 
 sealed interface ApiResponse<T> {
     data class Success<T>(val data: T) : ApiResponse<T>

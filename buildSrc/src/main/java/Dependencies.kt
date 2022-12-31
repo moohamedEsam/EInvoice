@@ -1,61 +1,58 @@
-import org.gradle.api.artifacts.dsl.DependencyHandler
-import org.gradle.kotlin.dsl.DependencyHandlerScope
-
 object Plugins {
-    val androidApplication by lazy { "com.android.application" }
-    val androidLibrary by lazy { "com.android.library" }
-    val kotlinAndroid by lazy { "org.jetbrains.kotlin.android" }
-    val kotlinJvm by lazy { "org.jetbrains.kotlin.jvm" }
-    val gradleDoctor by lazy { "com.osacky.doctor" }
-    val kotlinSerialization by lazy { "plugin.serialization" }
-    val ksp by lazy { "com.google.devtools.ksp" }
+    const val androidApplication = "com.android.application"
+    const val androidLibrary = "com.android.library"
+    const val kotlinAndroid = "org.jetbrains.kotlin.android"
+    const val kotlinJvm = "org.jetbrains.kotlin.jvm"
+    const val kotlinSerialization = "plugin.serialization"
+    const val ksp = "com.google.devtools.ksp"
 }
 
 
 object Dependencies {
-    val appCompact by lazy { "androidx.appcompat:appcompat:${Versions.appCompact}" }
-    val coreKtx by lazy { "androidx.core:core-ktx:${Versions.androidX}" }
+    const val appCompact = "androidx.appcompat:appcompat:${Versions.appCompact}"
+    const val coreKtx = "androidx.core:core-ktx:${Versions.androidX}"
 
-    val composeUi by lazy { "androidx.compose.ui:ui:${Versions.composeVersion}" }
-    val composeUiToolingPreview by lazy { "androidx.compose.ui:ui-tooling-preview:${Versions.composeVersion}" }
-    val composeMaterial3 by lazy { "androidx.compose.material3:${Versions.composeMaterial3}" }
-    val composeUiTestJunit4 by lazy { "androidx.compose.ui:ui-test-junit4:${Versions.composeVersion}" }
-    val composeUiTooling by lazy { "androidx.compose.ui:ui-tooling:${Versions.composeVersion}" }
-    val composeUiTestManifest by lazy { "androidx.compose.ui:ui-test-manifest:${Versions.composeVersion}" }
-    val extendedIcons by lazy { "androidx.compose.material:material-icons-extended:${Versions.composeVersion}" }
-    val activityCompose by lazy { "androidx.activity:activity-compose:${Versions.activityCompose}" }
-    val composeNavigation by lazy { "androidx.navigation:navigation-compose:${Versions.composeNavigation}" }
+    const val composeUi = "androidx.compose.ui:ui:${Versions.composeVersion}"
+    const val composeUiToolingPreview = "androidx.compose.ui:ui-tooling-preview:${Versions.composeVersion}"
+    const val composeMaterial3 = "androidx.compose.material3:${Versions.composeMaterial3}"
+    const val composeUiTestJunit4 = "androidx.compose.ui:ui-test-junit4:${Versions.composeVersion}"
+    const val composeUiTooling = "androidx.compose.ui:ui-tooling:${Versions.composeVersion}"
+    const val composeUiTestManifest = "androidx.compose.ui:ui-test-manifest:${Versions.composeVersion}"
+    const val extendedIcons = "androidx.compose.material:material-icons-extended:${Versions.composeVersion}"
+    const val activityCompose = "androidx.activity:activity-compose:${Versions.activityCompose}"
+    const val composeNavigation = "androidx.navigation:navigation-compose:${Versions.composeNavigation}"
 
-    val lifecycleRuntimeKtx by lazy { "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifeCycleRuntimeKtx}" }
-    val viewModelCompose by lazy { "androidx.lifecycle:lifecycle-viewmodel-compose:${Versions.lifeCycleRuntimeKtx}" }
-    val viewModelKtx by lazy { "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.lifeCycleRuntimeKtx}" }
-    val coroutinesCore by lazy { "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutinesVersion}" }
-    val coroutinesAndroid by lazy { "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutinesVersion}" }
-    val coroutinesTest by lazy { "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.coroutinesVersion}" }
+    const val lifecycleRuntimeKtx = "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifeCycleRuntimeKtx}"
+    const val viewModelCompose = "androidx.lifecycle:lifecycle-viewmodel-compose:${Versions.lifeCycleRuntimeKtx}"
+    const val viewModelKtx = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.lifeCycleRuntimeKtx}"
+    const val coroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutinesVersion}"
+    const val coroutinesAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutinesVersion}"
+    const val coroutinesTest = "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.coroutinesVersion}"
 
-    val splashScreen by lazy { "androidx.core:core-splashscreen:${Versions.splashScreen}" }
-    val coil by lazy { "io.coil-kt:coil:${Versions.coil}" }
-    val coilCompose by lazy { "io.coil-kt:coil-compose:${Versions.coil}" }
-    val coilGifs by lazy { "io.coil-kt:coil-gif:${Versions.coil}" }
+    const val splashScreen = "androidx.core:core-splashscreen:${Versions.splashScreen}"
+    const val coil = "io.coil-kt:coil:${Versions.coil}"
+    const val coilCompose = "io.coil-kt:coil-compose:${Versions.coil}"
+    const val coilGifs = "io.coil-kt:coil-gif:${Versions.coil}"
 
-    val room by lazy { "androidx.room:room-runtime:${Versions.room}" }
-    val roomKtx by lazy { "androidx.room:room-ktx:${Versions.room}" }
-    val roomCompiler by lazy { "androidx.room:room-compiler:${Versions.room}" }
-    val roomKsp by lazy { "androidx.room:room-compiler:${Versions.room}" }
-    val roomTesting by lazy { "androidx.room:room-testing:${Versions.room}" }
+    const val room = "androidx.room:room-runtime:${Versions.room}"
+    const val roomKtx = "androidx.room:room-ktx:${Versions.room}"
+    const val roomCompiler = "androidx.room:room-compiler:${Versions.room}"
+    const val roomKsp = "androidx.room:room-compiler:${Versions.room}"
+    const val roomTesting = "androidx.room:room-testing:${Versions.room}"
 
-    val ktorClient by lazy { "io.ktor:ktor-client-android:${Versions.ktorVersion}" }
-    val ktorCIO by lazy { "io.ktor:ktor-client-cio:${Versions.ktorVersion}" }
-    val ktorClientLogging by lazy { "io.ktor:ktor-client-logging:${Versions.ktorVersion}" }
-    val ktorContentNegotiation by lazy { "io.ktor:ktor-client-content-negotiation:${Versions.ktorVersion}" }
-    val ktorKotlinSerialization by lazy { "io.ktor:ktor-serialization-kotlinx-json:${Versions.ktorVersion}" }
-    val ktorAuthentication by lazy { "io.ktor:ktor-client-auth:${Versions.ktorVersion}" }
+    const val ktorClient = "io.ktor:ktor-client-android:${Versions.ktorVersion}"
+    const val ktorCIO = "io.ktor:ktor-client-cio:${Versions.ktorVersion}"
+    const val ktorClientLogging = "io.ktor:ktor-client-logging:${Versions.ktorVersion}"
+    const val ktorContentNegotiation = "io.ktor:ktor-client-content-negotiation:${Versions.ktorVersion}"
+    const val ktorKotlinSerialization = "io.ktor:ktor-serialization-kotlinx-json:${Versions.ktorVersion}"
+    const val ktorAuthentication = "io.ktor:ktor-client-auth:${Versions.ktorVersion}"
 
-    val junit by lazy { "junit:junit:${Versions.jUnit}" }
-    val truth by lazy { "com.google.truth:truth:${Versions.truth}" }
-    val turbine by lazy { "app.cash.turbine:turbine:${Versions.turbine}" }
+    const val junit = "junit:junit:${Versions.jUnit}"
+    const val truth = "com.google.truth:truth:${Versions.truth}"
+    const val turbine = "app.cash.turbine:turbine:${Versions.turbine}"
 
 
-    val koin by lazy { "io.insert-koin:koin-android:${Versions.koin}" }
-    val koinCompose by lazy { "io.insert-koin:koin-androidx-compose:${Versions.koin}" }
+    const val koinAndroid = "io.insert-koin:koin-android:${Versions.koin}"
+    const val koinCore = "io.insert-koin:koin-core:${Versions.koin}"
+    const val koinCompose = "io.insert-koin:koin-androidx-compose:${Versions.koin}"
 }
