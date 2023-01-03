@@ -4,9 +4,9 @@ import com.example.common.models.Result
 import com.example.models.auth.Credentials
 import com.example.models.auth.Register
 import com.example.models.auth.Token
-import com.example.network.AuthRemoteDataSource
+import com.example.network.EInvoiceRemoteDataSource
 
-class KtorAuthRepository(private val remote: AuthRemoteDataSource) : AuthRepository {
+class KtorAuthRepository(private val remote: EInvoiceRemoteDataSource) : AuthRepository {
 
     override suspend fun login(credentials: Credentials): Result<Token> = remote.login(credentials)
 

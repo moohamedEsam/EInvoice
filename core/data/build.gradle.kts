@@ -26,5 +26,6 @@ dependencies{
     implementation(project(":core:models"))
     implementation(project(":core:network"))
     implementation(project(":common"))
+    implementation(project(":core:database"))
 
 }

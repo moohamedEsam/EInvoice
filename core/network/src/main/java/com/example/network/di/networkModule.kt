@@ -1,8 +1,8 @@
 package com.example.network.di
 
 import android.util.Log
-import com.example.network.AuthRemoteDataSource
-import com.example.network.KtorAuthRemoteDataSource
+import com.example.network.EInvoiceRemoteDataSource
+import com.example.network.KtorEInvoiceRemoteDataSource
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.auth.*
@@ -13,7 +13,7 @@ import org.koin.dsl.module
 
 val networkModule = module {
     single { provideHttpClient() }
-    single<AuthRemoteDataSource> { KtorAuthRemoteDataSource(get()) }
+    single<EInvoiceRemoteDataSource> { KtorEInvoiceRemoteDataSource(get()) }
 }
 
 fun provideHttpClient() = HttpClient(CIO) {

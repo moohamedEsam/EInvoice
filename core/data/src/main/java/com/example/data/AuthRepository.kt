@@ -1,11 +1,12 @@
 package com.example.data
 
 import com.example.common.models.Result
+import com.example.models.auth.*
 
 interface AuthRepository {
-    suspend fun login(credentials: com.example.models.auth.Credentials): Result<com.example.models.auth.Token>
+    suspend fun login(credentials: Credentials): Result<Token>
 
-    suspend fun register(register: com.example.models.auth.Register): Result<com.example.models.auth.Token>
+    suspend fun register(register: Register): Result<Token>
 
     suspend fun logout(): Result<Unit>
 
