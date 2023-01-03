@@ -7,16 +7,19 @@ plugins {
 android {
     namespace = "com.example.auth"
     compileSdk = Versions.compileSdk
+
     defaultConfig {
         minSdk = Versions.minSdk
         targetSdk = Versions.compileSdk
         vectorDrawables.useSupportLibrary = true
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     buildFeatures.compose = true
     kotlinOptions.jvmTarget = "1.8"
     composeOptions.kotlinCompilerExtensionVersion = Versions.kotlinCompilerExtensionVersion
@@ -46,11 +49,19 @@ dependencies {
     implementation(Dependencies.coroutinesAndroid)
     implementation(Dependencies.coroutinesCore)
     implementation(Dependencies.viewModelCompose)
+    implementation(Dependencies.composeNavigation)
     implementation(project(":common"))
+    implementation(project(":core:network"))
+
 
     testImplementation(Dependencies.junit)
     testImplementation(Dependencies.truth)
     testImplementation(Dependencies.turbine)
     testImplementation(Dependencies.ktorTesting)
     testImplementation(Dependencies.coroutinesTest)
+
+    androidTestImplementation(Dependencies.composeUiTestJunit4)
+    androidTestImplementation(Dependencies.composeUiTestManifest)
+    androidTestImplementation(Dependencies.truth)
+    androidTestImplementation(Dependencies.junit)
 }

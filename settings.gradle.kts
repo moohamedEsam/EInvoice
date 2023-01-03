@@ -16,3 +16,5 @@ rootProject.name = "EInvoice"
 include(":app")
 include(":features:auth")
 include(":common")
+include(":core:network")
+include(":core:data")

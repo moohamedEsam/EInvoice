@@ -1,18 +1,16 @@
-package com.example.auth.presentation.screens.login
+package com.example.auth.presentation.screens.register
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
@@ -29,16 +27,16 @@ import org.koin.androidx.compose.get
 import org.koin.androidx.compose.viewModel
 
 @Composable
-fun LoginScreen(
+fun RegisterScreen(
     logo: Any,
     snackbarHostState: SnackbarHostState,
-    onLoggedIn: () -> Unit,
-    onRegisterClick: () -> Unit,
+    onRegistered: () -> Unit,
+    onLoginClick: () -> Unit,
     imageLoader: ImageLoader = get()
 ) {
-    val viewModel: LoginViewModel by viewModel()
+    val viewModel: RegisterViewModel by viewModel()
 
-    LoginScreenContent(
+    RegisterScreenContent(
         logo = logo,
         email = viewModel.email,
         emailValidation = viewModel.emailValidationResult,
@@ -46,38 +44,49 @@ fun LoginScreen(
         password = viewModel.password,
         passwordValidation = viewModel.passwordValidationResult,
         onPasswordValueChange = viewModel::setPassword,
-        loginButtonEnable = viewModel.enableLogin,
+        confirmPassword = viewModel.confirmPassword,
+        confirmPasswordValidation = viewModel.confirmPasswordValidationResult,
+        onConfirmPasswordValueChange = viewModel::setConfirmPassword,
+        registerButtonEnable = viewModel.enableRegister,
         loading = viewModel.isLoading,
-        onLoginButtonClick = { viewModel.login(onSuccess = { onLoggedIn() }) },
-        onRegisterClick = onRegisterClick,
+        onRegisterButtonClick = { viewModel.register(onSuccess = { onRegistered() }) },
+        onLoginClick = onLoginClick,
+        username = viewModel.username,
+        usernameValidation = viewModel.usernameValidationResult,
+        onUsernameValueChange = viewModel::setUsername,
         imageLoader = imageLoader
     )
 
     LaunchedEffect(key1 = Unit) {
-        viewModel.snackBarChannel.collectLatest {
+        viewModel.snackbarChannel.collectLatest {
             snackbarHostState.handleSnackBarEvent(it)
         }
     }
 }
 
 @Composable
-private fun LoginScreenContent(
+private fun RegisterScreenContent(
     logo: Any,
+    username: StateFlow<String>,
+    usernameValidation: StateFlow<ValidationResult>,
+    onUsernameValueChange: (String) -> Unit,
     email: StateFlow<String>,
     emailValidation: StateFlow<ValidationResult>,
     onEmailValueChange: (String) -> Unit,
     password: StateFlow<String>,
     passwordValidation: StateFlow<ValidationResult>,
     onPasswordValueChange: (String) -> Unit,
-    loginButtonEnable: StateFlow<Boolean>,
+    confirmPassword: StateFlow<String>,
+    confirmPasswordValidation: StateFlow<ValidationResult>,
+    onConfirmPasswordValueChange: (String) -> Unit,
+    registerButtonEnable: StateFlow<Boolean>,
     loading: StateFlow<Boolean>,
-    onLoginButtonClick: () -> Unit,
-    onRegisterClick: () -> Unit,
+    onRegisterButtonClick: () -> Unit,
+    onLoginClick: () -> Unit,
     imageLoader: ImageLoader
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         AsyncImage(
@@ -98,6 +107,14 @@ private fun LoginScreenContent(
         ) {
 
             ValidationTextField(
+                valueState = username,
+                validationState = usernameValidation,
+                label = "Username",
+                modifier = Modifier.fillMaxWidth(),
+                onValueChange = onUsernameValueChange
+            )
+
+            ValidationTextField(
                 valueState = email,
                 validationState = emailValidation,
                 label = "Email",
@@ -112,43 +129,50 @@ private fun LoginScreenContent(
                 onValueChange = onPasswordValueChange
             )
 
-            OneTimeEventButton(
-                enabled = loginButtonEnable,
-                loading = loading,
+            ValidationPasswordTextField(
+                valueState = confirmPassword,
+                validationState = confirmPasswordValidation,
                 modifier = Modifier.fillMaxWidth(),
-                onClick = onLoginButtonClick,
-                label = "Login"
+                onValueChange = onConfirmPasswordValueChange,
+                label = "Confirm Password"
             )
 
-            TextButton(onClick = onRegisterClick) {
-                Text("Don't have an account? Register")
+            OneTimeEventButton(
+                enabled = registerButtonEnable,
+                loading = loading,
+                label = "Register",
+                onClick = onRegisterButtonClick,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            TextButton(onClick = onLoginClick) {
+                Text("Already have an account? Login")
             }
         }
     }
 }
 
-
 @Preview
 @Composable
-fun LoginScreenContentPreview() {
-    //comment the image loader to see the preview
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        LoginScreenContent(
-            logo = "",
-            email = MutableStateFlow(""),
-            emailValidation = MutableStateFlow(ValidationResult.Empty),
-            onEmailValueChange = {},
-            password = MutableStateFlow(""),
-            passwordValidation = MutableStateFlow(ValidationResult.Empty),
-            onPasswordValueChange = {},
-            loginButtonEnable = MutableStateFlow(true),
-            onLoginButtonClick = {},
-            onRegisterClick = {},
-            imageLoader = ImageLoader(LocalContext.current),
-            loading = MutableStateFlow(false)
-        )
-    }
+fun RegisterScreenPreview() {
+    RegisterScreenContent(
+        logo = "",
+        username = MutableStateFlow("mohamed"),
+        usernameValidation = MutableStateFlow(ValidationResult.Empty),
+        onUsernameValueChange = {},
+        email = MutableStateFlow(""),
+        emailValidation = MutableStateFlow(ValidationResult.Empty),
+        onEmailValueChange = {},
+        password = MutableStateFlow(""),
+        passwordValidation = MutableStateFlow(ValidationResult.Empty),
+        onPasswordValueChange = {},
+        confirmPassword = MutableStateFlow(""),
+        confirmPasswordValidation = MutableStateFlow(ValidationResult.Empty),
+        onConfirmPasswordValueChange = {},
+        registerButtonEnable = MutableStateFlow(true),
+        loading = MutableStateFlow(false),
+        onRegisterButtonClick = {},
+        onLoginClick = {},
+        imageLoader = ImageLoader(LocalContext.current)
+    )
 }

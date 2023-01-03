@@ -55,7 +55,6 @@ object Dependencies {
     const val truth = "com.google.truth:truth:${Versions.truth}"
     const val turbine = "app.cash.turbine:turbine:${Versions.turbine}"
 
-
     const val koinAndroid = "io.insert-koin:koin-android:${Versions.koin}"
     const val koinCore = "io.insert-koin:koin-core:${Versions.koin}"
     const val koinCompose = "io.insert-koin:koin-androidx-compose:${Versions.koin}"

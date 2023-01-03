@@ -6,6 +6,7 @@ import com.example.auth.domain.LoginUseCase
 import com.example.auth.domain.LogoutUseCase
 import com.example.auth.domain.RegisterUseCase
 import com.example.auth.presentation.screens.login.LoginViewModel
+import com.example.auth.presentation.screens.register.RegisterViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -15,4 +16,5 @@ val authModule = module {
     single { LogoutUseCase(get<AuthRepository>()::logout) }
     single { RegisterUseCase(get<AuthRepository>()::register) }
     viewModel { LoginViewModel(get()) }
+    viewModel { RegisterViewModel(get()) }
 }

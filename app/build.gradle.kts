@@ -69,5 +69,6 @@ dependencies {
     implementation(Dependencies.viewModelCompose)
 
     implementation(project(":common"))
-implementation(project(":features:auth"))
+    implementation(project(":features:auth"))
+    implementation(project(":core:network"))
 }
