@@ -1,7 +1,9 @@
 package com.example.einvoice
 
 import android.app.Application
-import com.example.auth.presentation.di.authModule
+import com.example.auth.di.authModule
+import com.example.data.di.dataModule
+import com.example.domain.di.domainModule
 import com.example.einvoice.di.utilsModule
 import com.example.network.di.networkModule
 import org.koin.android.ext.koin.androidContext
@@ -14,7 +16,7 @@ class ApplicationClass : Application() {
             androidContext(this@ApplicationClass)
             modules(
                 listOf(
-                    authModule, utilsModule, networkModule
+                    authModule, utilsModule, networkModule, dataModule, domainModule
                 )
             )
         }

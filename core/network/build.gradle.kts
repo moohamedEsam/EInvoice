@@ -28,4 +28,6 @@ dependencies{
     implementation(Dependencies.ktorAuthentication)
     implementation(Dependencies.koinAndroid)
     implementation(Dependencies.koinCore)
+    implementation(project(":core:models"))
+    implementation(project(":common"))
 }

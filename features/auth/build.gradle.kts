@@ -51,17 +51,6 @@ dependencies {
     implementation(Dependencies.viewModelCompose)
     implementation(Dependencies.composeNavigation)
     implementation(project(":common"))
-    implementation(project(":core:network"))
-
-
-    testImplementation(Dependencies.junit)
-    testImplementation(Dependencies.truth)
-    testImplementation(Dependencies.turbine)
-    testImplementation(Dependencies.ktorTesting)
-    testImplementation(Dependencies.coroutinesTest)
-
-    androidTestImplementation(Dependencies.composeUiTestJunit4)
-    androidTestImplementation(Dependencies.composeUiTestManifest)
-    androidTestImplementation(Dependencies.truth)
-    androidTestImplementation(Dependencies.junit)
+    implementation(project(":core:models"))
+    implementation(project(":core:domain"))
 }

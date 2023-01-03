@@ -8,7 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.example.auth.presentation.screens.login.LoginScreen
+import com.example.auth.login.LoginScreen
 import com.example.einvoice.presentation.shared.EInvoiceLayout
 import com.example.einvoice.ui.theme.EInvoiceTheme
 

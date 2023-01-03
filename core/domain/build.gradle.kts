@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.data"
+    namespace = "com.example.database"
     compileSdk = Versions.compileSdk
     defaultConfig {
         minSdk = Versions.minSdk
@@ -20,11 +20,10 @@ android {
     composeOptions.kotlinCompilerExtensionVersion = Versions.kotlinCompilerExtensionVersion
 }
 
-dependencies{
-    implementation(Dependencies.koinAndroid)
-    implementation(Dependencies.koinCore)
+dependencies {
+    implementation(project(":core:data"))
     implementation(project(":core:models"))
-    implementation(project(":core:network"))
     implementation(project(":common"))
-
+    implementation(Dependencies.koinCore)
+    implementation(Dependencies.koinAndroid)
 }

@@ -71,4 +71,6 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":features:auth"))
     implementation(project(":core:network"))
+    implementation(project(":core:data"))
+    implementation(project(":core:domain"))
 }

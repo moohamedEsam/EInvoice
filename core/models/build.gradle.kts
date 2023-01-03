@@ -1,10 +1,11 @@
 plugins {
     id(Plugins.androidLibrary)
     id(Plugins.kotlinAndroid)
+    kotlin(Plugins.kotlinSerialization) version Versions.kotlinSerialization
 }
 
 android {
-    namespace = "com.example.data"
+    namespace = "com.example.models"
     compileSdk = Versions.compileSdk
     defaultConfig {
         minSdk = Versions.minSdk
@@ -21,10 +22,5 @@ android {
 }
 
 dependencies{
-    implementation(Dependencies.koinAndroid)
-    implementation(Dependencies.koinCore)
-    implementation(project(":core:models"))
-    implementation(project(":core:network"))
-    implementation(project(":common"))
-
+    implementation(Dependencies.ktorKotlinSerialization)
 }

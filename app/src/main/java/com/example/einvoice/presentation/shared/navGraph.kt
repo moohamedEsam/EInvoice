@@ -7,13 +7,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import com.example.auth.presentation.screens.login.LoginScreen
-import com.example.auth.presentation.screens.login.loginScreen
-import com.example.auth.presentation.screens.login.navigateToLoginScreen
-import com.example.auth.presentation.screens.register.RegisterScreen
-import com.example.auth.presentation.screens.register.navigateToRegister
-import com.example.auth.presentation.screens.register.registerScreen
+import com.example.auth.login.LoginScreen
+import com.example.auth.login.loginScreen
+import com.example.auth.register.navigateToRegister
+import com.example.auth.register.registerScreen
 import com.example.einvoice.R
 
 @Composable
