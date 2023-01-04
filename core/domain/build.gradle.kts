@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.database"
+    namespace = "com.example.domain"
     compileSdk = Versions.compileSdk
     defaultConfig {
         minSdk = Versions.minSdk
@@ -15,7 +15,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-
     kotlinOptions.jvmTarget = "1.8"
     composeOptions.kotlinCompilerExtensionVersion = Versions.kotlinCompilerExtensionVersion
 }

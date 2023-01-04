@@ -11,6 +11,7 @@ import com.example.auth.login.LoginScreen
 import com.example.auth.login.loginScreen
 import com.example.auth.register.navigateToRegister
 import com.example.auth.register.registerScreen
+import com.example.company.screen.companyScreen
 import com.example.einvoice.R
 
 @Composable
@@ -18,11 +19,12 @@ fun EInvoiceNavGraph(
     navController: NavHostController,
     snackbarHostState: SnackbarHostState,
     paddingValues: PaddingValues,
+    startScreen: String,
     modifier: Modifier = Modifier
 ) {
     NavHost(
         navController = navController,
-        startDestination = LoginScreen,
+        startDestination = startScreen,
         modifier = modifier.padding(paddingValues)
     ) {
         loginScreen(
@@ -38,5 +40,7 @@ fun EInvoiceNavGraph(
             onRegistered = { },
             onLoginClick = navController::popBackStack
         )
+
+        companyScreen()
     }
 }

@@ -11,7 +11,7 @@ import androidx.navigation.compose.rememberNavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EInvoiceLayout() {
+fun EInvoiceLayout(startScreen: String) {
     val snackbarHostState by remember {
         mutableStateOf(SnackbarHostState())
     }
@@ -25,7 +25,8 @@ fun EInvoiceLayout() {
             EInvoiceNavGraph(
                 navController = navController,
                 snackbarHostState = snackbarHostState,
-                paddingValues = it
+                paddingValues = it,
+                startScreen = startScreen
             )
         }
     )

@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.auth"
+    namespace = "com.example.company"
     compileSdk = Versions.compileSdk
 
     defaultConfig {

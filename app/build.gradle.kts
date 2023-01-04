@@ -67,9 +67,11 @@ dependencies {
     implementation(Dependencies.coroutinesAndroid)
     implementation(Dependencies.coroutinesCore)
     implementation(Dependencies.viewModelCompose)
+    implementation(Dependencies.splashScreen)
 
     implementation(project(":common"))
     implementation(project(":features:auth"))
+    implementation(project(":features:company"))
     implementation(project(":core:network"))
     implementation(project(":core:data"))
     implementation(project(":core:domain"))

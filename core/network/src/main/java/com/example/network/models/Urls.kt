@@ -2,7 +2,7 @@ package com.example.network.models
 
 object Urls {
     private const val BASE_URL = "http://192.168.1.7:7081"
-
+    const val REFRESH_TOKEN = "$BASE_URL/User/refresh_token"
     const val LOGIN = "$BASE_URL/User/sign_in"
     const val REGISTER = "$BASE_URL/User/create"
     const val COMPANY = "$BASE_URL/Company"

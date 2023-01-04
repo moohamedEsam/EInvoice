@@ -1,6 +1,7 @@
 plugins {
     id(Plugins.androidLibrary)
     id(Plugins.kotlinAndroid)
+    kotlin(Plugins.kotlinSerialization) version Versions.kotlinSerialization
 }
 
 android {
