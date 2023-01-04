@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.MainActivityViewModel
 import com.example.auth.login.LoginScreen
-import com.example.company.screen.CompanyScreen
+import com.example.company.screen.CompaniesScreen
 import com.example.einvoice.presentation.shared.EInvoiceLayout
 import com.example.einvoice.ui.theme.EInvoiceTheme
 import org.koin.android.ext.android.inject
@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
                 val startScreen by remember {
                     derivedStateOf {
                         if (userLoggedIn == true)
-                            CompanyScreen
+                            CompaniesScreen
                         else
                             LoginScreen
 

@@ -6,7 +6,7 @@ interface Syncable<T> {
     suspend fun syncWith(synchronizer: Synchronizer): Boolean
 }
 
-interface Synchronizer
+class Synchronizer
 
 
 suspend fun <T> Synchronizer.handleSync(

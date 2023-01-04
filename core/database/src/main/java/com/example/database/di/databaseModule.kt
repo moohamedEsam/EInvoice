@@ -15,4 +15,4 @@ private fun Scope.provideEInvoiceDatabase() = Room.databaseBuilder(
     androidContext(),
     EInvoiceDatabase::class.java,
     "einvoice_database"
-)
+).build()

@@ -2,7 +2,9 @@ package com.example.einvoice
 
 import android.app.Application
 import com.example.auth.di.authModule
+import com.example.company.di.companyModule
 import com.example.data.di.dataModule
+import com.example.database.di.databaseModule
 import com.example.domain.di.domainModule
 import com.example.einvoice.di.appModule
 import com.example.network.di.networkModule
@@ -16,7 +18,13 @@ class ApplicationClass : Application() {
             androidContext(this@ApplicationClass)
             modules(
                 listOf(
-                    authModule, appModule, networkModule, dataModule, domainModule
+                    authModule,
+                    appModule,
+                    networkModule,
+                    dataModule,
+                    domainModule,
+                    companyModule,
+                    databaseModule
                 )
             )
         }

@@ -7,11 +7,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import com.example.auth.login.LoginScreen
 import com.example.auth.login.loginScreen
 import com.example.auth.register.navigateToRegister
 import com.example.auth.register.registerScreen
-import com.example.company.screen.companyScreen
+import com.example.company.screen.companiesScreen
 import com.example.einvoice.R
 
 @Composable
@@ -41,6 +40,8 @@ fun EInvoiceNavGraph(
             onLoginClick = navController::popBackStack
         )
 
-        companyScreen()
+        companiesScreen(snackbarHostState) {
+
+        }
     }
 }

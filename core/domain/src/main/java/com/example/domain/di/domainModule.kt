@@ -5,11 +5,7 @@ import com.example.domain.auth.isUserLoggedInUseCase
 import com.example.domain.auth.loginUseCase
 import com.example.domain.auth.logoutUseCase
 import com.example.domain.auth.registerUseCase
-import com.example.domain.company.CreateCompanyUseCase
-import com.example.domain.company.DeleteCompanyUseCase
-import com.example.domain.company.GetCompaniesUseCase
-import com.example.domain.company.GetCompanyUseCase
-import com.example.domain.company.UpdateCompanyUseCase
+import com.example.domain.company.*
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 

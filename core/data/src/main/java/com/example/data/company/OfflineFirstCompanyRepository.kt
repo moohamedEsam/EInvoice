@@ -22,7 +22,7 @@ class OfflineFirstCompanyRepository(
         Result.Success(company)
     }
 
-    override fun getCompany(id: String): Flow<Company> = localDataSource.getCompanyById(id.toInt())
+    override fun getCompany(id: String): Flow<Company> = localDataSource.getCompanyById(id)
         .map(CompanyEntity::asCompany)
 
     override fun getCompanies(): Flow<List<Company>> = localDataSource.getCompanies()
@@ -34,7 +34,7 @@ class OfflineFirstCompanyRepository(
     }
 
     override suspend fun deleteCompany(id: String): Result<Unit> = tryWrapper {
-        localDataSource.deleteCompany(id.toInt())
+        localDataSource.deleteCompany(id)
         Result.Success(Unit)
     }
 
@@ -59,7 +59,7 @@ class OfflineFirstCompanyRepository(
                 localDataSource.insertCompany(company.asCompanyEntity())
             },
             localDeleter = { company ->
-                localDataSource.deleteCompany(company.id.toInt())
+                localDataSource.deleteCompany(company.id)
             }
         )
 

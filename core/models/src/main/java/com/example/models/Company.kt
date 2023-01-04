@@ -1,7 +1,7 @@
 package com.example.models
 
 import kotlinx.serialization.Serializable
-import java.util.UUID
+import java.util.*
 
 @Serializable
 data class Company(

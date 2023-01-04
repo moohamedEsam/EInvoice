@@ -1,6 +1,5 @@
 package com.example.network.di
 
-import android.content.Context
 import android.util.Log
 import com.example.common.functions.loadTokenFromSharedPref
 import com.example.common.functions.saveTokenToSharedPref
@@ -18,6 +17,7 @@ import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
@@ -29,7 +29,10 @@ val networkModule = module {
 
 fun Scope.provideHttpClient() = HttpClient(CIO) {
     install(ContentNegotiation) {
-        json()
+        json(Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+        })
     }
 
     install(Logging) {
@@ -40,7 +43,7 @@ fun Scope.provideHttpClient() = HttpClient(CIO) {
         }
     }
 
-    install(Auth){
+    install(Auth) {
         bearer {
             loadTokens {
                 val token = loadTokenFromSharedPref(androidContext()) ?: return@loadTokens null
@@ -49,12 +52,12 @@ fun Scope.provideHttpClient() = HttpClient(CIO) {
 
             refreshTokens {
                 val token = loadTokenFromSharedPref(androidContext()) ?: return@refreshTokens null
-                val refreshToken = client.post(Urls.REFRESH_TOKEN){
+                val refreshToken = client.post(Urls.REFRESH_TOKEN) {
                     setBody(mapOf("token" to token))
                     contentType(ContentType.Application.Json)
                     markAsRefreshTokenRequest()
                 }.body<Token>()
-                if(token != refreshToken.value)
+                if (token != refreshToken.value)
                     saveTokenToSharedPref(androidContext(), refreshToken.value)
                 BearerTokens(token, token)
             }
