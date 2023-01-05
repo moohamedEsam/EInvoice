@@ -28,11 +28,18 @@ fun CompanyEntity.asCompany() = Company(
     id = id
 )
 
-fun Company.asCompanyEntity() = CompanyEntity(
+fun Company.asCompanyEntity(
+    isCreated: Boolean = false,
+    isUpdated: Boolean = false,
+    isDeleted: Boolean = false
+) = CompanyEntity(
     name = name,
     registrationNumber = registrationNumber,
     ceo = ceo,
     phone = phone,
     website = website,
-    id = id
+    id = id,
+    isCreated = isCreated,
+    isUpdated = isUpdated,
+    isDeleted = isDeleted
 )

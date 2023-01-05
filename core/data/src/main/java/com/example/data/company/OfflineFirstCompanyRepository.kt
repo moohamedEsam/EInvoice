@@ -11,6 +11,7 @@ import com.example.database.room.EInvoiceDao
 import com.example.models.Company
 import com.example.network.EInvoiceRemoteDataSource
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class OfflineFirstCompanyRepository(
@@ -18,7 +19,7 @@ class OfflineFirstCompanyRepository(
     private val remoteDataSource: EInvoiceRemoteDataSource
 ) : CompanyRepository {
     override suspend fun createCompany(company: Company): Result<Company> = tryWrapper {
-        localDataSource.insertCompany(company.asCompanyEntity())
+        localDataSource.insertCompany(company.asCompanyEntity(isCreated = true))
         Result.Success(company)
     }
 
@@ -29,12 +30,20 @@ class OfflineFirstCompanyRepository(
         .map { companies -> companies.map(CompanyEntity::asCompany) }
 
     override suspend fun updateCompany(company: Company): Result<Company> = tryWrapper {
-        localDataSource.updateCompany(company.asCompanyEntity())
+        val companyEntity = localDataSource.getCompanyById(company.id).first()
+        if(companyEntity.isCreated)
+            localDataSource.updateCompany(company.asCompanyEntity(isCreated = true))
+        else
+            localDataSource.updateCompany(company.asCompanyEntity(isUpdated = true))
         Result.Success(company)
     }
 
     override suspend fun deleteCompany(id: String): Result<Unit> = tryWrapper {
-        localDataSource.deleteCompany(id)
+        val company = localDataSource.getCompanyById(id).first()
+        if(company.isCreated)
+            localDataSource.deleteCompany(company.id)
+        else
+            localDataSource.updateCompany(company.copy(isDeleted = true))
         Result.Success(Unit)
     }
 

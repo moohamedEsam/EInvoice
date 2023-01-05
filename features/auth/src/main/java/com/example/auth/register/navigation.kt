@@ -5,10 +5,10 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 
-const val RegisterScreen = "RegisterScreen"
+const val RegisterScreenRoute = "RegisterScreen"
 
 fun NavHostController.navigateToRegister() {
-    navigate(RegisterScreen)
+    navigate(RegisterScreenRoute)
 }
 
 fun NavGraphBuilder.registerScreen(
@@ -17,7 +17,7 @@ fun NavGraphBuilder.registerScreen(
     onRegistered: () -> Unit,
     onLoginClick: () -> Unit
 ) {
-    composable(RegisterScreen) {
+    composable(RegisterScreenRoute) {
         RegisterScreen(
             logo = logo,
             snackbarHostState = snackbarHostState,
