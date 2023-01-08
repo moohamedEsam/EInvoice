@@ -14,8 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.MainActivityViewModel
 import com.example.auth.login.LoginScreenRoute
-import com.example.company.screen.CompaniesScreenRoute
-import com.example.company.screen.all.CompaniesScreen
+import com.example.company.screen.all.CompaniesScreenRoute
 import com.example.einvoice.presentation.shared.EInvoiceLayout
 import com.example.einvoice.ui.theme.EInvoiceTheme
 import org.koin.android.ext.android.inject

@@ -101,7 +101,7 @@ private fun CreateCompanyButton(
         modifier = modifier,
         enabled = isEnabled
     ) {
-        Text(text = "Create")
+        Text(text = "Save")
     }
 }
 

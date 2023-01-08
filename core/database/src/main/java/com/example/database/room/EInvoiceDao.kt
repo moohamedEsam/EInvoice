@@ -53,8 +53,14 @@ interface EInvoiceDao {
     @Query("DELETE FROM Company where id = :id")
     suspend fun deleteCompany(id: String)
 
+    @Query("delete from company")
+    suspend fun deleteAllCompanies()
+
     @Update
     suspend fun updateCompany(company: CompanyEntity)
+
+    @Query("update Company set isDeleted = 1 where id = :id")
+    suspend fun markCompanyAsDeleted(id: String)
 
 
     // Client

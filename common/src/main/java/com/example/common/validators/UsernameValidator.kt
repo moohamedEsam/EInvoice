@@ -3,7 +3,7 @@ package com.example.common.validators
 import com.example.common.models.ValidationResult
 
 const val USERNAME_MIN_LENGTH = 3
-const val USERNAME_MAX_LENGTH = 20
+const val USERNAME_MAX_LENGTH = 40
 
 fun validateUsername(username: String): ValidationResult = when {
     username.isEmpty() -> ValidationResult.Empty

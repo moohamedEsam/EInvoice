@@ -5,10 +5,13 @@ import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,14 +25,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.common.components.OutlinedSearchTextField
+import com.example.common.functions.handleSnackBarEvent
 import com.example.company.screen.form.CompanyFormScreenContent
 import com.example.models.Company
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.viewModel
 
 @Composable
 fun CompaniesScreen(
+    snackbarHostState: SnackbarHostState,
     onCompanyClick: (Company) -> Unit
 ) {
     val viewModel: CompaniesViewModel by viewModel()
@@ -40,10 +46,18 @@ fun CompaniesScreen(
         onCompanyClick = onCompanyClick,
         queryState = viewModel.query,
         onQueryChange = viewModel::setQuery,
-        onCreateNewCompanyClick = viewModel::toggleCreateDialog
+        onCreateNewCompanyClick = viewModel::toggleCreateDialog,
+        onCompanyEditClick = { viewModel.editCompany(it.id) },
+        onCompanyDeleteClick = viewModel::deleteCompany,
     )
     if (showDialog)
         CreateCompanyDialog(viewModel)
+
+    LaunchedEffect(key1 = Unit){
+        viewModel.snackBarChannel.collectLatest {
+            snackbarHostState.handleSnackBarEvent(it)
+        }
+    }
 
 }
 
@@ -68,7 +82,7 @@ private fun CreateCompanyDialog(viewModel: CompaniesViewModel) {
                 onPhoneNumberChange = viewModel::setPhone,
                 phoneNumberValidation = viewModel.phoneValidationResult,
                 isFormValid = viewModel.isFormValid,
-                onCreateClick = viewModel::createCompany
+                onCreateClick = viewModel::saveCompany
             )
         }
     }
@@ -82,6 +96,8 @@ private fun CompaniesScreenContent(
     queryState: StateFlow<String>,
     onQueryChange: (String) -> Unit,
     onCompanyClick: (Company) -> Unit,
+    onCompanyEditClick: (Company) -> Unit,
+    onCompanyDeleteClick: (Company) -> Unit,
     onCreateNewCompanyClick: () -> Unit = {}
 ) {
     Column(
@@ -99,24 +115,26 @@ private fun CompaniesScreenContent(
                 available: Offset,
                 source: NestedScrollSource
             ): Offset {
-                expanded = available.y < 0
+                expanded = consumed.y < 0f || available.y < 0f
                 return super.onPostScroll(consumed, available, source)
             }
         }
         CompanySearchTextField(queryState = queryState, onQueryChange = onQueryChange)
-        LazyColumn(
+        LazyVerticalStaggeredGrid(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
                 .weight(1f)
-                .nestedScroll(nestedScrollConnection)
+                .nestedScroll(nestedScrollConnection),
+            columns = StaggeredGridCells.Adaptive(250.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(companies, key = { it.id }) { company ->
                 CompanyItem(
                     company = company,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .animateItemPlacement(),
-                    onClick = { onCompanyClick(company) }
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { onCompanyClick(company) },
+                    onEditClick = { onCompanyEditClick(company) },
+                    onDeleteClick = { onCompanyDeleteClick(company) }
                 )
             }
         }
@@ -145,11 +163,15 @@ private fun ColumnScope.CreateNewCompanyFloatingButton(
 private fun CompanyItem(
     company: Company,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    onEditClick: () -> Unit = {},
+    onDeleteClick: () -> Unit = {}
 ) {
     OutlinedCard(modifier = modifier, onClick = onClick) {
         Column(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(text = company.name, style = MaterialTheme.typography.headlineSmall, maxLines = 1)
@@ -175,6 +197,15 @@ private fun CompanyItem(
                 style = MaterialTheme.typography.bodyLarge,
                 maxLines = 1
             )
+            Row(modifier = Modifier.align(Alignment.End)) {
+                IconButton(onClick = onEditClick) {
+                    Icon(Icons.Filled.Edit, contentDescription = "Edit company")
+                }
+                IconButton(onClick = onDeleteClick) {
+                    Icon(Icons.Filled.Delete, contentDescription = "Delete company")
+                }
+
+            }
         }
     }
 }
@@ -192,31 +223,25 @@ private fun CompanySearchTextField(queryState: StateFlow<String>, onQueryChange:
 @Preview(showBackground = true)
 @Composable
 fun CompaniesScreenPreview() {
-    val companies = listOf(
+    val companies = List(10) {
         Company(
-            id = "1",
+            id = it.toString(),
             name = "Company 1",
             registrationNumber = "123456789",
             website = "https://www.google.com",
             phone = "123456789",
             ceo = "John Doe",
-        ),
-        Company(
-            id = "2",
-            name = "Company 2",
-            registrationNumber = "123456789",
-            website = "https://www.google.com",
-            phone = "123456789",
-            ceo = "John Doe",
         )
-    )
+    }
 
     CompaniesScreenContent(
         companies = companies,
         modifier = Modifier.fillMaxSize(),
         queryState = MutableStateFlow(""),
         onQueryChange = {},
-        onCompanyClick = {}
+        onCompanyClick = {},
+        onCompanyEditClick = {},
+        onCompanyDeleteClick = {}
     ) {}
 
 }

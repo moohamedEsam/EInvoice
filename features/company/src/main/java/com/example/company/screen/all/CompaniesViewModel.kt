@@ -2,12 +2,14 @@ package com.example.company.screen.all
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
+import com.example.common.validators.validatePhone
 import com.example.common.validators.validateUsername
-import com.example.domain.company.CreateCompanyUseCase
-import com.example.domain.company.GetCompaniesUseCase
-import com.example.domain.company.UpdateCompanyUseCase
+import com.example.common.validators.validateWebsite
+import com.example.domain.company.*
 import com.example.models.Company
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -15,14 +17,15 @@ class CompaniesViewModel(
     private val getCompaniesUseCase: GetCompaniesUseCase,
     private val createCompanyUseCase: CreateCompanyUseCase,
     private val updateCompanyUseCase: UpdateCompanyUseCase,
+    private val deleteCompanyUseCase: DeleteCompanyUseCase
 ) : ViewModel() {
     private val _companies = MutableStateFlow(emptyList<Company>())
     private val _query = MutableStateFlow("")
 
     val query = _query.asStateFlow()
 
-    val companies = combine(_companies, _query){ companies, query ->
-        if(query.isBlank()) return@combine companies
+    val companies = combine(_companies, _query) { companies, query ->
+        if (query.isBlank()) return@combine companies
         companies.filter { company ->
             company.name.contains(query, ignoreCase = true)
         }
@@ -47,23 +50,35 @@ class CompaniesViewModel(
 
     private val _website = MutableStateFlow("")
     val website = _website.asStateFlow()
-    val websiteValidationResult = website.map(::validateUsername)
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
+    val websiteValidationResult = website.map {
+        if (it.isEmpty()) ValidationResult.Valid
+        else validateWebsite(it)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
 
     private val _phone = MutableStateFlow("")
     val phone = _phone.asStateFlow()
-    val phoneValidationResult = phone.map(::validateUsername)
+    val phoneValidationResult = phone.map(::validatePhone)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
 
     val isFormValid = combine(
         nameValidationResult,
-        ceoValidationResult
-    ) { nameValidationResult, ceoValidationResult ->
-        nameValidationResult is ValidationResult.Valid && ceoValidationResult is ValidationResult.Valid
+        registrationNumberValidationResult,
+        ceoValidationResult,
+        websiteValidationResult,
+        phoneValidationResult
+    ) { name, registrationNumber, ceo, website, phone ->
+        name is ValidationResult.Valid &&
+                registrationNumber is ValidationResult.Valid &&
+                ceo is ValidationResult.Valid &&
+                website is ValidationResult.Valid &&
+                phone is ValidationResult.Valid
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
 
     private val _showCreateDialog = MutableStateFlow(false)
     val showCreateDialog = _showCreateDialog.asStateFlow()
+    private val _snackBarChannel = Channel<SnackBarEvent>()
+    val snackBarChannel = _snackBarChannel.receiveAsFlow()
+    private var companyId: String? = null
 
     init {
         viewModelScope.launch {
@@ -97,21 +112,92 @@ class CompaniesViewModel(
         _phone.update { phone }
     }
 
-    fun toggleCreateDialog() {
-        _showCreateDialog.update { !it }
+    fun editCompany(companyId: String) {
+        val company = _companies.value.first { it.id == companyId }
+        _name.update { company.name }
+        _registrationNumber.update { company.registrationNumber }
+        _ceo.update { company.ceo }
+        _website.update { company.website ?: "" }
+        _phone.update { company.phone }
+        this.companyId = companyId
+        toggleCreateDialog()
     }
 
-    fun createCompany() {
+    fun toggleCreateDialog() {
+        _showCreateDialog.update { !it }
+        if (!showCreateDialog.value)
+            clearForm()
+    }
+
+    private fun clearForm() {
+        _name.update { "" }
+        _registrationNumber.update { "" }
+        _ceo.update { "" }
+        _website.update { "" }
+        _phone.update { "" }
+        _showCreateDialog.update { false }
+        companyId = null
+    }
+
+    fun saveCompany() {
         viewModelScope.launch {
-            createCompanyUseCase(
-                Company(
-                    name = name.value,
-                    registrationNumber = registrationNumber.value,
-                    ceo = ceo.value,
-                    website = website.value,
-                    phone = phone.value
+            val result = if (companyId == null)
+                createCompanyUseCase(
+                    Company(
+                        name = name.value,
+                        registrationNumber = registrationNumber.value,
+                        ceo = ceo.value,
+                        website = website.value,
+                        phone = phone.value
+                    )
                 )
-            )
+            else
+                updateCompanyUseCase(
+                    Company(
+                        name = name.value,
+                        registrationNumber = registrationNumber.value,
+                        ceo = ceo.value,
+                        website = website.value,
+                        phone = phone.value,
+                        id = companyId!!
+                    )
+                )
+
+            result.ifSuccess {
+                _snackBarChannel.send(SnackBarEvent("Company saved successfully"))
+                toggleCreateDialog()
+            }
+            result.ifFailure {
+                _snackBarChannel.send(
+                    SnackBarEvent(
+                        it ?: "Something went wrong",
+                        "Retry",
+                        ::saveCompany
+                    )
+                )
+            }
+        }
+    }
+
+    fun deleteCompany(company: Company) {
+        viewModelScope.launch {
+            val result = deleteCompanyUseCase(company.id)
+            result.ifSuccess {
+                val event = SnackBarEvent("Company deleted successfully", "Undo") {
+                    viewModelScope.launch {
+                        createCompanyUseCase(company)
+                    }
+                }
+                _snackBarChannel.send(event)
+            }
+            result.ifFailure {
+                val event = SnackBarEvent(
+                    it ?: "Something went wrong",
+                    "Retry"
+                ) { deleteCompany(company) }
+
+                _snackBarChannel.send(event)
+            }
         }
     }
 }

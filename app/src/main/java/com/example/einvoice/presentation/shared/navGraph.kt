@@ -10,7 +10,7 @@ import androidx.navigation.compose.NavHost
 import com.example.auth.login.loginScreen
 import com.example.auth.register.navigateToRegister
 import com.example.auth.register.registerScreen
-import com.example.company.screen.companiesScreen
+import com.example.company.screen.all.companiesScreen
 import com.example.einvoice.R
 
 @Composable

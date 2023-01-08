@@ -43,7 +43,7 @@ class OfflineFirstCompanyRepository(
         if(company.isCreated)
             localDataSource.deleteCompany(company.id)
         else
-            localDataSource.updateCompany(company.copy(isDeleted = true))
+            localDataSource.markCompanyAsDeleted(company.id)
         Result.Success(Unit)
     }
 
@@ -67,8 +67,8 @@ class OfflineFirstCompanyRepository(
             localCreator = { company ->
                 localDataSource.insertCompany(company.asCompanyEntity())
             },
-            localDeleter = { company ->
-                localDataSource.deleteCompany(company.id)
+            beforLocalCreate = {
+                localDataSource.deleteAllCompanies()
             }
         )
 
