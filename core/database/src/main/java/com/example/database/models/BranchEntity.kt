@@ -12,7 +12,6 @@ data class BranchEntity(
     val internalId: String,
     val companyId: String,
     val street: String,
-    val city: String,
     val country: String,
     val governate: String,
     val postalCode: String,
@@ -22,6 +21,9 @@ data class BranchEntity(
     val room: String,
     val landmark: String,
     val additionalInformation: String,
+    val isCreated: Boolean = false,
+    val isUpdated: Boolean = false,
+    val isDeleted: Boolean = false,
     @PrimaryKey val id: String = UUID.randomUUID().toString()
 )
 
@@ -31,7 +33,6 @@ fun BranchEntity.asBranch() = Branch(
     internalId = internalId,
     companyId = companyId,
     street = street,
-    city = city,
     country = country,
     governate = governate,
     postalCode = postalCode,
@@ -43,12 +44,15 @@ fun BranchEntity.asBranch() = Branch(
     additionalInformation = additionalInformation
 )
 
-fun Branch.asBranchEntity() = BranchEntity(
+fun Branch.asBranchEntity(
+    isCreated: Boolean = false,
+    isUpdated: Boolean = false,
+    isDeleted: Boolean = false
+) = BranchEntity(
     name = name,
     internalId = internalId,
     companyId = companyId,
     street = street,
-    city = city,
     country = country,
     governate = governate,
     postalCode = postalCode,
@@ -58,5 +62,8 @@ fun Branch.asBranchEntity() = BranchEntity(
     room = room,
     landmark = landmark,
     additionalInformation = additionalInformation,
+    isCreated = isCreated,
+    isUpdated = isUpdated,
+    isDeleted = isDeleted,
     id = id
 )

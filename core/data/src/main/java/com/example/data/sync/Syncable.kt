@@ -13,8 +13,9 @@ suspend fun <T> Synchronizer.handleSync(
     remoteFetcher: suspend () -> Result<List<T>>,
     remoteDeleter: suspend () -> Result<Unit>,
     remoteCreator: suspend () -> Result<Unit>,
+    remoteUpdater: suspend () -> Result<Unit>,
     localCreator: suspend (T) -> Unit,
-    beforLocalCreate: suspend () -> Unit,
+    beforeLocalCreate: suspend () -> Unit,
 ): Boolean {
     val remoteCreateResult = remoteCreator()
     if (remoteCreateResult !is Result.Success) return false
@@ -22,10 +23,13 @@ suspend fun <T> Synchronizer.handleSync(
     val remoteDeleteResult = remoteDeleter()
     if (remoteDeleteResult !is Result.Success) return false
 
+    val remoteUpdateResult = remoteUpdater()
+    if (remoteUpdateResult !is Result.Success) return false
+
     val result = remoteFetcher()
     if (result !is Result.Success) return false
 
-    beforLocalCreate()
+    beforeLocalCreate()
 
     for (record in result.data)
         localCreator(record)

@@ -22,6 +22,15 @@ interface EInvoiceDao {
     @Query("SELECT * FROM Branch WHERE id = :id")
     fun getBranchById(id: String): Flow<BranchEntity>
 
+    @Query("SELECT * FROM Branch WHERE isDeleted = 0 and isCreated = 1")
+    suspend fun getCreatedBranches(): List<BranchEntity>
+
+    @Query("SELECT * FROM Branch WHERE isDeleted = 0 and isUpdated = 1")
+    suspend fun getUpdatedBranches(): List<BranchEntity>
+
+    @Query("SELECT * FROM Branch WHERE isDeleted = 1")
+    suspend fun getDeletedBranches(): List<BranchEntity>
+
     @Insert
     suspend fun insertBranch(branch: BranchEntity)
 
@@ -38,10 +47,13 @@ interface EInvoiceDao {
     @Query("SELECT * FROM Company WHERE id = :id and isDeleted = 0")
     fun getCompanyById(id: String): Flow<CompanyEntity>
 
-    @Query("SELECT * FROM Company WHERE isUpdated = 1")
+    @Query("SELECT * FROM Company WHERE isUpdated = 1 and isDeleted = 0")
     suspend fun getUpdatedCompanies(): List<CompanyEntity>
 
-    @Query("SELECT * FROM Company WHERE isCreated = 1")
+    @Query("delete from branch")
+    suspend fun deleteAllBranches()
+
+    @Query("SELECT * FROM Company WHERE isCreated = 1 and isDeleted = 0")
     suspend fun getCreatedCompanies(): List<CompanyEntity>
 
     @Query("SELECT * FROM Company WHERE isDeleted = 1")

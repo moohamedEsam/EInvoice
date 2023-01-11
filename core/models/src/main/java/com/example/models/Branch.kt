@@ -1,16 +1,18 @@
 package com.example.models
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 
 @Serializable
 data class Branch(
     val id: String,
+    @SerialName("branchName")
     val name: String,
+    @SerialName("branchId")
     val internalId: String,
     val companyId: String,
     val street: String,
-    val city: String,
     val country: String,
     val governate: String,
     val postalCode: String,

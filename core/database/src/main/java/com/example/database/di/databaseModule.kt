@@ -2,6 +2,7 @@ package com.example.database.di
 
 import androidx.room.Room
 import com.example.database.room.EInvoiceDatabase
+import com.example.database.room.Migration_1_2
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
@@ -15,4 +16,4 @@ private fun Scope.provideEInvoiceDatabase() = Room.databaseBuilder(
     androidContext(),
     EInvoiceDatabase::class.java,
     "einvoice_database"
-).build()
+).addMigrations(Migration_1_2).build()

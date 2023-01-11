@@ -16,6 +16,7 @@ object Versions {
 
     const val splashScreen = "1.0.0-beta02"
     const val koin = "3.1.6"
+    const val workVersion = "2.7.1"
     const val ksp = "1.7.20-1.0.8"
     const val ktorVersion = "2.1.3"
     const val coil = "2.2.2"

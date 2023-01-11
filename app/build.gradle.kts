@@ -70,10 +70,12 @@ dependencies {
     implementation(Dependencies.splashScreen)
 
     implementation(project(":common"))
-    implementation(project(":features:auth"))
-    implementation(project(":features:company"))
     implementation(project(":core:network"))
     implementation(project(":core:data"))
     implementation(project(":core:domain"))
     implementation(project(":core:database"))
+    implementation(project(":features:auth"))
+    implementation(project(":features:company"))
+    implementation(project(":features:mapLocation"))
+    implementation(project(":features:branch"))
 }

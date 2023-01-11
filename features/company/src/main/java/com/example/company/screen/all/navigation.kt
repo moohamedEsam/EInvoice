@@ -18,5 +18,7 @@ fun NavGraphBuilder.companiesScreen(
 }
 
 fun NavHostController.navigateToCompaniesScreen() {
-    navigate(CompaniesScreenRoute)
+    navigate(CompaniesScreenRoute){
+        launchSingleTop = true
+    }
 }

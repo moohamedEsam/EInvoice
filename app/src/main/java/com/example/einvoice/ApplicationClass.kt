@@ -2,11 +2,13 @@ package com.example.einvoice
 
 import android.app.Application
 import com.example.auth.di.authModule
+import com.example.branch.di.branchModule
 import com.example.company.di.companyModule
 import com.example.data.di.dataModule
 import com.example.database.di.databaseModule
 import com.example.domain.di.domainModule
 import com.example.einvoice.di.appModule
+import com.example.maplocation.mapLocationModule
 import com.example.network.di.networkModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -24,7 +26,9 @@ class ApplicationClass : Application() {
                     dataModule,
                     domainModule,
                     companyModule,
-                    databaseModule
+                    databaseModule,
+                    mapLocationModule,
+                    branchModule
                 )
             )
         }

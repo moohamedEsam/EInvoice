@@ -48,7 +48,11 @@ object Dependencies {
     const val ktorAuthentication = "io.ktor:ktor-client-auth:${Versions.ktorVersion}"
     const val ktorTesting = "io.ktor:ktor-client-mock:${Versions.ktorVersion}"
 
+    const val composeMaps = "com.google.maps.android:maps-compose:2.7.2"
+    const val maps = "com.google.android.gms:play-services-maps:18.1.0"
+    const val location = "com.google.android.gms:play-services-location:20.0.0"
 
+    const val workManager = "androidx.work:work-runtime-ktx:${Versions.workVersion}"
 
 
     const val junit = "junit:junit:${Versions.jUnit}"

@@ -31,7 +31,7 @@ class OfflineFirstCompanyRepository(
 
     override suspend fun updateCompany(company: Company): Result<Company> = tryWrapper {
         val companyEntity = localDataSource.getCompanyById(company.id).first()
-        if(companyEntity.isCreated)
+        if (companyEntity.isCreated)
             localDataSource.updateCompany(company.asCompanyEntity(isCreated = true))
         else
             localDataSource.updateCompany(company.asCompanyEntity(isUpdated = true))
@@ -40,7 +40,7 @@ class OfflineFirstCompanyRepository(
 
     override suspend fun deleteCompany(id: String): Result<Unit> = tryWrapper {
         val company = localDataSource.getCompanyById(id).first()
-        if(company.isCreated)
+        if (company.isCreated)
             localDataSource.deleteCompany(company.id)
         else
             localDataSource.markCompanyAsDeleted(company.id)
@@ -64,10 +64,17 @@ class OfflineFirstCompanyRepository(
                 }
                 Result.Success(Unit)
             },
+            remoteUpdater = {
+                val companies = localDataSource.getUpdatedCompanies()
+                companies.forEach { company ->
+                    remoteDataSource.updateCompany(company.asCompany())
+                }
+                Result.Success(Unit)
+            },
             localCreator = { company ->
                 localDataSource.insertCompany(company.asCompanyEntity())
             },
-            beforLocalCreate = {
+            beforeLocalCreate = {
                 localDataSource.deleteAllCompanies()
             }
         )

@@ -6,6 +6,7 @@ import com.example.common.functions.saveTokenToSharedPref
 import com.example.models.auth.Token
 import com.example.network.EInvoiceRemoteDataSource
 import com.example.network.KtorEInvoiceRemoteDataSource
+import com.example.network.models.ApiResponse
 import com.example.network.models.Urls
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -56,7 +57,7 @@ fun Scope.provideHttpClient() = HttpClient(CIO) {
                     setBody(mapOf("token" to token))
                     contentType(ContentType.Application.Json)
                     markAsRefreshTokenRequest()
-                }.body<Token>()
+                }.body<ApiResponse<Token>>().data!!
                 if (token != refreshToken.value)
                     saveTokenToSharedPref(androidContext(), refreshToken.value)
                 BearerTokens(token, token)
