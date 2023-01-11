@@ -3,11 +3,13 @@ package com.example.branch.screens.form
 import android.location.Address
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
 import com.example.common.validators.notBlankValidator
 import com.example.common.validators.validateUsername
 import com.example.domain.branch.*
 import com.example.domain.company.GetCompaniesUseCase
+import com.example.functions.SnackBarManager
 import com.example.models.branch.Branch
 import com.example.models.OptionalAddress
 import com.example.models.branch.BranchView
@@ -24,7 +26,8 @@ class BranchFormViewModel(
     private val updateBranchUseCase: UpdateBranchUseCase,
     private val getBranchViewUseCase: GetBranchViewUseCase,
     private val branchId: String,
-) : ViewModel() {
+    private val snackBarManager: SnackBarManager
+) : ViewModel(), SnackBarManager by snackBarManager {
     private val _otherBranchesInternalIds = MutableStateFlow(emptyList<String>())
     private val isUpdating = branchId.isNotBlank()
     private val _name = MutableStateFlow("")
@@ -212,7 +215,7 @@ class BranchFormViewModel(
         _selectedCompany.update { company }
     }
 
-    fun saveBranch(onResult: (com.example.common.models.Result<Branch>) -> Unit) {
+    fun saveBranch() {
         viewModelScope.launch {
             _isLoading.update { true }
             val branch = Branch(
@@ -236,7 +239,14 @@ class BranchFormViewModel(
                 createBranchUseCase(branch)
 
             _isLoading.update { false }
-            onResult(result)
+            result.ifFailure {
+                val event = SnackBarEvent(
+                    message = it ?: "Error",
+                    actionLabel = "Retry",
+                    action = ::saveBranch
+                )
+                showSnackBarEvent(event)
+            }
         }
     }
 

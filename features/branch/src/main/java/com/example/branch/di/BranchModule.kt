@@ -14,7 +14,8 @@ val branchModule = module {
             createBranchUseCase = get(),
             updateBranchUseCase = get(),
             getBranchViewUseCase = get(),
-            branchId = params[0]
+            branchId = params[0],
+            snackBarManager = get()
         )
     }
     viewModel { (branchId: String) ->
@@ -23,7 +24,8 @@ val branchModule = module {
             getBranchViewUseCase = get(),
             getDocumentsByBranchUseCase = get(),
             deleteBranchUseCase = get(),
-            undoDeleteBranchUseCase = get()
+            undoDeleteBranchUseCase = get(),
+            snackBarManager = get()
         )
     }
     viewModel { BranchesViewModel(get()) }

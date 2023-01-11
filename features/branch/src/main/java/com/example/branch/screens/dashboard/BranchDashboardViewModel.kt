@@ -8,6 +8,7 @@ import com.example.domain.branch.GetBranchViewUseCase
 import com.example.domain.branch.UndoDeleteBranchUseCase
 import com.example.domain.document.DaysRange
 import com.example.domain.document.GetDocumentsByTypeInDurationUseCase
+import com.example.functions.SnackBarManager
 import com.example.models.branch.BranchView
 import com.example.models.document.DocumentView
 import kotlinx.coroutines.flow.*
@@ -19,8 +20,9 @@ class BranchDashboardViewModel(
     private val getBranchViewUseCase: GetBranchViewUseCase,
     private val getDocumentsByBranchUseCase: GetDocumentsByTypeInDurationUseCase,
     private val deleteBranchUseCase: DeleteBranchUseCase,
-    private val undoDeleteBranchUseCase: UndoDeleteBranchUseCase
-) : ViewModel() {
+    private val undoDeleteBranchUseCase: UndoDeleteBranchUseCase,
+    private val snackBarManager: SnackBarManager
+) : ViewModel(), SnackBarManager by snackBarManager {
     private val _branchView: MutableStateFlow<BranchView?> = MutableStateFlow(null)
     private val _lastDate = MutableStateFlow(Date())
     private val _documents = MutableStateFlow(emptyList<DocumentView>())
@@ -47,17 +49,17 @@ class BranchDashboardViewModel(
         _lastDate.value = date
     }
 
-    fun onDeleteClick(onResult: (Result<Unit>) -> Unit) {
+    fun onDeleteClick() {
         viewModelScope.launch {
             val result = deleteBranchUseCase(branchId)
-            onResult(result)
-        }
-    }
-
-    fun onUndoDeleteClick(onResult: (Result<Unit>) -> Unit) {
-        viewModelScope.launch {
-            val result = undoDeleteBranchUseCase(branchId)
-            onResult(result)
+            val event = result.getSnackBarEvent(
+                successMessage = "Branch deleted successfully",
+                successActionLabel = "Undo",
+                successAction = { undoDeleteBranchUseCase(branchId) },
+                errorActionLabel = "Retry",
+                errorAction = ::onDeleteClick
+            )
+            showSnackBarEvent(event)
         }
     }
 

@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.common.models.Result.*
-import com.example.common.models.SnackBarEvent
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
 import java.util.*
@@ -24,7 +23,6 @@ fun ClientDashboardScreen(
     clientId: String,
     onDocumentClick: (String) -> Unit,
     onEditClick: () -> Unit,
-    onShowSnackBarEvent: (SnackBarEvent) -> Unit,
 ) {
     val viewModel: ClientDashboardViewModel by viewModel { parametersOf(clientId) }
     val uiState by viewModel.uiState.collectAsState()
@@ -33,16 +31,7 @@ fun ClientDashboardScreen(
         onDocumentClick = onDocumentClick,
         onEditClick = onEditClick,
         onDeleteClick = {
-            viewModel.onDeleteClick { result ->
-                val event = if (result is Success)
-                    SnackBarEvent(
-                        "Client deleted successfully",
-                        "Undo"
-                    ) { viewModel.onUndoDeleteClick { } }
-                else
-                    SnackBarEvent((result as? Error)?.exception ?: "Error deleting client")
-                onShowSnackBarEvent(event)
-            }
+            viewModel.onDeleteClick()
         },
         onDatePicked = viewModel::onDatePicked
     )

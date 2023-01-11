@@ -33,9 +33,9 @@ sealed interface Result<T> {
     suspend fun getSnackBarEvent(
         successMessage: String,
         successActionLabel: String? = null,
-        successAction: () -> Unit = {},
+        successAction: suspend () -> Unit = {},
         errorActionLabel: String? = null,
-        errorAction: () -> Unit = {}
+        errorAction: suspend () -> Unit = {}
     ): SnackBarEvent =
         when (this) {
             is Success -> SnackBarEvent(

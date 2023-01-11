@@ -4,23 +4,17 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.common.models.SnackBarEvent
 
 const val DocumentFormScreenRoute = "document form"
 
 
-fun NavGraphBuilder.documentFormScreen(
-    onShowSnackBarEvent: (SnackBarEvent) -> Unit
-) {
+fun NavGraphBuilder.documentFormScreen() {
     composable(
         route = "$DocumentFormScreenRoute/{documentId}/{status}",
         arguments = getScreenNavigationArguments()
     ) {
         val documentId = it.arguments?.getString("documentId") ?: " "
-        DocumentFormScreen(
-            documentId = documentId,
-            onShowSnackBarEvent = onShowSnackBarEvent
-        )
+        DocumentFormScreen(documentId = documentId)
     }
 }
 

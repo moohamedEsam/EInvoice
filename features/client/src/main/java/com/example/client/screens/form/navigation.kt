@@ -3,16 +3,13 @@ package com.example.client.screens.form
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import com.example.common.models.SnackBarEvent
 import com.example.maplocation.latKey
 import com.example.maplocation.lngKey
 
 const val ClientFormScreenRoute = "Client Form"
 private const val clientIdKey = "clientId"
 fun NavGraphBuilder.clientFormScreen(
-    onLocationRequested: () -> Unit,
-    onShowSnackBarEvent: (SnackBarEvent) -> Unit,
-    onClientCreated: (String) -> Unit
+    onLocationRequested: () -> Unit
 ) {
     composable(
         route="$ClientFormScreenRoute/{$clientIdKey}",
@@ -21,12 +18,10 @@ fun NavGraphBuilder.clientFormScreen(
         val lat = it.arguments?.getDouble(latKey) ?: 0.0
         val lng = it.arguments?.getDouble(lngKey) ?: 0.0
         ClientFormScreen(
-            onLocationRequested = onLocationRequested,
-            onShowSnackBarEvent = onShowSnackBarEvent,
-            onClientCreated = onClientCreated,
             clientId = clientId,
             lat = lat,
-            lng = lng
+            lng = lng,
+            onLocationRequested = onLocationRequested
         )
     }
 }

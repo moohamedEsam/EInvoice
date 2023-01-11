@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -14,8 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.example.common.models.Result
-import com.example.common.models.SnackBarEvent
 import com.example.einvoicecomponents.ItemCard
 import com.example.einvoicecomponents.ListScreenContent
 import com.example.item.screens.form.ItemFormScreenContent
@@ -27,9 +24,7 @@ import org.koin.androidx.compose.viewModel
 
 
 @Composable
-fun ItemsScreen(
-    onShowSnackbarEvent: (SnackBarEvent) -> Unit,
-) {
+fun ItemsScreen() {
     val viewModel: ItemsViewModel by viewModel()
     val items by viewModel.items.collectAsState()
     val showDialog by viewModel.showDialog.collectAsState()
@@ -41,14 +36,13 @@ fun ItemsScreen(
         onItemClick = { viewModel.onItemClicked(it) }
     )
     if (showDialog)
-        ItemFormDialog(viewModel, onShowSnackbarEvent)
+        ItemFormDialog(viewModel)
 
 }
 
 @Composable
 private fun ItemFormDialog(
-    viewModel: ItemsViewModel,
-    onShowSnackbarEvent: (SnackBarEvent) -> Unit
+    viewModel: ItemsViewModel
 ) {
     Dialog(onDismissRequest = viewModel::dismissDialog) {
         Card {
@@ -83,17 +77,7 @@ private fun ItemFormDialog(
                     isEnabled = viewModel.isFormValid,
                     isLoading = viewModel.isLoading,
                     onFormSubmit = {
-                        viewModel.saveItem { result ->
-                            val snackBarEvent = if (result is Result.Success)
-                                SnackBarEvent("Item saved successfully")
-                            else
-                                SnackBarEvent(
-                                    (result as? Result.Error)?.exception ?: "Error saving item",
-                                    actionLabel = "Retry",
-                                    action = { viewModel.saveItem {} }
-                                )
-                            onShowSnackbarEvent(snackBarEvent)
-                        }
+                        viewModel.saveItem()
                     }
                 )
             }

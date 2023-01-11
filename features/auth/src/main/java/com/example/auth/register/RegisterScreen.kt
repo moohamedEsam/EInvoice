@@ -15,7 +15,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.AsyncImage
-import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
 import com.example.einvoicecomponents.OneTimeEventButton
 import com.example.einvoicecomponents.textField.ValidationPasswordTextField
@@ -28,7 +27,6 @@ import org.koin.androidx.compose.viewModel
 @Composable
 fun RegisterScreen(
     logo: Any,
-    onShowSnackBarEvent: (SnackBarEvent) -> Unit,
     onRegistered: () -> Unit,
     onLoginClick: () -> Unit,
     imageLoader: ImageLoader = get()
@@ -48,19 +46,7 @@ fun RegisterScreen(
         onConfirmPasswordValueChange = viewModel::setConfirmPassword,
         registerButtonEnable = viewModel.enableRegister,
         loading = viewModel.isLoading,
-        onRegisterButtonClick = {
-            viewModel.register { result ->
-                when (result) {
-                    is com.example.common.models.Result.Success -> onRegistered()
-                    is com.example.common.models.Result.Error -> onShowSnackBarEvent(
-                        SnackBarEvent(
-                            result.exception ?: "Unknown error"
-                        )
-                    )
-                    else -> Unit
-                }
-            }
-        },
+        onRegisterButtonClick = { viewModel.register(onRegistered) },
         onLoginClick = onLoginClick,
         username = viewModel.username,
         usernameValidation = viewModel.usernameValidationResult,

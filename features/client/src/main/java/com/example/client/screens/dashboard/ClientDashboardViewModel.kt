@@ -8,6 +8,7 @@ import com.example.domain.client.GetClientUseCase
 import com.example.domain.client.UndoDeleteClientUseCase
 import com.example.domain.document.DaysRange
 import com.example.domain.document.GetDocumentsByTypeInDurationUseCase
+import com.example.functions.SnackBarManager
 import com.example.models.Client
 import com.example.models.document.DocumentView
 import kotlinx.coroutines.flow.*
@@ -19,8 +20,9 @@ class ClientDashboardViewModel(
     private val getClientUseCase: GetClientUseCase,
     private val getDocumentsByClientUseCase: GetDocumentsByTypeInDurationUseCase,
     private val deleteClientUseCase: DeleteClientUseCase,
-    private val undoDeleteClientUseCase: UndoDeleteClientUseCase
-) : ViewModel() {
+    private val undoDeleteClientUseCase: UndoDeleteClientUseCase,
+    private val snackBarManager: SnackBarManager
+) : ViewModel(), SnackBarManager by snackBarManager {
     private val _client: MutableStateFlow<Client?> = MutableStateFlow(null)
     private val _lastDate = MutableStateFlow(Date())
     private val _documents = MutableStateFlow(emptyList<DocumentView>())
@@ -46,17 +48,17 @@ class ClientDashboardViewModel(
         _lastDate.value = date
     }
 
-    fun onDeleteClick(onResult: (Result<Unit>) -> Unit) {
+    fun onDeleteClick() {
         viewModelScope.launch {
             val result = deleteClientUseCase(clientId)
-            onResult(result)
-        }
-    }
-
-    fun onUndoDeleteClick(onResult: (Result<Unit>) -> Unit) {
-        viewModelScope.launch {
-            val result = undoDeleteClientUseCase(clientId)
-            onResult(result)
+            val event = result.getSnackBarEvent(
+                successMessage = "Client deleted",
+                successAction = {undoDeleteClientUseCase(clientId)},
+                successActionLabel = "Undo",
+                errorActionLabel = "Retry",
+                errorAction = ::onDeleteClick
+            )
+            showSnackBarEvent(event)
         }
     }
 

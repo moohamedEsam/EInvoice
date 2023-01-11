@@ -49,17 +49,7 @@ fun EInvoiceLayout(startScreen: String) {
     val snackbarHostState by remember {
         mutableStateOf(SnackbarHostState())
     }
-    val coroutineScope = rememberCoroutineScope()
-    val onShowSnackbarEvent: (SnackBarEvent) -> Unit = {
-        coroutineScope.launch {
-            snackbarHostState.handleSnackBarEvent(it)
-        }
-    }
-    LaunchedEffect(key1 = Unit) {
-        viewModel.getReceiverChannel().collectLatest {
-            snackbarHostState.handleSnackBarEvent(it)
-        }
-    }
+    observeSnackBarEventChannel(viewModel, snackbarHostState)
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     Scaffold(
@@ -76,8 +66,7 @@ fun EInvoiceLayout(startScreen: String) {
                 navController = navController,
                 paddingValues = it,
                 startScreen = startScreen,
-                drawerState = drawerState,
-                onShowSnackbarEvent = onShowSnackbarEvent
+                drawerState = drawerState
             )
         },
         topBar = {
@@ -88,6 +77,18 @@ fun EInvoiceLayout(startScreen: String) {
             )
         }
     )
+}
+
+@Composable
+private fun observeSnackBarEventChannel(
+    viewModel: LayoutViewModel,
+    snackbarHostState: SnackbarHostState
+) {
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getReceiverChannel().collectLatest {
+            snackbarHostState.handleSnackBarEvent(it)
+        }
+    }
 }
 
 @Composable
@@ -116,8 +117,7 @@ private fun EInvoiceDrawer(
     paddingValues: PaddingValues,
     startScreen: String,
     modifier: Modifier = Modifier,
-    drawerState: DrawerState,
-    onShowSnackbarEvent: (SnackBarEvent) -> Unit
+    drawerState: DrawerState
 ) {
     ModalNavigationDrawer(
         drawerContent = { DrawerContent(navController = navController) },
@@ -127,8 +127,7 @@ private fun EInvoiceDrawer(
     ) {
         EInvoiceNavGraph(
             navController = navController,
-            startScreen = startScreen,
-            onShowSnackbarEvent = onShowSnackbarEvent
+            startScreen = startScreen
         )
     }
 }

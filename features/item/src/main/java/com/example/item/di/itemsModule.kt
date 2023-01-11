@@ -5,5 +5,14 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val itemModule = module {
-    viewModel { ItemsViewModel(get(), get(), get(), get(), get()) }
+    viewModel {
+        ItemsViewModel(
+            getItemsUseCase = get(),
+            getBranchesUseCase = get(),
+            getUnitTypesUseCase = get(),
+            createItemUseCase = get(),
+            updateItemUseCase = get(),
+            snackBarManager = get()
+        )
+    }
 }

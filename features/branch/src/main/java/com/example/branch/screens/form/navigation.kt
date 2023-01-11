@@ -3,7 +3,6 @@ package com.example.branch.screens.form
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import com.example.common.models.SnackBarEvent
 import com.example.maplocation.latKey
 import com.example.maplocation.lngKey
 
@@ -11,7 +10,6 @@ const val BranchFormScreenRoute = "Branch Form"
 const val branchIdKey = "id"
 
 fun NavGraphBuilder.branchFormScreen(
-    onShowSnackBarEvent: (SnackBarEvent) -> Unit,
     onLocationRequested: () -> Unit = {}
 ) {
     composable("$BranchFormScreenRoute/{$branchIdKey}") {
@@ -22,7 +20,6 @@ fun NavGraphBuilder.branchFormScreen(
             latitude = lat,
             longitude = lng,
             branchId = id,
-            onShowSnackbarEvent = onShowSnackBarEvent,
             onLocationRequested = onLocationRequested
         )
     }

@@ -3,7 +3,6 @@ package com.example.document.screens.details
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import com.example.common.models.SnackBarEvent
 
 const val DocumentDetailsScreenRoute = "Document Details"
 
@@ -13,7 +12,6 @@ fun NavGraphBuilder.documentDetailsScreen(
     onBranchClick: (String) -> Unit,
     onClientClick: (String) -> Unit,
     onEditClick: (String) -> Unit,
-    onShowSnackBarEvent: (SnackBarEvent) -> Unit,
 ) {
     composable(
         route = "$DocumentDetailsScreenRoute/{documentId}",
@@ -25,7 +23,6 @@ fun NavGraphBuilder.documentDetailsScreen(
             onBranchClick = onBranchClick,
             onClientClick = onClientClick,
             onEditClick = onEditClick,
-            onShowSnackBarEvent = onShowSnackBarEvent,
         )
     }
 }

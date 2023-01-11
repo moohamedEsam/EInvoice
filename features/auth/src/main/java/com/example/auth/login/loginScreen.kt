@@ -17,8 +17,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.AsyncImage
-import com.example.common.models.Result
-import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
 import com.example.einvoicecomponents.OneTimeEventButton
 import com.example.einvoicecomponents.textField.ValidationPasswordTextField
@@ -33,7 +31,6 @@ fun LoginScreen(
     logo: Any,
     onLoggedIn: () -> Unit,
     onRegisterClick: () -> Unit,
-    onShowSnackBarEvent: (SnackBarEvent) -> Unit,
     imageLoader: ImageLoader = get()
 ) {
     val viewModel: LoginViewModel by viewModel()
@@ -48,14 +45,7 @@ fun LoginScreen(
         onPasswordValueChange = viewModel::setPassword,
         loginButtonEnable = viewModel.enableLogin,
         loading = viewModel.isLoading,
-        onLoginButtonClick = {
-            viewModel.login { result ->
-                if (result is Result.Success)
-                    onLoggedIn()
-                else if (result is Result.Error)
-                    onShowSnackBarEvent(SnackBarEvent(result.exception ?: "Unknown error"))
-            }
-        },
+        onLoginButtonClick = { viewModel.login(onLoggedIn) },
         onRegisterClick = onRegisterClick,
         imageLoader = imageLoader
     )
@@ -102,7 +92,9 @@ private fun LoginScreenContent(
                 valueState = email,
                 validationState = emailValidation,
                 label = "Email",
-                modifier = Modifier.fillMaxWidth().testTag("email"),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("email"),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 onValueChange = onEmailValueChange
             )
@@ -110,14 +102,18 @@ private fun LoginScreenContent(
             ValidationPasswordTextField(
                 valueState = password,
                 validationState = passwordValidation,
-                modifier = Modifier.fillMaxWidth().testTag("password"),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("password"),
                 onValueChange = onPasswordValueChange,
             )
 
             OneTimeEventButton(
                 enabled = loginButtonEnable,
                 loading = loading,
-                modifier = Modifier.fillMaxWidth().testTag("login"),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("login"),
                 onClick = onLoginButtonClick,
                 label = "Login"
             )

@@ -17,8 +17,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.models.OptionalAddress
-import com.example.common.models.Result
-import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
 import com.example.einvoicecomponents.*
 import com.example.einvoicecomponents.textField.ValidationOutlinedTextField
@@ -36,7 +34,6 @@ fun BranchFormScreen(
     latitude: Double? = null,
     longitude: Double? = null,
     branchId: String,
-    onShowSnackbarEvent: (SnackBarEvent) -> Unit,
     onLocationRequested: () -> Unit = {},
 ) {
     val viewModel: BranchFormViewModel by viewModel(parameters = { parametersOf(branchId) })
@@ -71,22 +68,7 @@ fun BranchFormScreen(
         onOptionalAddressChange = viewModel::setOptionalAddress,
         isSaveButtonEnabled = viewModel.isFormValid,
         isLoading = viewModel.isLoading,
-        onSaveClick = {
-            viewModel.saveBranch { result ->
-                if (result is Result.Success) {
-                    onShowSnackbarEvent(SnackBarEvent("Branch saved successfully"))
-                } else {
-                    val snackBarEvent = SnackBarEvent(
-                        (result as? Result.Error)?.exception ?: "Error",
-                        actionLabel = "Retry",
-                    ) {
-                        viewModel.saveBranch { }
-                    }
-                    onShowSnackbarEvent(snackBarEvent)
-                }
-
-            }
-        }
+        onSaveClick = viewModel::saveBranch
     )
 }
 

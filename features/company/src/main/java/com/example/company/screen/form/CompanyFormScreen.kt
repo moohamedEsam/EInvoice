@@ -22,7 +22,6 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun CompanyFormScreen(companyId: String) {
     val viewModel: CompanyFormViewModel by viewModel { parametersOf(companyId) }
-
     CompanyFormScreenContent(
         nameState = viewModel.name,
         onNameChange = viewModel::setName,

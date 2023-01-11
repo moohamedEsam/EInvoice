@@ -29,6 +29,7 @@ val documentsModule = module {
             documentId = params[0],
             getDocumentUseCase = get(),
             getDocumentsInternalIdsByCompanyIdUseCase = get(),
+            snackBarManager = get(),
         )
     }
 
@@ -37,7 +38,8 @@ val documentsModule = module {
             getDocumentUseCase = get(),
             deleteDocumentUseCase = get(),
             undoDeleteDocumentUseCase = get(),
-            documentId = documentId
+            documentId = documentId,
+            snackBarManager = get(),
         )
     }
 }

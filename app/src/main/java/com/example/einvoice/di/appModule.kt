@@ -17,7 +17,7 @@ val appModule = module {
     single { provideImageLoader() }
     viewModel { MainActivityViewModel(get()) }
     viewModel { LayoutViewModel(get(), get(), get()) }
-    factory<SnackBarManager> { BaseSnackBarManager() }
+    single<SnackBarManager> { BaseSnackBarManager() }
 }
 
 

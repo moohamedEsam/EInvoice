@@ -2,7 +2,6 @@ package com.example.item.screens.all
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.common.models.Result
 import com.example.common.models.ValidationResult
 import com.example.common.validators.notBlankValidator
 import com.example.domain.branch.GetBranchesUseCase
@@ -10,6 +9,7 @@ import com.example.domain.item.CreateItemUseCase
 import com.example.domain.item.GetItemsUseCase
 import com.example.domain.item.GetUnitTypesUseCase
 import com.example.domain.item.UpdateItemUseCase
+import com.example.functions.SnackBarManager
 import com.example.models.branch.Branch
 import com.example.models.item.Item
 import com.example.models.item.UnitType
@@ -23,8 +23,9 @@ class ItemsViewModel(
     private val getBranchesUseCase: GetBranchesUseCase,
     private val getUnitTypesUseCase: GetUnitTypesUseCase,
     private val createItemUseCase: CreateItemUseCase,
-    private val updateItemUseCase: UpdateItemUseCase
-) : ViewModel() {
+    private val updateItemUseCase: UpdateItemUseCase,
+    private val snackBarManager: SnackBarManager
+) : ViewModel(), SnackBarManager by snackBarManager {
     private var itemId: String? = null
     private val _items = MutableStateFlow(emptyList<Item>())
     private val _query = MutableStateFlow("")
@@ -200,7 +201,7 @@ class ItemsViewModel(
         _showDialog.update { false }
     }
 
-    fun saveItem(onResult: (Result<Item>) -> Unit) {
+    fun saveItem() {
         viewModelScope.launch {
             _isLoading.update { true }
             val item = getCurrentItem() ?: return@launch
@@ -209,9 +210,14 @@ class ItemsViewModel(
             else
                 updateItemUseCase(item)
 
-            onResult(result)
+            val event = result.getSnackBarEvent(
+                successMessage = "Item saved successfully",
+                errorActionLabel = "Retry",
+                errorAction = ::saveItem
+            )
+            showSnackBarEvent(event)
             _isLoading.update { false }
-            _showDialog.update { false }
+            result.ifSuccess { _showDialog.update { false } }
         }
     }
 

@@ -2,17 +2,21 @@ package com.example.auth.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.common.models.Result
+import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
 import com.example.common.validators.validateEmail
 import com.example.common.validators.validatePassword
 import com.example.domain.auth.LoginUseCase
-import com.example.models.auth.Token
+import com.example.functions.SnackBarManager
+import com.example.models.auth.Credentials
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class LoginViewModel(private val loginUseCase: LoginUseCase) : ViewModel() {
+class LoginViewModel(
+    private val loginUseCase: LoginUseCase,
+    private val snackBarManager: SnackBarManager
+) : ViewModel(), SnackBarManager by snackBarManager {
     private val _email = MutableStateFlow("")
     val email = _email.asStateFlow()
     val emailValidationResult = email.map(::validateEmail)
@@ -38,11 +42,19 @@ class LoginViewModel(private val loginUseCase: LoginUseCase) : ViewModel() {
         _password.update { value }
     }
 
-    fun login(onResult: (Result<Token>) -> Unit): Job = viewModelScope.launch {
+    fun login(onLoggedIn: () -> Unit): Job = viewModelScope.launch {
         _isLoading.update { true }
-        val result = loginUseCase(com.example.models.auth.Credentials(email.value, password.value))
+        val result = loginUseCase(Credentials(email.value, password.value))
         _isLoading.update { false }
-        onResult(result)
+        result.ifFailure {
+            val event = SnackBarEvent(
+                message = it ?: "Unknown error",
+                action = { login(onLoggedIn) },
+                actionLabel = "Retry"
+            )
+            showSnackBarEvent(event)
+        }
+        result.ifSuccess { onLoggedIn() }
     }
 
 }

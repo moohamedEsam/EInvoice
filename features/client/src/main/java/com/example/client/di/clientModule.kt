@@ -14,7 +14,8 @@ val clientModule = module {
             updateClientUseCase = get(),
             getCompaniesUseCase = get(),
             clientId = params.get(),
-            getClientViewUseCase = get()
+            getClientViewUseCase = get(),
+            snackBarManager = get()
         )
     }
     viewModel { params ->
@@ -23,7 +24,8 @@ val clientModule = module {
             deleteClientUseCase = get(),
             getDocumentsByClientUseCase = get(),
             undoDeleteClientUseCase = get(),
-            clientId = params.get()
+            clientId = params.get(),
+            snackBarManager = get()
         )
     }
 }

@@ -1,6 +1,5 @@
 package com.example.document.screens.details
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,8 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.common.models.Result
-import com.example.common.models.SnackBarEvent
 import com.example.document.screens.form.DocumentSummery
 import com.example.document.screens.form.InvoiceLineItem
 import com.example.functions.getStatusColor
@@ -52,7 +49,6 @@ fun DocumentDetailsScreen(
     onBranchClick: (String) -> Unit,
     onClientClick: (String) -> Unit,
     onEditClick: (String) -> Unit,
-    onShowSnackBarEvent: (SnackBarEvent) -> Unit,
 ) {
     val viewModel: DocumentDetailsViewModel by viewModel { parametersOf(documentId) }
     val document by viewModel.document.collectAsState()
@@ -68,18 +64,9 @@ fun DocumentDetailsScreen(
         onClientClick = { onClientClick(document.client.id) },
         onEditClick = { onEditClick(document.id) },
         onDeleteClick = {
-            viewModel.deleteDocument { result ->
-                val event = if (result is Result.Success)
-                    SnackBarEvent("Document Deleted Successfully", "Undo") {
-                        viewModel.undoDeleteDocument {}
-                    }
-                else
-                    SnackBarEvent((result as? Result.Error)?.exception ?: "Error Deleting Document")
-                onShowSnackBarEvent(event)
-            }
+            viewModel.deleteDocument()
         },
-        onShowTaxesClick = viewModel::onShowTaxesClick,
-        onShowSnackBarEvent = onShowSnackBarEvent
+        onShowTaxesClick = viewModel::onShowTaxesClick
     )
     if (showTaxDialog) {
         TaxesDialog(
@@ -101,8 +88,7 @@ private fun DocumentScreenContent(
     onClientClick: () -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
-    onShowTaxesClick: (InvoiceLineView) -> Unit,
-    onShowSnackBarEvent: (SnackBarEvent) -> Unit
+    onShowTaxesClick: (InvoiceLineView) -> Unit
 ) {
     val simpleFormatter by remember {
         mutableStateOf(SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()))
@@ -128,8 +114,7 @@ private fun DocumentScreenContent(
                     documentView = documentView,
                     onBranchClick = onBranchClick,
                     onClientClick = onClientClick,
-                    simpleFormatter = simpleFormatter,
-                    onShowSnackBarEvent = onShowSnackBarEvent
+                    simpleFormatter = simpleFormatter
                 )
             }
 
@@ -176,8 +161,7 @@ private fun DocumentInfo(
     documentView: DocumentView,
     onBranchClick: () -> Unit,
     onClientClick: () -> Unit,
-    simpleFormatter: SimpleDateFormat,
-    onShowSnackBarEvent: (SnackBarEvent) -> Unit
+    simpleFormatter: SimpleDateFormat
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(text = "Company: ")
@@ -216,12 +200,7 @@ private fun DocumentInfo(
             Text(
                 text = documentView.status.name,
                 color = documentView.status.getStatusColor(MaterialTheme.colorScheme.onSurface),
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.clickable {
-                    if (documentView.error == null) return@clickable
-                    val event = SnackBarEvent(documentView.error ?: "")
-                    onShowSnackBarEvent(event)
-                }
+                style = MaterialTheme.typography.bodyLarge
             )
         }
         Text(
@@ -298,15 +277,13 @@ fun DocumentDetailsScreenPreview() {
                 )
             }
         ),
+        isEditEnabled = true,
+        isDeleteEnabled = true,
+        onCompanyClick = {},
         onBranchClick = {},
         onClientClick = {},
         onEditClick = {},
-        onDeleteClick = {},
-        onCompanyClick = {},
-        onShowTaxesClick = {},
-        isEditEnabled = true,
-        isDeleteEnabled = true,
-        onShowSnackBarEvent = {}
-    )
+        onDeleteClick = {}
+    ) {}
 
 }

@@ -8,13 +8,18 @@ import com.example.common.models.ValidationResult
 import com.example.common.validators.validateEmail
 import com.example.common.validators.validatePassword
 import com.example.common.validators.validateUsername
+import com.example.domain.auth.RegisterUseCase
+import com.example.functions.SnackBarManager
 import com.example.models.auth.Register
 import com.example.models.auth.Token
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class RegisterViewModel(private val registerUseCase: com.example.domain.auth.RegisterUseCase) : ViewModel() {
+class RegisterViewModel(
+    private val registerUseCase: RegisterUseCase,
+    private val snackBarManager: SnackBarManager
+) : ViewModel(), SnackBarManager by snackBarManager {
     private val _email = MutableStateFlow("")
     val email = _email.asStateFlow()
     val emailValidationResult = email.map(::validateEmail)
@@ -68,7 +73,7 @@ class RegisterViewModel(private val registerUseCase: com.example.domain.auth.Reg
         _confirmPassword.update { confirmPassword }
     }
 
-    fun register(onResult: (Result<Token>) -> Unit) {
+    fun register(onRegisterSuccess: () -> Unit) {
         viewModelScope.launch {
             _isLoading.update { true }
             val result = registerUseCase(
@@ -79,7 +84,15 @@ class RegisterViewModel(private val registerUseCase: com.example.domain.auth.Reg
                 )
             )
             _isLoading.update { false }
-            onResult(result)
+            result.ifFailure {
+                val event = SnackBarEvent(
+                    message = it ?: "Unknown error",
+                    actionLabel = "Retry",
+                    action = { register(onRegisterSuccess) }
+                )
+                showSnackBarEvent(event)
+            }
+            result.ifSuccess { onRegisterSuccess() }
         }
     }
 }

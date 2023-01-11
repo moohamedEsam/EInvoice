@@ -8,8 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.common.models.Result
-import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
 import com.example.einvoicecomponents.OneTimeEventButton
 import com.example.models.Client
@@ -35,8 +33,7 @@ private const val UNKNOWN_ERROR = "Unknown error"
 
 @Composable
 fun DocumentFormScreen(
-    documentId: String,
-    onShowSnackBarEvent: (SnackBarEvent) -> Unit
+    documentId: String
 ) {
     val viewModel: DocumentFormViewModel by viewModel { parametersOf(documentId) }
     val showInvoiceDialog by viewModel.isInvoiceDialogVisible.collectAsState()
@@ -76,20 +73,7 @@ fun DocumentFormScreen(
         },
         isEnabled = viewModel.isEnabled,
         isLoading = viewModel.isLoading,
-        onFormSubmit = {
-            viewModel.save { result ->
-                val snackBarEvent = if (result is Result.Error)
-                    SnackBarEvent(
-                        message = result.exception ?: UNKNOWN_ERROR,
-                        actionLabel = "Retry",
-                        action = { viewModel.save {} }
-                    )
-                else
-                    SnackBarEvent(message = "Saved successfully")
-
-                onShowSnackBarEvent(snackBarEvent)
-            }
-        }
+        onFormSubmit = viewModel::save
     )
 
     if (showTaxDialog) {
@@ -100,15 +84,7 @@ fun DocumentFormScreen(
             onSubTaxChange = viewModel::setSubTax,
             taxRateState = viewModel.taxRate,
             onTaxRateChange = viewModel::setTaxRate,
-            onSaveTax = {
-                viewModel.saveTax { result ->
-                    if (result !is Result.Error) return@saveTax
-                    val snackBarEvent = SnackBarEvent(
-                        message = result.exception ?: UNKNOWN_ERROR,
-                    )
-                    onShowSnackBarEvent(snackBarEvent)
-                }
-            },
+            onSaveTax = viewModel::saveTax,
             availableTaxes = viewModel.taxTypes,
             onDismiss = viewModel::dismissTaxDialog,
             taxRateValidationResult = viewModel.taxRateValidationResult
@@ -129,15 +105,7 @@ fun DocumentFormScreen(
             discountState = viewModel.discount,
             onDiscountChange = viewModel::setDiscount,
             discountValidationResult = viewModel.discountValidationResult,
-            onAddClick = {
-                viewModel.saveInvoice { result ->
-                    if (result !is Result.Error) return@saveInvoice
-                    val snackBarEvent = SnackBarEvent(
-                        message = result.exception ?: UNKNOWN_ERROR,
-                    )
-                    onShowSnackBarEvent(snackBarEvent)
-                }
-            },
+            onAddClick = viewModel::saveInvoice,
             onDismiss = viewModel::dismissInvoiceDialog,
         )
     }

@@ -11,12 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.common.models.Result
-import com.example.common.models.SnackBarEvent
-import com.example.models.branch.Branch
-import com.example.models.branch.BranchView
-import com.example.models.branch.empty
-import com.example.models.document.DocumentView
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -29,7 +23,6 @@ fun BranchDashboardScreen(
     branchId: String,
     onDocumentClick: (String) -> Unit,
     onEditClick: () -> Unit,
-    onShowSnackBarEvent: (SnackBarEvent) -> Unit,
 ) {
     val viewModel: BranchDashboardViewModel by viewModel { parametersOf(branchId) }
     val uiState by viewModel.uiState.collectAsState()
@@ -38,16 +31,7 @@ fun BranchDashboardScreen(
         onDocumentClick = onDocumentClick,
         onEditClick = onEditClick,
         onDeleteClick = {
-            viewModel.onDeleteClick { result ->
-                val event = if (result is Result.Success)
-                    SnackBarEvent(
-                        "Branch deleted successfully",
-                        "Undo"
-                    ) { viewModel.onUndoDeleteClick { } }
-                else
-                    SnackBarEvent((result as? Result.Error)?.exception ?: "Error deleting branch")
-                onShowSnackBarEvent(event)
-            }
+            viewModel.onDeleteClick()
         },
         onDatePicked = viewModel::onDatePicked
     )

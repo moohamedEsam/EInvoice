@@ -17,7 +17,6 @@ import com.example.client.screens.dashboard.clientDashboardScreen
 import com.example.client.screens.dashboard.navigateToClientDashboardScreen
 import com.example.client.screens.form.clientFormScreen
 import com.example.client.screens.form.navigateToClientFormScreen
-import com.example.common.models.SnackBarEvent
 import com.example.company.screen.all.companiesScreen
 import com.example.company.screen.all.navigateToCompaniesScreen
 import com.example.company.screen.dashboard.companyDashboardScreen
@@ -43,7 +42,6 @@ import com.example.maplocation.navigateToMapScreen
 fun EInvoiceNavGraph(
     navController: NavHostController,
     startScreen: String,
-    onShowSnackbarEvent: (SnackBarEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     NavHost(
@@ -52,7 +50,6 @@ fun EInvoiceNavGraph(
         modifier = modifier
     ) {
         loginScreen(
-            onShowSnackBarEvent = onShowSnackbarEvent,
             logo = R.drawable.logo,
             onLoggedIn = navController::navigateToCompaniesScreen,
             onRegisterClick = navController::navigateToRegister
@@ -60,7 +57,6 @@ fun EInvoiceNavGraph(
 
         registerScreen(
             logo = R.drawable.logo,
-            onShowSnackBarEvent = onShowSnackbarEvent,
             onRegistered = navController::popBackStack,
             onLoginClick = navController::popBackStack
         )
@@ -80,9 +76,7 @@ fun EInvoiceNavGraph(
             onCreateDocumentClick = navController::navigateToDocumentFormScreen
         )
 
-        branchFormScreen(onShowSnackbarEvent) {
-            navController.navigateToMapScreen()
-        }
+        branchFormScreen(onLocationRequested = navController::navigateToMapScreen)
 
         mapScreen { lat, lng ->
             navController.previousBackStackEntry?.arguments?.putDouble(latKey, lat)
@@ -98,8 +92,7 @@ fun EInvoiceNavGraph(
 
         branchDashboardScreen(
             onDocumentClick = navController::navigateToDocumentDetailsScreen,
-            onEditClick = navController::navigateToBranchFormScreen,
-            onShowSnackBarEvent = onShowSnackbarEvent
+            onEditClick = navController::navigateToBranchFormScreen
         )
 
         clientsScreen(
@@ -108,19 +101,14 @@ fun EInvoiceNavGraph(
             onEditClick = navController::navigateToClientFormScreen
         )
 
-        clientFormScreen(
-            onLocationRequested = navController::navigateToMapScreen,
-            onShowSnackBarEvent = onShowSnackbarEvent,
-            onClientCreated = navController::navigateToClientDashboardScreen
-        )
+        clientFormScreen(onLocationRequested = navController::navigateToMapScreen)
 
         clientDashboardScreen(
             onDocumentClick = navController::navigateToDocumentDetailsScreen,
-            onClientEditClick = navController::navigateToClientFormScreen,
-            onShowSnackBarEvent = onShowSnackbarEvent
+            onClientEditClick = navController::navigateToClientFormScreen
         )
 
-        itemsScreen(onShowSnackBarEvent = onShowSnackbarEvent)
+        itemsScreen()
 
         documentsScreen(
             onDocumentClick = navController::navigateToDocumentDetailsScreen,
@@ -130,14 +118,13 @@ fun EInvoiceNavGraph(
             onDocumentUpdateClick = navController::navigateToDocumentFormScreen
         )
 
-        documentFormScreen(onShowSnackbarEvent)
+        documentFormScreen()
 
         documentDetailsScreen(
             onCompanyClick = navController::navigateToCompanyDashboardScreen,
             onBranchClick = navController::navigateToBranchDashboardScreen,
             onClientClick = navController::navigateToClientDashboardScreen,
-            onEditClick = navController::navigateToDocumentFormScreen,
-            onShowSnackBarEvent = onShowSnackbarEvent
+            onEditClick = navController::navigateToDocumentFormScreen
         )
 
         settingsScreen()

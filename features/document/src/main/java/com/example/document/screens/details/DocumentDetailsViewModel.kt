@@ -6,11 +6,11 @@ import com.example.common.models.Result
 import com.example.domain.document.DeleteDocumentUseCase
 import com.example.domain.document.GetDocumentUseCase
 import com.example.domain.document.UndoDeleteDocumentUseCase
+import com.example.functions.SnackBarManager
 import com.example.models.document.DocumentStatus
 import com.example.models.document.DocumentView
 import com.example.models.document.empty
 import com.example.models.invoiceLine.InvoiceLineView
-import com.example.models.invoiceLine.InvoiceTax
 import com.example.models.invoiceLine.empty
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -20,7 +20,8 @@ class DocumentDetailsViewModel(
     private val deleteDocumentUseCase: DeleteDocumentUseCase,
     private val undoDeleteDocumentUseCase: UndoDeleteDocumentUseCase,
     private val documentId: String,
-) : ViewModel() {
+    private val snackBarManager: SnackBarManager
+) : ViewModel(), SnackBarManager by snackBarManager {
     private val _document = MutableStateFlow(DocumentView.empty())
     val document = _document.asStateFlow()
 
@@ -33,17 +34,17 @@ class DocumentDetailsViewModel(
     private val _invoiceLine = MutableStateFlow(InvoiceLineView.empty())
     val invoiceLine = _invoiceLine.asStateFlow()
 
-    fun deleteDocument(onResult: (Result<Unit>) -> Unit) {
+    fun deleteDocument() {
         viewModelScope.launch {
             val result = deleteDocumentUseCase(documentId)
-            onResult(result)
-        }
-    }
-
-    fun undoDeleteDocument(onResult: (Result<Unit>) -> Unit) {
-        viewModelScope.launch {
-            val result = undoDeleteDocumentUseCase(documentId)
-            onResult(result)
+            val event = result.getSnackBarEvent(
+                successMessage = "Document deleted",
+                successActionLabel = "Undo",
+                successAction = { undoDeleteDocumentUseCase(documentId) },
+                errorActionLabel = "Retry",
+                errorAction = ::deleteDocument
+            )
+            showSnackBarEvent(event)
         }
     }
 

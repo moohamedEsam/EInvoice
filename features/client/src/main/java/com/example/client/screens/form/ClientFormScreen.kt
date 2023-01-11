@@ -18,8 +18,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.common.models.Result
-import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
 import com.example.einvoicecomponents.*
 import com.example.einvoicecomponents.textField.ValidationOutlinedTextField
@@ -39,8 +37,6 @@ fun ClientFormScreen(
     lat: Double,
     lng: Double,
     onLocationRequested: () -> Unit,
-    onShowSnackBarEvent: (SnackBarEvent) -> Unit,
-    onClientCreated: (String) -> Unit,
 ) {
     val viewModel: ClientFormViewModel by viewModel { parametersOf(clientId) }
     if (lat != 0.0 && lng != 0.0) {
@@ -82,22 +78,7 @@ fun ClientFormScreen(
         onLocationRequested = onLocationRequested,
         isLoadingState = viewModel.isLoading,
         isEnabledState = viewModel.isFormValid,
-        onFormSubmitted = {
-            viewModel.saveClient { result ->
-                val event = if (result is Result.Success) {
-                    onClientCreated(result.data.id)
-                    SnackBarEvent("Client saved successfully")
-                } else
-                    SnackBarEvent(
-                        message = (result as? Result.Error)?.exception ?: " Error saving client",
-                        actionLabel = "Retry",
-                        action = { viewModel.saveClient {} }
-                    )
-
-                onShowSnackBarEvent(event)
-
-            }
-        },
+        onFormSubmitted = viewModel::saveClient,
     )
 }
 

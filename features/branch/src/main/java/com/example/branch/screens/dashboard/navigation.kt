@@ -3,23 +3,19 @@ package com.example.branch.screens.dashboard
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import com.example.common.models.SnackBarEvent
 
 const val BranchDashboardScreenRoute= "Branch Dashboard"
 
 fun NavGraphBuilder.branchDashboardScreen(
     onDocumentClick: (String) -> Unit,
     onEditClick: (String) -> Unit,
-    onShowSnackBarEvent: (SnackBarEvent) -> Unit,
 ){
     composable("$BranchDashboardScreenRoute/{branchId}"){
         val branchId = it.arguments?.getString("branchId") ?: ""
         BranchDashboardScreen(
             branchId = branchId,
-            onDocumentClick = onDocumentClick,
-            onEditClick = { onEditClick(branchId) },
-            onShowSnackBarEvent = onShowSnackBarEvent
-        )
+            onDocumentClick = onDocumentClick
+        ) { onEditClick(branchId) }
     }
 }
 

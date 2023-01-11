@@ -2,7 +2,7 @@ package com.example.document.screens.form
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.common.models.Result
+import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
 import com.example.common.validators.notBlankValidator
 import com.example.common.validators.numberValidator
@@ -14,6 +14,7 @@ import com.example.domain.document.GetDocumentsInternalIdsByCompanyIdUseCase
 import com.example.domain.document.UpdateDocumentUseCase
 import com.example.domain.item.GetItemsByBranchUseCase
 import com.example.domain.item.GetTaxTypesUseCase
+import com.example.functions.SnackBarManager
 import com.example.models.Client
 import com.example.models.branch.Branch
 import com.example.models.company.Company
@@ -36,7 +37,8 @@ class DocumentFormViewModel(
     private val getItemsByBranchUseCase: GetItemsByBranchUseCase,
     private val getTaxTypesUseCase: GetTaxTypesUseCase,
     documentId: String,
-) : ViewModel() {
+    private val snackBarManager: SnackBarManager
+) : ViewModel(), SnackBarManager by snackBarManager {
     private val isUpdatingDocument = documentId.isNotBlank()
     private val newDocumentId = if (isUpdatingDocument) documentId else UUID.randomUUID().toString()
     private val _alreadyUsedInternalIds = MutableStateFlow(emptyList<String>())
@@ -187,13 +189,14 @@ class DocumentFormViewModel(
             _price.update { item.price.toString() }
     }
 
-    fun saveInvoice(onResult: (Result<Unit>) -> Unit) = viewModelScope.launch {
+    fun saveInvoice() = viewModelScope.launch {
         val item = selectedItem.value ?: return@launch
         val itemAlreadyExists =
             _invoices.value.any { it.item.id == item.id && it.id != invoiceLineId }
 
         if (itemAlreadyExists) {
-            onResult(Result.Error("Item already exists"))
+            val event = SnackBarEvent(message = "Item already exists")
+            showSnackBarEvent(event)
             return@launch
         }
 
@@ -250,13 +253,14 @@ class DocumentFormViewModel(
         _createdAt.update { date }
     }
 
-    fun saveTax(onResult: (Result<Unit>) -> Unit) = viewModelScope.launch {
+    fun saveTax() = viewModelScope.launch {
         val tax = getCurrentInvoiceTax() ?: return@launch
         val invoiceLine = _invoices.value.find { it.id == invoiceLineId } ?: return@launch
         val taxAlreadyExists =
             invoiceLine.taxes.any { it.taxSubTypeCode == tax.taxSubTypeCode && !isUpdatingTax }
         if (taxAlreadyExists) {
-            onResult(Result.Error("Tax already exists"))
+            val event = SnackBarEvent(message = "Tax already exists")
+            showSnackBarEvent(event)
             return@launch
         }
 
@@ -415,11 +419,16 @@ class DocumentFormViewModel(
         _isInvoiceDialogVisible.update { true }
     }
 
-    fun save(onResult: (Result<DocumentView>) -> Unit) {
+    fun save() {
         viewModelScope.launch {
             val document = getCurrentDocumentView() ?: return@launch
             val result = insertOrUpdateDocument(document)
-            onResult(result)
+            val event = result.getSnackBarEvent(
+                successMessage = "Document Saved Successfully",
+                errorActionLabel = "Retry",
+                errorAction = ::save
+            )
+            showSnackBarEvent(event)
         }
     }
 
