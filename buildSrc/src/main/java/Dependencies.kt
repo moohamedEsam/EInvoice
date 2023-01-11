@@ -62,4 +62,5 @@ object Dependencies {
     const val koinAndroid = "io.insert-koin:koin-android:${Versions.koin}"
     const val koinCore = "io.insert-koin:koin-core:${Versions.koin}"
     const val koinCompose = "io.insert-koin:koin-androidx-compose:${Versions.koin}"
+    const val koinWorkManager = "io.insert-koin:koin-androidx-workmanager:${Versions.koin}"
 }
