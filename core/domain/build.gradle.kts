@@ -25,4 +25,6 @@ dependencies {
     implementation(project(":common"))
     implementation(Dependencies.koinCore)
     implementation(Dependencies.koinAndroid)
+    implementation(Dependencies.coroutinesAndroid)
+    implementation(Dependencies.coroutinesCore)
 }

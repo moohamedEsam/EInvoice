@@ -81,4 +81,6 @@ dependencies {
     implementation(project(":features:company"))
     implementation(project(":features:mapLocation"))
     implementation(project(":features:branch"))
+    implementation(project(":features:EInvoiceComponents"))
+
 }

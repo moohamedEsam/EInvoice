@@ -1,4 +1,4 @@
-package com.example.common.components
+package com.example.einvoicecomponents
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,7 +41,7 @@ fun ValidationTextField(
 
 @Preview
 @Composable
-fun ValidationTextFieldPreview() {
+fun ValidationTextFieldPreviews() {
     ValidationTextField(
         valueState = MutableStateFlow(""),
         validationState = MutableStateFlow(ValidationResult.Empty),

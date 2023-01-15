@@ -1,4 +1,4 @@
-package com.example.common.components
+package com.example.einvoicecomponents
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons

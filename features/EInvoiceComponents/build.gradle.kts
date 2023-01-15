@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.auth"
+    namespace = "com.example.einvoicecomponents"
     compileSdk = Versions.compileSdk
 
     defaultConfig {
@@ -34,17 +34,6 @@ dependencies {
     implementation(Dependencies.coil)
     implementation(Dependencies.coilCompose)
     implementation(Dependencies.coilGifs)
-    implementation(Dependencies.koinAndroid)
-    implementation(Dependencies.koinCore)
-    implementation(Dependencies.koinCompose)
-    implementation(Dependencies.lifecycleRuntimeKtx)
-    implementation(Dependencies.viewModelKtx)
-    implementation(Dependencies.coroutinesAndroid)
-    implementation(Dependencies.coroutinesCore)
-    implementation(Dependencies.viewModelCompose)
-    implementation(Dependencies.composeNavigation)
     implementation(project(":common"))
-    implementation(project(":features:EInvoiceComponents"))
     implementation(project(":core:models"))
-    implementation(project(":core:domain"))
 }

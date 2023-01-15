@@ -1,6 +1,5 @@
-package com.example.common.components
+package com.example.einvoicecomponents
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api

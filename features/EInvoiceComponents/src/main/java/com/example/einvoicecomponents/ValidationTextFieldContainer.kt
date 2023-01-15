@@ -1,4 +1,4 @@
-package com.example.common.components
+package com.example.einvoicecomponents
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
@@ -32,7 +32,7 @@ fun ValidationTextFieldContainer(
 
 @Preview
 @Composable
-fun ValidationTextFieldPreviw() {
+fun ValidationTextFieldPreview() {
     ValidationTextFieldContainer(validation = ValidationResult.Invalid("Invalid email")) {
         Text(text = "Email")
     }

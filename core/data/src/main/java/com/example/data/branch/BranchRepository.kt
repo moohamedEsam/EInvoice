@@ -10,11 +10,11 @@ interface BranchRepository : Syncable<Branch> {
 
     fun getBranch(id: String): Flow<Branch>
 
-    suspend fun createBranch(branch: Branch): com.example.common.models.Result<Branch>
+    suspend fun createBranch(branch: Branch): Result<Branch>
 
     suspend fun updateBranch(branch: Branch): Result<Branch>
 
-    suspend fun deleteBranch(id: String): com.example.common.models.Result<Unit>
+    suspend fun deleteBranch(id: String): Result<Unit>
 
     fun getBranchesByCompanyId(companyId: String): Flow<List<Branch>>
 }

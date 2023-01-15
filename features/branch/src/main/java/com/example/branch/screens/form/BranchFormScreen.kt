@@ -15,12 +15,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.branch.models.OptionalAddress
-import com.example.common.components.OneTimeEventButton
-import com.example.common.components.ValidationTextField
+import com.example.models.OptionalAddress
 import com.example.common.models.Result
 import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
+import com.example.einvoicecomponents.AddressComposable
+import com.example.einvoicecomponents.OneTimeEventButton
+import com.example.einvoicecomponents.OptionalAddressComposable
+import com.example.einvoicecomponents.ValidationTextField
 import com.example.models.Company
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -148,7 +150,7 @@ private fun BranchFormScreenContent(
             }
         }
 
-        BranchAddressContent(
+        AddressComposable(
             addressState = address,
             onCountryChange = onCountryChange,
             onGovernorateChange = onGovernorateChange,
@@ -158,7 +160,7 @@ private fun BranchFormScreenContent(
         )
 
         Text(text = "Optional Address Information", style = MaterialTheme.typography.headlineSmall)
-        BranchOptionalAddressContent(
+        OptionalAddressComposable(
             optionalAddressState = optionalAddress,
             onOptionalAddressChange = onOptionalAddressChange
         )
@@ -225,101 +227,6 @@ private fun CompanyDropDownMenuBox(
             }
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun BranchAddressContent(
-    addressState: StateFlow<Address>,
-    onCountryChange: (String) -> Unit = {},
-    onGovernorateChange: (String) -> Unit = {},
-    onCityChange: (String) -> Unit = {},
-    onStreetChange: (String) -> Unit = {},
-    onPostalCodeChange: (String) -> Unit = {},
-) {
-    val address by addressState.collectAsState()
-    TextField(
-        value = address.countryName ?: "",
-        onValueChange = onCountryChange,
-        label = { Text("Country") },
-        modifier = Modifier.fillMaxWidth()
-    )
-    TextField(
-        value = address.adminArea ?: "",
-        onValueChange = onGovernorateChange,
-        label = { Text("Governate") },
-        modifier = Modifier.fillMaxWidth()
-    )
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        TextField(
-            value = address.subAdminArea ?: "",
-            onValueChange = onCityChange,
-            label = { Text("City") },
-            modifier = Modifier.weight(1f)
-        )
-        TextField(
-            value = address.postalCode ?: "",
-            onValueChange = onPostalCodeChange,
-            label = { Text("PostalCode") },
-            modifier = Modifier.weight(1f)
-        )
-    }
-    TextField(
-        value = address.thoroughfare ?: "",
-        onValueChange = onStreetChange,
-        label = { Text("Street") },
-        modifier = Modifier.fillMaxWidth()
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun BranchOptionalAddressContent(
-    optionalAddressState: StateFlow<OptionalAddress>,
-    onOptionalAddressChange: (OptionalAddress) -> Unit
-) {
-    val optionalAddress by optionalAddressState.collectAsState()
-    TextField(
-        value = optionalAddress.buildingNumber,
-        onValueChange = { onOptionalAddressChange(optionalAddress.copy(buildingNumber = it)) },
-        label = { Text("Building Number") },
-        modifier = Modifier.fillMaxWidth()
-    )
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        TextField(
-            value = optionalAddress.room,
-            label = { Text("Room") },
-            onValueChange = {
-                onOptionalAddressChange(optionalAddress.copy(room = it))
-            },
-            modifier = Modifier.weight(1f)
-        )
-        TextField(
-            value = optionalAddress.floor,
-            label = { Text("Floor") },
-            onValueChange = {
-                onOptionalAddressChange(optionalAddress.copy(floor = it))
-            },
-            modifier = Modifier.weight(1f)
-        )
-    }
-
-    TextField(
-        value = optionalAddress.additionalInformation,
-        label = { Text("Additional Info") },
-        onValueChange = {
-            onOptionalAddressChange(optionalAddress.copy(additionalInformation = it))
-        },
-        modifier = Modifier.fillMaxWidth()
-    )
-
 }
 
 @Preview(showBackground = true)

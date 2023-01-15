@@ -3,11 +3,9 @@ package com.example.auth.login
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -16,16 +14,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.AsyncImage
-import com.example.common.components.OneTimeEventButton
-import com.example.common.components.ValidationPasswordTextField
-import com.example.common.components.ValidationTextField
-import com.example.common.functions.handleSnackBarEvent
 import com.example.common.models.Result
 import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
+import com.example.einvoicecomponents.OneTimeEventButton
+import com.example.einvoicecomponents.ValidationPasswordTextField
+import com.example.einvoicecomponents.ValidationTextField
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.get
 import org.koin.androidx.compose.viewModel
 

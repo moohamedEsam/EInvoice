@@ -23,6 +23,8 @@ android {
 dependencies{
     implementation(Dependencies.koinAndroid)
     implementation(Dependencies.koinCore)
+    implementation(Dependencies.coroutinesCore)
+    implementation(Dependencies.coroutinesAndroid)
     implementation(project(":core:models"))
     implementation(project(":core:network"))
     implementation(project(":common"))

@@ -18,6 +18,9 @@ data class ClientEntity(
     val businessType: BusinessType,
     val taxStatus: TaxStatus,
     val companyId: String,
+    val isCreated: Boolean = false,
+    val isUpdated: Boolean = false,
+    val isDeleted: Boolean = false,
     @PrimaryKey val id: String = UUID.randomUUID().toString()
 )
 
@@ -33,7 +36,11 @@ fun ClientEntity.asClient() = Client(
     companyId = companyId
 )
 
-fun Client.asClientEntity() = ClientEntity(
+fun Client.asClientEntity(
+    isCreated: Boolean = false,
+    isUpdated: Boolean = false,
+    isDeleted: Boolean = false
+) = ClientEntity(
     registrationNumber = registrationNumber,
     name = name,
     email = email,
@@ -42,5 +49,8 @@ fun Client.asClientEntity() = ClientEntity(
     businessType = businessType,
     taxStatus = taxStatus,
     companyId = companyId,
-    id = id
+    id = id,
+    isCreated = isCreated,
+    isUpdated = isUpdated,
+    isDeleted = isDeleted
 )

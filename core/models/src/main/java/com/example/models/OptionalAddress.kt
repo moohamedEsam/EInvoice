@@ -1,4 +1,4 @@
-package com.example.branch.models
+package com.example.models
 
 data class OptionalAddress(
     val buildingNumber: String,

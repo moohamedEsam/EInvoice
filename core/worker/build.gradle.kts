@@ -21,6 +21,7 @@ android {
 }
 
 dependencies{
+    implementation(Dependencies.coreKtx)
     implementation(Dependencies.koinAndroid)
     implementation(Dependencies.koinCore)
     implementation(Dependencies.koinWorkManager)

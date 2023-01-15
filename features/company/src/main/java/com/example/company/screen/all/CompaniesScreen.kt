@@ -24,15 +24,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.example.common.components.OutlinedSearchTextField
-import com.example.common.functions.handleSnackBarEvent
 import com.example.common.models.Result
 import com.example.common.models.SnackBarEvent
 import com.example.company.screen.form.CompanyFormScreenContent
+import com.example.einvoicecomponents.OutlinedSearchTextField
 import com.example.models.Company
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.viewModel
 
 @Composable

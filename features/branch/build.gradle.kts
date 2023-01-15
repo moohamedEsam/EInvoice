@@ -48,5 +48,6 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":core:models"))
     implementation(project(":core:domain"))
+    implementation(project(":features:EInvoiceComponents"))
     implementation(project(":features:mapLocation"))
 }

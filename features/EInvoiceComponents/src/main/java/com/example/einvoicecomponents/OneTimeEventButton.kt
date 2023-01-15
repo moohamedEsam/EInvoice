@@ -1,4 +1,4 @@
-package com.example.common.components
+package com.example.einvoicecomponents
 
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material3.Button

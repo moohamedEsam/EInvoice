@@ -88,11 +88,23 @@ interface EInvoiceDao {
     @Query("SELECT * FROM Client WHERE id = :id")
     fun getClientById(id: String): Flow<ClientEntity>
 
+    @Query("SELECT * FROM Client WHERE isDeleted = 0 and isCreated = 1")
+    suspend fun getCreatedClients(): List<ClientEntity>
+
+    @Query("SELECT * FROM Client WHERE isDeleted = 0 and isUpdated = 1")
+    suspend fun getUpdatedClients(): List<ClientEntity>
+
+    @Query("SELECT * FROM Client WHERE isDeleted = 1")
+    suspend fun getDeletedClients(): List<ClientEntity>
+
     @Insert
     suspend fun insertClient(client: ClientEntity)
 
     @Query("DELETE FROM Client where id = :id")
     suspend fun deleteClient(id: String)
+
+    @Query("delete from client")
+    suspend fun deleteAllClients()
 
     @Update
     suspend fun updateClient(client: ClientEntity)

@@ -1,4 +1,4 @@
-package com.example.common.functions
+package com.example.functions
 
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState

@@ -3,8 +3,7 @@ package com.example.branch.screens.form
 import android.location.Address
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.branch.models.OptionalAddress
-import com.example.common.models.SnackBarEvent
+import com.example.models.OptionalAddress
 import com.example.common.models.ValidationResult
 import com.example.common.validators.validateUsername
 import com.example.domain.branch.CreateBranchUseCase
@@ -13,7 +12,6 @@ import com.example.domain.branch.UpdateBranchUseCase
 import com.example.domain.company.GetCompaniesUseCase
 import com.example.models.Branch
 import com.example.models.Company
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
