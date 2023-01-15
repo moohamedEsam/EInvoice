@@ -2,11 +2,11 @@ package com.example.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.util.UUID
 
 
 @Serializable
 data class Branch(
-    val id: String,
     @SerialName("branchName")
     val name: String,
     @SerialName("branchId")
@@ -21,5 +21,6 @@ data class Branch(
     val floor: String,
     val room: String,
     val landmark: String,
-    val additionalInformation: String
+    val additionalInformation: String,
+    val id: String = UUID.randomUUID().toString()
 )

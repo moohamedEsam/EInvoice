@@ -1,7 +1,9 @@
 package com.example.company.screen.all
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.common.models.Result
 import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
 import com.example.common.validators.validatePhone
@@ -17,7 +19,8 @@ class CompaniesViewModel(
     private val getCompaniesUseCase: GetCompaniesUseCase,
     private val createCompanyUseCase: CreateCompanyUseCase,
     private val updateCompanyUseCase: UpdateCompanyUseCase,
-    private val deleteCompanyUseCase: DeleteCompanyUseCase
+    private val deleteCompanyUseCase: DeleteCompanyUseCase,
+    private val undoDeleteCompanyUseCase: UndoDeleteCompanyUseCase
 ) : ViewModel() {
     private val _companies = MutableStateFlow(emptyList<Company>())
     private val _query = MutableStateFlow("")
@@ -76,8 +79,6 @@ class CompaniesViewModel(
 
     private val _showCreateDialog = MutableStateFlow(false)
     val showCreateDialog = _showCreateDialog.asStateFlow()
-    private val _snackBarChannel = Channel<SnackBarEvent>()
-    val snackBarChannel = _snackBarChannel.receiveAsFlow()
     private var companyId: String? = null
 
     init {
@@ -139,7 +140,7 @@ class CompaniesViewModel(
         companyId = null
     }
 
-    fun saveCompany() {
+    fun saveCompany(onResult: (result: Result<Company>) -> Unit = {}) {
         viewModelScope.launch {
             val result = if (companyId == null)
                 createCompanyUseCase(
@@ -162,42 +163,23 @@ class CompaniesViewModel(
                         id = companyId!!
                     )
                 )
-
+            onResult(result)
             result.ifSuccess {
-                _snackBarChannel.send(SnackBarEvent("Company saved successfully"))
                 toggleCreateDialog()
-            }
-            result.ifFailure {
-                _snackBarChannel.send(
-                    SnackBarEvent(
-                        it ?: "Something went wrong",
-                        "Retry",
-                        ::saveCompany
-                    )
-                )
             }
         }
     }
 
-    fun deleteCompany(company: Company) {
+    fun deleteCompany(company: Company, onResult: (result: Result<Unit>) -> Unit = {}) {
         viewModelScope.launch {
             val result = deleteCompanyUseCase(company.id)
-            result.ifSuccess {
-                val event = SnackBarEvent("Company deleted successfully", "Undo") {
-                    viewModelScope.launch {
-                        createCompanyUseCase(company)
-                    }
-                }
-                _snackBarChannel.send(event)
-            }
-            result.ifFailure {
-                val event = SnackBarEvent(
-                    it ?: "Something went wrong",
-                    "Retry"
-                ) { deleteCompany(company) }
+            onResult(result)
+        }
+    }
 
-                _snackBarChannel.send(event)
-            }
+    fun undoDeleteCompany(company: Company) {
+        viewModelScope.launch {
+            undoDeleteCompanyUseCase(company.id)
         }
     }
 }

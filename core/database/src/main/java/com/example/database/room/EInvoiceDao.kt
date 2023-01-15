@@ -74,6 +74,9 @@ interface EInvoiceDao {
     @Query("update Company set isDeleted = 1 where id = :id")
     suspend fun markCompanyAsDeleted(id: String)
 
+    @Query("update Company set isDeleted = 0 where id = :id")
+    suspend fun undoDeleteCompany(id: String)
+
 
     // Client
     @Query("SELECT * FROM Client")

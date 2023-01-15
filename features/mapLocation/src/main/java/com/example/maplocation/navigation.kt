@@ -5,7 +5,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 
 const val MapScreenRoute = "map"
-
+const val latKey = "lat"
+const val lngKey = "lng"
 fun NavGraphBuilder.mapScreen(
     onLocationPicked: (lat: Double, lng: Double) -> Unit
 ) {

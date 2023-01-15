@@ -12,6 +12,7 @@ import com.example.models.Company
 import com.example.network.EInvoiceRemoteDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
 class OfflineFirstCompanyRepository(
@@ -44,6 +45,11 @@ class OfflineFirstCompanyRepository(
             localDataSource.deleteCompany(company.id)
         else
             localDataSource.markCompanyAsDeleted(company.id)
+        Result.Success(Unit)
+    }
+
+    override suspend fun undoDeleteCompany(id: String): Result<Unit> = tryWrapper {
+        localDataSource.undoDeleteCompany(id)
         Result.Success(Unit)
     }
 

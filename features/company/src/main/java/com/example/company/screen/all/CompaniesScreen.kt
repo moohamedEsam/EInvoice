@@ -26,6 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.common.components.OutlinedSearchTextField
 import com.example.common.functions.handleSnackBarEvent
+import com.example.common.models.Result
+import com.example.common.models.SnackBarEvent
 import com.example.company.screen.form.CompanyFormScreenContent
 import com.example.models.Company
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,7 +37,7 @@ import org.koin.androidx.compose.viewModel
 
 @Composable
 fun CompaniesScreen(
-    snackbarHostState: SnackbarHostState,
+    onShowSnackBarEvent: (SnackBarEvent) -> Unit,
     onCompanyClick: (Company) -> Unit
 ) {
     val viewModel: CompaniesViewModel by viewModel()
@@ -48,21 +50,33 @@ fun CompaniesScreen(
         onQueryChange = viewModel::setQuery,
         onCreateNewCompanyClick = viewModel::toggleCreateDialog,
         onCompanyEditClick = { viewModel.editCompany(it.id) },
-        onCompanyDeleteClick = viewModel::deleteCompany,
+        onCompanyDeleteClick = {
+            viewModel.deleteCompany(it) { result ->
+                val event = if (result is Result.Success)
+                    SnackBarEvent("Company deleted successfully", actionLabel = "Undo") {
+                        viewModel.undoDeleteCompany(it)
+                    }
+                else
+                    SnackBarEvent(
+                        (result as? Result.Error)?.exception ?: "Error Deleting company",
+                        actionLabel = "Retry"
+                    ) {
+                        viewModel.deleteCompany(it)
+                    }
+                onShowSnackBarEvent(event)
+            }
+        }
     )
     if (showDialog)
-        CreateCompanyDialog(viewModel)
-
-    LaunchedEffect(key1 = Unit){
-        viewModel.snackBarChannel.collectLatest {
-            snackbarHostState.handleSnackBarEvent(it)
-        }
-    }
+        CreateCompanyDialog(viewModel, onShowSnackBarEvent)
 
 }
 
 @Composable
-private fun CreateCompanyDialog(viewModel: CompaniesViewModel) {
+private fun CreateCompanyDialog(
+    viewModel: CompaniesViewModel,
+    onShowSnackBarEvent: (SnackBarEvent) -> Unit
+) {
     Dialog(onDismissRequest = viewModel::toggleCreateDialog) {
         Card {
             CompanyFormScreenContent(
@@ -82,7 +96,20 @@ private fun CreateCompanyDialog(viewModel: CompaniesViewModel) {
                 onPhoneNumberChange = viewModel::setPhone,
                 phoneNumberValidation = viewModel.phoneValidationResult,
                 isFormValid = viewModel.isFormValid,
-                onCreateClick = viewModel::saveCompany
+                onCreateClick = {
+                    viewModel.saveCompany { result ->
+                        val event = if (result is Result.Success)
+                            SnackBarEvent("Company Saved successfully")
+                        else
+                            SnackBarEvent(
+                                (result as? Result.Error)?.exception ?: "Error creating company",
+                                actionLabel = "Retry"
+                            ) {
+                                viewModel.saveCompany()
+                            }
+                        onShowSnackBarEvent(event)
+                    }
+                }
             )
         }
     }

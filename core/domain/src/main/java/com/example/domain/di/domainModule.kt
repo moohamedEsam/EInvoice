@@ -2,7 +2,6 @@ package com.example.domain.di
 
 import com.example.data.branch.BranchRepository
 import com.example.data.company.CompanyRepository
-import com.example.data.sync.Synchronizer
 import com.example.domain.auth.isUserLoggedInUseCase
 import com.example.domain.auth.loginUseCase
 import com.example.domain.auth.logoutUseCase
@@ -22,6 +21,7 @@ val domainModule = module {
     single { CreateCompanyUseCase(get<CompanyRepository>()::createCompany) }
     single { UpdateCompanyUseCase(get<CompanyRepository>()::updateCompany) }
     single { DeleteCompanyUseCase(get<CompanyRepository>()::deleteCompany) }
+    single { UndoDeleteCompanyUseCase(get<CompanyRepository>()::undoDeleteCompany) }
     single { GetBranchesUseCase(get<BranchRepository>()::getBranches) }
     single { GetBranchUseCase(get<BranchRepository>()::getBranch) }
     single { CreateBranchUseCase(get<BranchRepository>()::createBranch) }

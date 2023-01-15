@@ -10,6 +10,8 @@ interface CompanyRepository : Syncable<Company> {
     fun getCompany(id: String): Flow<Company>
     suspend fun updateCompany(company: Company): Result<Company>
     suspend fun deleteCompany(id: String): Result<Unit>
+
+    suspend fun undoDeleteCompany(id: String): Result<Unit>
     fun getCompanies(): Flow<List<Company>>
 
 }

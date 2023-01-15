@@ -19,6 +19,7 @@ import com.example.common.components.OneTimeEventButton
 import com.example.common.components.ValidationPasswordTextField
 import com.example.common.components.ValidationTextField
 import com.example.common.functions.handleSnackBarEvent
+import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,7 +30,7 @@ import org.koin.androidx.compose.viewModel
 @Composable
 fun RegisterScreen(
     logo: Any,
-    snackbarHostState: SnackbarHostState,
+    onShowSnackBarEvent: (SnackBarEvent) -> Unit,
     onRegistered: () -> Unit,
     onLoginClick: () -> Unit,
     imageLoader: ImageLoader = get()
@@ -49,19 +50,25 @@ fun RegisterScreen(
         onConfirmPasswordValueChange = viewModel::setConfirmPassword,
         registerButtonEnable = viewModel.enableRegister,
         loading = viewModel.isLoading,
-        onRegisterButtonClick = { viewModel.register(onSuccess = { onRegistered() }) },
+        onRegisterButtonClick = {
+            viewModel.register { result ->
+                when (result) {
+                    is com.example.common.models.Result.Success -> onRegistered()
+                    is com.example.common.models.Result.Error -> onShowSnackBarEvent(
+                        SnackBarEvent(
+                            result.exception ?: "Unknown error"
+                        )
+                    )
+                    else -> Unit
+                }
+            }
+        },
         onLoginClick = onLoginClick,
         username = viewModel.username,
         usernameValidation = viewModel.usernameValidationResult,
         onUsernameValueChange = viewModel::setUsername,
         imageLoader = imageLoader
     )
-
-    LaunchedEffect(key1 = Unit) {
-        viewModel.snackbarChannel.collectLatest {
-            snackbarHostState.handleSnackBarEvent(it)
-        }
-    }
 }
 
 @Composable

@@ -1,6 +1,5 @@
 package com.example.branch.screens.all
 
-import androidx.compose.material3.SnackbarHostState
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -8,13 +7,13 @@ import androidx.navigation.compose.composable
 const val BranchesScreenRoute = "branches"
 
 fun NavGraphBuilder.branchesScreen(
-    snackbarHostState: SnackbarHostState,
     onCreateBranchClick: () -> Unit,
+    onBranchClick: (String) -> Unit,
 ) {
     composable(BranchesScreenRoute) {
         BranchesScreen(
-            snackbarHostState = snackbarHostState,
-            onCreateBranchClick = onCreateBranchClick,
+            onBranchClick = onBranchClick,
+            onAddBranchClick = onCreateBranchClick
         )
     }
 }

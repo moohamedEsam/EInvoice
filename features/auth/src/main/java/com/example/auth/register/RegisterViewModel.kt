@@ -2,14 +2,14 @@ package com.example.auth.register
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.domain.auth.RegisterUseCase
-import com.example.models.auth.Register
-import com.example.models.auth.Token
+import com.example.common.models.Result
 import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
 import com.example.common.validators.validateEmail
 import com.example.common.validators.validatePassword
 import com.example.common.validators.validateUsername
+import com.example.models.auth.Register
+import com.example.models.auth.Token
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -51,8 +51,6 @@ class RegisterViewModel(private val registerUseCase: com.example.domain.auth.Reg
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
-    private val _snackbarChannel = Channel<SnackBarEvent>()
-    val snackbarChannel = _snackbarChannel.receiveAsFlow()
 
     fun setEmail(email: String) {
         _email.update { email }
@@ -70,22 +68,18 @@ class RegisterViewModel(private val registerUseCase: com.example.domain.auth.Reg
         _confirmPassword.update { confirmPassword }
     }
 
-    fun register(onSuccess: (com.example.models.auth.Token) -> Unit) {
+    fun register(onResult: (Result<Token>) -> Unit) {
         viewModelScope.launch {
             _isLoading.update { true }
             val result = registerUseCase(
-                com.example.models.auth.Register(
+                Register(
                     email.value,
                     password.value,
                     username.value
                 )
             )
             _isLoading.update { false }
-            result.ifFailure {
-                val event = SnackBarEvent(it ?: "Unknown error", "Retry") { register(onSuccess) }
-                _snackbarChannel.send(event)
-            }
-            result.ifSuccess(onSuccess)
+            onResult(result)
         }
     }
 }

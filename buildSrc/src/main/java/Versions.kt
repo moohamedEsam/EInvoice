@@ -1,5 +1,5 @@
 object Versions {
-    const val androidLibrary = "7.3.1"
+    const val androidLibrary = "7.4.0"
     const val androidApplication = "7.3.1"
     const val androidX = "1.9.0"
     const val kotlin = "1.7.20"

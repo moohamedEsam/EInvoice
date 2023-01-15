@@ -16,6 +16,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.branch.screens.all.navigateToBranchesScreen
 import com.example.branch.screens.form.BranchFormScreenRoute
 import com.example.branch.screens.form.navigateToBranchFormScreen
+import com.example.common.functions.handleSnackBarEvent
+import com.example.common.models.SnackBarEvent
 import com.example.company.screen.all.CompaniesScreenRoute
 import com.example.company.screen.all.navigateToCompaniesScreen
 import kotlinx.coroutines.launch
@@ -25,6 +27,12 @@ import kotlinx.coroutines.launch
 fun EInvoiceLayout(startScreen: String) {
     val snackbarHostState by remember {
         mutableStateOf(SnackbarHostState())
+    }
+    val coroutineScope = rememberCoroutineScope()
+    val onShowSnackbarEvent: (SnackBarEvent) -> Unit = {
+        coroutineScope.launch {
+            snackbarHostState.handleSnackBarEvent(it)
+        }
     }
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -36,10 +44,10 @@ fun EInvoiceLayout(startScreen: String) {
         content = {
             EInvoiceDrawer(
                 navController = navController,
-                snackbarHostState = snackbarHostState,
                 paddingValues = it,
                 startScreen = startScreen,
-                drawerState = drawerState
+                drawerState = drawerState,
+                onShowSnackbarEvent = onShowSnackbarEvent
             )
         },
         topBar = {
@@ -56,10 +64,10 @@ fun EInvoiceLayout(startScreen: String) {
 private fun EInvoiceDrawer(
     navController: NavHostController,
     paddingValues: PaddingValues,
-    snackbarHostState: SnackbarHostState,
     startScreen: String,
     modifier: Modifier = Modifier,
-    drawerState: DrawerState
+    drawerState: DrawerState,
+    onShowSnackbarEvent: (SnackBarEvent) -> Unit
 ) {
     ModalNavigationDrawer(
         drawerContent = { DrawerContent(navController = navController) },
@@ -69,8 +77,8 @@ private fun EInvoiceDrawer(
     ) {
         EInvoiceNavGraph(
             navController = navController,
-            snackbarHostState = snackbarHostState,
-            startScreen = startScreen
+            startScreen = startScreen,
+            onShowSnackbarEvent = onShowSnackbarEvent
         )
     }
 }
@@ -113,7 +121,7 @@ fun EInvoiceTopBar(navController: NavHostController, drawerState: DrawerState) {
     val coroutine = rememberCoroutineScope()
     CenterAlignedTopAppBar(
         title = {
-            Text(text = currentRoute)
+            Text(text = currentRoute.takeWhile { it != '/' })
         },
         navigationIcon = {
             IconButton(

@@ -1,28 +1,37 @@
 package com.example.branch.screens.form
 
-import androidx.compose.material3.SnackbarHostState
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import com.example.common.models.SnackBarEvent
+import com.example.maplocation.latKey
+import com.example.maplocation.lngKey
 
 const val BranchFormScreenRoute = "Branch Form Screen"
+const val branchIdKey = "id"
 
 fun NavGraphBuilder.branchFormScreen(
-    snackbarHostState: SnackbarHostState,
+    onShowSnackBarEvent: (SnackBarEvent) -> Unit,
     onLocationRequested: () -> Unit = {}
 ) {
-    composable(BranchFormScreenRoute) {
-        val lat = it.arguments?.getDouble("lat")
-        val lng = it.arguments?.getDouble("lng")
-        BranchFormScreen(lat, lng, snackbarHostState, onLocationRequested)
+    composable("$BranchFormScreenRoute/{$branchIdKey}") {
+        val lat = it.arguments?.getDouble(latKey)
+        val lng = it.arguments?.getDouble(lngKey)
+        val id = it.arguments?.getString(branchIdKey) ?: " "
+        BranchFormScreen(
+            latitude = lat,
+            longitude = lng,
+            branchId = id,
+            onShowSnackbarEvent = onShowSnackBarEvent,
+            onLocationRequested = onLocationRequested
+        )
     }
 }
 
 fun NavHostController.navigateToBranchFormScreen(
-    lat: Double? = null,
-    lng: Double? = null
+    id: String = " "
 ) {
-    navigate("$BranchFormScreenRoute?lat=$lat&lng=$lng"){
+    navigate("$BranchFormScreenRoute/$id") {
         restoreState = true
         launchSingleTop = true
     }

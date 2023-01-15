@@ -2,12 +2,12 @@ package com.example.auth.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.common.models.SnackBarEvent
+import com.example.common.models.Result
 import com.example.common.models.ValidationResult
 import com.example.common.validators.validateEmail
 import com.example.common.validators.validatePassword
+import com.example.models.auth.Token
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -29,9 +29,6 @@ class LoginViewModel(private val loginUseCase: com.example.domain.auth.LoginUseC
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
-    private val _snackBarChannel = Channel<SnackBarEvent>()
-    val snackBarChannel = _snackBarChannel.receiveAsFlow()
-
     fun setEmail(value: String) {
         _email.update { value }
     }
@@ -40,15 +37,11 @@ class LoginViewModel(private val loginUseCase: com.example.domain.auth.LoginUseC
         _password.update { value }
     }
 
-    fun login(onSuccess: (com.example.models.auth.Token) -> Unit): Job = viewModelScope.launch {
+    fun login(onResult: (Result<Token>) -> Unit): Job = viewModelScope.launch {
         _isLoading.update { true }
         val result = loginUseCase(com.example.models.auth.Credentials(email.value, password.value))
         _isLoading.update { false }
-        result.ifFailure {
-            val event = SnackBarEvent(it ?: "Unknown error", "Retry") { login(onSuccess) }
-            _snackBarChannel.send(event)
-        }
-        result.ifSuccess(onSuccess)
+        onResult(result)
     }
 
 }

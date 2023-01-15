@@ -20,6 +20,8 @@ import com.example.common.components.OneTimeEventButton
 import com.example.common.components.ValidationPasswordTextField
 import com.example.common.components.ValidationTextField
 import com.example.common.functions.handleSnackBarEvent
+import com.example.common.models.Result
+import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,9 +32,9 @@ import org.koin.androidx.compose.viewModel
 @Composable
 fun LoginScreen(
     logo: Any,
-    snackbarHostState: SnackbarHostState,
     onLoggedIn: () -> Unit,
     onRegisterClick: () -> Unit,
+    onShowSnackBarEvent: (SnackBarEvent) -> Unit,
     imageLoader: ImageLoader = get()
 ) {
     val viewModel: LoginViewModel by viewModel()
@@ -47,16 +49,17 @@ fun LoginScreen(
         onPasswordValueChange = viewModel::setPassword,
         loginButtonEnable = viewModel.enableLogin,
         loading = viewModel.isLoading,
-        onLoginButtonClick = { viewModel.login(onSuccess = { onLoggedIn() }) },
+        onLoginButtonClick = {
+            viewModel.login { result ->
+                if (result is Result.Success)
+                    onLoggedIn()
+                else if (result is Result.Error)
+                    onShowSnackBarEvent(SnackBarEvent(result.exception ?: "Unknown error"))
+            }
+        },
         onRegisterClick = onRegisterClick,
         imageLoader = imageLoader
     )
-
-    LaunchedEffect(key1 = Unit) {
-        viewModel.snackBarChannel.collectLatest {
-            snackbarHostState.handleSnackBarEvent(it)
-        }
-    }
 }
 
 @Composable

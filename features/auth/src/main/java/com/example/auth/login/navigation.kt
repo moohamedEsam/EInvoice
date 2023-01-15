@@ -1,9 +1,9 @@
 package com.example.auth.login
 
-import androidx.compose.material3.SnackbarHostState
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import com.example.common.models.SnackBarEvent
 
 const val LoginScreenRoute = "login"
 
@@ -16,14 +16,14 @@ fun NavHostController.navigateToLoginScreen() {
 }
 
 fun NavGraphBuilder.loginScreen(
-    snackbarHostState: SnackbarHostState,
     logo: Any,
     onLoggedIn: () -> Unit,
-    onRegisterClick: () -> Unit
+    onRegisterClick: () -> Unit,
+    onShowSnackBarEvent: (SnackBarEvent) -> Unit,
 ) {
     composable(LoginScreenRoute) {
         LoginScreen(
-            snackbarHostState = snackbarHostState,
+            onShowSnackBarEvent = onShowSnackBarEvent,
             logo = logo,
             onLoggedIn = onLoggedIn,
             onRegisterClick = onRegisterClick
