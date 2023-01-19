@@ -3,6 +3,7 @@ package com.example.worker
 import android.content.Context
 import androidx.work.*
 import com.example.data.branch.BranchRepository
+import com.example.data.client.ClientRepository
 import com.example.data.company.CompanyRepository
 import com.example.data.sync.Synchronizer
 import kotlinx.coroutines.*
@@ -12,6 +13,7 @@ class SynchronizerWorker(
     workerParams: WorkerParameters,
     private val companyRepository: CompanyRepository,
     private val branchRepository: BranchRepository,
+    private val clientRepository: ClientRepository,
     private val synchronizer: Synchronizer,
     private val dispatcher: CoroutineDispatcher
 ) : CoroutineWorker(appContext, workerParams) {
@@ -20,7 +22,8 @@ class SynchronizerWorker(
             withContext(dispatcher) {
                 val isSyncSuccessful = awaitAll(
                     async { companyRepository.syncWith(synchronizer) },
-                    async { branchRepository.syncWith(synchronizer) }
+                    async { branchRepository.syncWith(synchronizer) },
+                    async { clientRepository.syncWith(synchronizer) }
                 ).all { it }
                 if (!isSyncSuccessful)
                     Result.retry()

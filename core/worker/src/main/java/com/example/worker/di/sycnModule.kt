@@ -14,6 +14,7 @@ val syncModule = module {
             workerParams = get(),
             companyRepository = get(),
             branchRepository = get(),
+            clientRepository = get(),
             synchronizer = Synchronizer(),
             dispatcher = Dispatchers.IO
         )

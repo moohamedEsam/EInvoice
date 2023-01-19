@@ -5,21 +5,14 @@ import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,7 +20,7 @@ import androidx.compose.ui.window.Dialog
 import com.example.common.models.Result
 import com.example.common.models.SnackBarEvent
 import com.example.company.screen.form.CompanyFormScreenContent
-import com.example.einvoicecomponents.OutlinedSearchTextField
+import com.example.einvoicecomponents.ListScreenContent
 import com.example.models.Company
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -125,63 +118,27 @@ private fun CompaniesScreenContent(
     onCompanyDeleteClick: (Company) -> Unit,
     onCreateNewCompanyClick: () -> Unit = {}
 ) {
-    Column(
+
+    ListScreenContent(
+        queryState = queryState,
+        onQueryChange = onQueryChange,
+        floatingButtonText = "Create New Company",
+        adaptiveItemSize = 250.dp,
+        onFloatingButtonClick = onCreateNewCompanyClick,
         modifier = modifier
-            .fillMaxSize()
-            .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        var expanded by remember {
-            mutableStateOf(false)
-        }
-        val nestedScrollConnection = object : NestedScrollConnection {
-            override fun onPostScroll(
-                consumed: Offset,
-                available: Offset,
-                source: NestedScrollSource
-            ): Offset {
-                expanded = consumed.y < 0f || available.y < 0f
-                return super.onPostScroll(consumed, available, source)
-            }
-        }
-        CompanySearchTextField(queryState = queryState, onQueryChange = onQueryChange)
-        LazyVerticalStaggeredGrid(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier
-                .weight(1f)
-                .nestedScroll(nestedScrollConnection),
-            columns = StaggeredGridCells.Adaptive(250.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(companies, key = { it.id }) { company ->
-                CompanyItem(
-                    company = company,
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = { onCompanyClick(company) },
-                    onEditClick = { onCompanyEditClick(company) },
-                    onDeleteClick = { onCompanyDeleteClick(company) }
-                )
-            }
-        }
-        CreateNewCompanyFloatingButton(onCreateNewCompanyClick) {
-            expanded
+    ){
+        items(companies, key = { it.id }) { company ->
+            CompanyItem(
+                company = company,
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { onCompanyClick(company) },
+                onEditClick = { onCompanyEditClick(company) },
+                onDeleteClick = { onCompanyDeleteClick(company) }
+            )
         }
     }
 }
 
-@Composable
-private fun ColumnScope.CreateNewCompanyFloatingButton(
-    onCreateNewCompanyClick: () -> Unit,
-    isExpanded: () -> Boolean
-) {
-    ExtendedFloatingActionButton(
-        onClick = onCreateNewCompanyClick,
-        modifier = Modifier.align(Alignment.End),
-        text = { Text("Create new company") },
-        icon = { Icon(Icons.Filled.Add, contentDescription = "Create new company") },
-        expanded = isExpanded()
-    )
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -233,16 +190,6 @@ private fun CompanyItem(
             }
         }
     }
-}
-
-@Composable
-private fun CompanySearchTextField(queryState: StateFlow<String>, onQueryChange: (String) -> Unit) {
-    OutlinedSearchTextField(
-        queryState = queryState,
-        onQueryChange = onQueryChange,
-        label = "Search",
-        modifier = Modifier.fillMaxWidth()
-    )
 }
 
 @Preview(showBackground = true)

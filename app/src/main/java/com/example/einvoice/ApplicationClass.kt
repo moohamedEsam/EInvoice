@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.work.*
 import com.example.auth.di.authModule
 import com.example.branch.di.branchModule
+import com.example.client.di.clientModule
 import com.example.company.di.companyModule
 import com.example.data.di.dataModule
 import com.example.database.di.databaseModule
@@ -35,7 +36,8 @@ class ApplicationClass : Application() {
                     databaseModule,
                     mapLocationModule,
                     branchModule,
-                    syncModule
+                    syncModule,
+                    clientModule
                 )
             )
         }

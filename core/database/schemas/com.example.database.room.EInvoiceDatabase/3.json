@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "143f3d8a1454e7a5510541fbb401f9b6",
+    "identityHash": "f77681d75eb7c41fcabbe6618178e40b",
     "entities": [
       {
         "tableName": "Branch",
@@ -190,7 +190,7 @@
       },
       {
         "tableName": "Client",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`registrationNumber` TEXT NOT NULL, `name` TEXT NOT NULL, `email` TEXT NOT NULL, `phone` TEXT NOT NULL, `address` TEXT NOT NULL, `businessType` TEXT NOT NULL, `taxStatus` TEXT NOT NULL, `companyId` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`registrationNumber` TEXT NOT NULL, `name` TEXT NOT NULL, `email` TEXT NOT NULL, `phone` TEXT NOT NULL, `address` TEXT NOT NULL, `businessType` TEXT NOT NULL, `taxStatus` TEXT NOT NULL, `companyId` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "registrationNumber",
@@ -238,6 +238,24 @@
             "fieldPath": "companyId",
             "columnName": "companyId",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isCreated",
+            "columnName": "isCreated",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isUpdated",
+            "columnName": "isUpdated",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isDeleted",
+            "columnName": "isDeleted",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -322,7 +340,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '143f3d8a1454e7a5510541fbb401f9b6')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f77681d75eb7c41fcabbe6618178e40b')"
     ]
   }
 }

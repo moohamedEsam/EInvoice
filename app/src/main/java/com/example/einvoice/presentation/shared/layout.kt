@@ -13,8 +13,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.auth.login.LoginScreenRoute
 import com.example.branch.screens.all.navigateToBranchesScreen
 import com.example.branch.screens.form.BranchFormScreenRoute
+import com.example.client.screens.all.ClientsScreenRoute
+import com.example.client.screens.all.navigateToClientsScreen
 import com.example.common.models.SnackBarEvent
 import com.example.company.screen.all.CompaniesScreenRoute
 import com.example.company.screen.all.navigateToCompaniesScreen
@@ -108,6 +111,13 @@ private fun DrawerContent(navController: NavHostController) {
             selected = currentRoute == BranchFormScreenRoute,
             onClick = navController::navigateToBranchesScreen
         )
+
+        NavigationDrawerItem(
+            icon = { Icon(Icons.Outlined.Home, contentDescription = null) },
+            label = { Text("Clients") },
+            selected = currentRoute == ClientsScreenRoute,
+            onClick = navController::navigateToClientsScreen
+        )
     }
 }
 
@@ -118,6 +128,7 @@ fun EInvoiceTopBar(navController: NavHostController, drawerState: DrawerState) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route ?: return
     val coroutine = rememberCoroutineScope()
+    if (currentRoute == LoginScreenRoute) return
     CenterAlignedTopAppBar(
         title = {
             Text(text = currentRoute.takeWhile { it != '/' })

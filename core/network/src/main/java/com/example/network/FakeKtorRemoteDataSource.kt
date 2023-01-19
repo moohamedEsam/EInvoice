@@ -58,7 +58,6 @@ class FakeKtorRemoteDataSource : EInvoiceRemoteDataSource {
                 phone = "phone",
                 address = Address(
                     "street",
-                    "city",
                     "country",
                     "zip",
                     "state",
@@ -96,7 +95,6 @@ class FakeKtorRemoteDataSource : EInvoiceRemoteDataSource {
                         "district",
                         "reference",
                         "latitude",
-                        "longitude",
                     ),
                     businessType = BusinessType.B,
                     taxStatus = TaxStatus.Taxable,
@@ -129,7 +127,6 @@ class FakeKtorRemoteDataSource : EInvoiceRemoteDataSource {
                     "district",
                     "reference",
                     "latitude",
-                    "longitude",
                 ),
                 businessType = BusinessType.B,
                 taxStatus = TaxStatus.Taxable,

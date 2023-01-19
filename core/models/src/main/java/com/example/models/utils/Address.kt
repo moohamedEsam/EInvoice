@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Address(
     val street: String,
-    val city: String,
     val country: String,
     val governate: String,
     val postalCode: String,

@@ -10,8 +10,10 @@ import com.example.auth.register.registerScreen
 import com.example.branch.screens.all.branchesScreen
 import com.example.branch.screens.form.branchFormScreen
 import com.example.branch.screens.form.navigateToBranchFormScreen
+import com.example.client.screens.all.clientsScreen
 import com.example.common.models.SnackBarEvent
 import com.example.company.screen.all.companiesScreen
+import com.example.company.screen.all.navigateToCompaniesScreen
 import com.example.einvoice.R
 import com.example.maplocation.latKey
 import com.example.maplocation.lngKey
@@ -33,7 +35,7 @@ fun EInvoiceNavGraph(
         loginScreen(
             onShowSnackBarEvent = onShowSnackbarEvent,
             logo = R.drawable.invoice,
-            onLoggedIn = {},
+            onLoggedIn = navController::navigateToCompaniesScreen,
             onRegisterClick = navController::navigateToRegister
         )
 
@@ -64,5 +66,7 @@ fun EInvoiceNavGraph(
                 navController.navigateToBranchFormScreen(id = it)
             }
         )
+
+        clientsScreen(onClientClicked = {}, onCreateClientClicked = {})
     }
 }

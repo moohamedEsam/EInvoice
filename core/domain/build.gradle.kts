@@ -22,9 +22,11 @@ android {
 dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:models"))
+    implementation(project(":core:worker"))
     implementation(project(":common"))
     implementation(Dependencies.koinCore)
     implementation(Dependencies.koinAndroid)
     implementation(Dependencies.coroutinesAndroid)
     implementation(Dependencies.coroutinesCore)
+    implementation(Dependencies.workManager)
 }
