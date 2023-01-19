@@ -86,23 +86,23 @@ private fun ClientItem(
             )
 
             Text(
-                text = "Tax status: ${client.taxStatus}",
+                text = "Tax status: ${client.status}",
                 style = MaterialTheme.typography.bodyMedium
             )
 
 
+            if (client.address != null) {
+                Text(
+                    text = "Governorate: ${client.address?.governate}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
 
-            Text(
-                text = "Governorate: ${client.address.governate}",
-                style = MaterialTheme.typography.bodyMedium
-            )
+                Text(
+                    text = "City: ${client.address?.regionCity}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
 
-            Text(
-                text = "City: ${client.address.regionCity}",
-                style = MaterialTheme.typography.bodyMedium
-            )
-
-
+            }
         }
     }
 }
@@ -130,7 +130,7 @@ fun ClientsScreenPreview() {
         id = "Id 1",
         registrationNumber = "Registration Number 1",
         businessType = BusinessType.B,
-        taxStatus = TaxStatus.Taxable,
+        status = TaxStatus.Taxable,
         companyId = "Company Id 1",
     )
     ClientsScreenContent(

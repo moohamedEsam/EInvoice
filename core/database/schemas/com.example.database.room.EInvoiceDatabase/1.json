@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "f77681d75eb7c41fcabbe6618178e40b",
+    "identityHash": "4474148d4afa60d7a0840fdf12c92c9d",
     "entities": [
       {
         "tableName": "Branch",
@@ -190,7 +190,7 @@
       },
       {
         "tableName": "Client",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`registrationNumber` TEXT NOT NULL, `name` TEXT NOT NULL, `email` TEXT NOT NULL, `phone` TEXT NOT NULL, `address` TEXT NOT NULL, `businessType` TEXT NOT NULL, `taxStatus` TEXT NOT NULL, `companyId` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`registrationNumber` TEXT NOT NULL, `name` TEXT NOT NULL, `email` TEXT NOT NULL, `phone` TEXT NOT NULL, `address` TEXT, `businessType` TEXT NOT NULL, `status` TEXT NOT NULL, `companyId` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "registrationNumber",
@@ -220,7 +220,7 @@
             "fieldPath": "address",
             "columnName": "address",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "businessType",
@@ -229,8 +229,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "taxStatus",
-            "columnName": "taxStatus",
+            "fieldPath": "status",
+            "columnName": "status",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -340,7 +340,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f77681d75eb7c41fcabbe6618178e40b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4474148d4afa60d7a0840fdf12c92c9d')"
     ]
   }
 }

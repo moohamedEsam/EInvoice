@@ -19,10 +19,7 @@ import com.example.models.OptionalAddress
 import com.example.common.models.Result
 import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
-import com.example.einvoicecomponents.AddressComposable
-import com.example.einvoicecomponents.OneTimeEventButton
-import com.example.einvoicecomponents.OptionalAddressComposable
-import com.example.einvoicecomponents.ValidationTextField
+import com.example.einvoicecomponents.*
 import com.example.models.Company
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -173,59 +170,6 @@ private fun BranchFormScreenContent(
             modifier = Modifier.align(Alignment.End)
         )
 
-    }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun CompanyDropDownMenuBox(
-    value: StateFlow<Company?>,
-    companies: StateFlow<List<Company>>,
-    modifier: Modifier = Modifier,
-    onCompanyPicked: (Company) -> Unit
-) {
-    var expanded by remember {
-        mutableStateOf(false)
-    }
-    val selectedCompany by value.collectAsState()
-    val companiesList by companies.collectAsState()
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
-        modifier = modifier
-    ) {
-        TextField(
-            value = selectedCompany?.name ?: "",
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Company") },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-            },
-            modifier = Modifier
-                .menuAnchor()
-                .fillMaxWidth(),
-            colors = ExposedDropdownMenuDefaults.textFieldColors()
-        )
-
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-        ) {
-            companiesList.forEach {
-                DropdownMenuItem(
-                    text = { Text(text = it.name) },
-                    onClick = {
-                        onCompanyPicked(it)
-                        expanded = false
-                    },
-                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
     }
 }
 

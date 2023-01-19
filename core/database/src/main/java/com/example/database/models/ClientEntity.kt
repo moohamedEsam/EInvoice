@@ -14,9 +14,9 @@ data class ClientEntity(
     val name: String,
     val email: String,
     val phone: String,
-    val address: Address,
+    val address: Address?,
     val businessType: BusinessType,
-    val taxStatus: TaxStatus,
+    val status: TaxStatus,
     val companyId: String,
     val isCreated: Boolean = false,
     val isUpdated: Boolean = false,
@@ -32,7 +32,7 @@ fun ClientEntity.asClient() = Client(
     phone = phone,
     address = address,
     businessType = businessType,
-    taxStatus = taxStatus,
+    status = status,
     companyId = companyId
 )
 
@@ -47,7 +47,7 @@ fun Client.asClientEntity(
     phone = phone,
     address = address,
     businessType = businessType,
-    taxStatus = taxStatus,
+    status = status,
     companyId = companyId,
     id = id,
     isCreated = isCreated,

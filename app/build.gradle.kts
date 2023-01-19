@@ -70,7 +70,6 @@ dependencies {
     implementation(Dependencies.coroutinesCore)
     implementation(Dependencies.viewModelCompose)
     implementation(Dependencies.splashScreen)
-
     implementation(project(":common"))
     implementation(project(":core:network"))
     implementation(project(":core:data"))

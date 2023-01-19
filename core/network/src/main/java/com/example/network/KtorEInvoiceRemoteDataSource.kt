@@ -8,9 +8,7 @@ import com.example.models.Company
 import com.example.models.auth.Credentials
 import com.example.models.auth.Register
 import com.example.models.auth.Token
-import com.example.network.models.ApiResponse
-import com.example.network.models.Urls
-import com.example.network.models.asResult
+import com.example.network.models.*
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
@@ -84,23 +82,23 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
 
     override suspend fun createClient(client: Client): Result<Client> = tryWrapper {
         val response = this.client.post(Urls.CLIENT) {
-            setBody(client)
+            setBody(client.asNetworkClient())
             contentType(ContentType.Application.Json)
         }
-        val apiResponse = response.body<ApiResponse<Client>>()
-        apiResponse.asResult()
+        val apiResponse = response.body<ApiResponse<NetworkClient>>()
+        apiResponse.asResult().map { it.asClient() }
     }
 
     override suspend fun getClient(clientId: String): Result<Client> = tryWrapper {
         val response = client.get(Urls.getClient(clientId))
-        val apiResponse = response.body<ApiResponse<Client>>()
-        apiResponse.asResult()
+        val apiResponse = response.body<ApiResponse<NetworkClient>>()
+        apiResponse.asResult().map { it.asClient() }
     }
 
     override suspend fun getClients(): Result<List<Client>> = tryWrapper {
         val response = client.get(Urls.CLIENT)
-        val apiResponse = response.body<ApiResponse<List<Client>>>()
-        apiResponse.asResult()
+        val apiResponse = response.body<ApiResponse<List<NetworkClient>>>()
+        apiResponse.asResult().map { clients -> clients.map { it.asClient() } }
     }
 
     override suspend fun updateClient(client: Client): Result<Client> = tryWrapper {
@@ -108,14 +106,14 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
             setBody(client)
             contentType(ContentType.Application.Json)
         }
-        val apiResponse = response.body<ApiResponse<Client>>()
-        apiResponse.asResult()
+        val apiResponse = response.body<ApiResponse<NetworkClient>>()
+        apiResponse.asResult().map { it.asClient() }
     }
 
     override suspend fun deleteClient(clientId: String): Result<Client> = tryWrapper {
         val response = client.delete(Urls.getClient(clientId))
-        val apiResponse = response.body<ApiResponse<Client>>()
-        apiResponse.asResult()
+        val apiResponse = response.body<ApiResponse<NetworkClient>>()
+        apiResponse.asResult().map { it.asClient() }
     }
 
     override suspend fun createBranch(branch: Branch): Result<Branch> = tryWrapper {
