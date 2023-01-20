@@ -19,7 +19,7 @@ fun ColumnScope.OneTimeEventButton(
     loading: StateFlow<Boolean>,
     modifier: Modifier = Modifier,
     label: String,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit
 ) {
     val isEnabled by enabled.collectAsState()
     val isLoading by loading.collectAsState()
