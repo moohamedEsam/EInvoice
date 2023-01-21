@@ -4,10 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.example.database.models.BranchEntity
-import com.example.database.models.ClientEntity
-import com.example.database.models.CompanyEntity
-import com.example.database.models.ItemEntity
+import com.example.database.models.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -128,5 +125,21 @@ interface EInvoiceDao {
     @Update
     suspend fun updateItem(item: ItemEntity)
 
+    @Query("SELECT * FROM Item WHERE isDeleted = 0 and isCreated = 1")
+    suspend fun getCreatedItems(): List<ItemEntity>
 
+    @Query("SELECT * FROM Item WHERE isDeleted = 0 and isUpdated = 1")
+    suspend fun getUpdatedItems(): List<ItemEntity>
+
+    @Query("SELECT * FROM Item WHERE isDeleted = 1")
+    suspend fun getDeletedItems(): List<ItemEntity>
+
+    @Query("delete from item")
+    suspend fun deleteAllItems()
+
+    @Insert
+    suspend fun insertUnitType(unitType: UnitTypeEntity)
+
+    @Query("delete FROM UnitType")
+    suspend fun deleteAllUnitTypes()
 }

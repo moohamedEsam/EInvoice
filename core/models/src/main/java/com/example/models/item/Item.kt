@@ -1,6 +1,7 @@
-package com.example.models
+package com.example.models.item
 
 import com.example.models.utils.TaxStatus
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable

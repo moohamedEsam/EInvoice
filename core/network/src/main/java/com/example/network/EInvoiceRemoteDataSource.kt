@@ -4,9 +4,11 @@ import com.example.common.models.Result
 import com.example.models.Branch
 import com.example.models.Client
 import com.example.models.Company
+import com.example.models.item.Item
 import com.example.models.auth.Credentials
 import com.example.models.auth.Register
 import com.example.models.auth.Token
+import com.example.models.item.UnitType
 
 interface EInvoiceRemoteDataSource {
     //auth
@@ -34,5 +36,17 @@ interface EInvoiceRemoteDataSource {
     suspend fun getBranches(): Result<List<Branch>>
     suspend fun updateBranch(branch: Branch): Result<Branch>
     suspend fun deleteBranch(branchId: String): Result<Branch>
+
+    // item related
+    suspend fun createItem(item: Item): Result<Item>
+    suspend fun getItem(itemId: String): Result<Item>
+
+    suspend fun getItems(): Result<List<Item>>
+
+    suspend fun updateItem(item: Item): Result<Item>
+
+    suspend fun deleteItem(itemId: String): Result<Item>
+
+    suspend fun getUnitTypes(): Result<List<UnitType>>
 
 }

@@ -1,12 +1,14 @@
 package com.example.data.sync
 
 import com.example.common.models.Result
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 
 interface Syncable<T> {
     suspend fun syncWith(synchronizer: Synchronizer): Boolean
 }
 
-class Synchronizer
+data class Synchronizer(val dispatcher: CoroutineDispatcher = Dispatchers.IO)
 
 
 suspend fun <T> Synchronizer.handleSync(

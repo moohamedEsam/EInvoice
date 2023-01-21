@@ -8,6 +8,8 @@ import com.example.models.Company
 import com.example.models.auth.Credentials
 import com.example.models.auth.Register
 import com.example.models.auth.Token
+import com.example.models.item.Item
+import com.example.models.item.UnitType
 import com.example.network.models.*
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -114,6 +116,48 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
         val response = client.delete(Urls.getClient(clientId))
         val apiResponse = response.body<ApiResponse<NetworkClient>>()
         apiResponse.asResult().map { it.asClient() }
+    }
+
+    override suspend fun createItem(item: Item): Result<Item> = tryWrapper {
+        val response = this.client.post(Urls.ITEM) {
+            setBody(item.asNetworkItem())
+            contentType(ContentType.Application.Json)
+        }
+        val apiResponse = response.body<ApiResponse<Item>>()
+        apiResponse.asResult()
+    }
+
+    override suspend fun getItem(itemId: String): Result<Item> = tryWrapper {
+        val response = client.get(Urls.getItem(itemId))
+        val apiResponse = response.body<ApiResponse<NetworkItem>>()
+        apiResponse.asResult().map { it.asItem() }
+    }
+
+    override suspend fun getItems(): Result<List<Item>> = tryWrapper {
+        val response = client.get(Urls.ITEM)
+        val apiResponse = response.body<ApiResponse<List<NetworkItem>>>()
+        apiResponse.asResult().map { items -> items.map { it.asItem() } }
+    }
+
+    override suspend fun updateItem(item: Item): Result<Item> = tryWrapper {
+        val response = this.client.put(Urls.getItem(item.id)) {
+            setBody(item.asNetworkItem())
+            contentType(ContentType.Application.Json)
+        }
+        val apiResponse = response.body<ApiResponse<Item>>()
+        apiResponse.asResult()
+    }
+
+    override suspend fun deleteItem(itemId: String): Result<Item> = tryWrapper {
+        val response = client.delete(Urls.getItem(itemId))
+        val apiResponse = response.body<ApiResponse<NetworkItem>>()
+        apiResponse.asResult().map { it.asItem() }
+    }
+
+    override suspend fun getUnitTypes(): Result<List<UnitType>> = tryWrapper {
+        val response = client.get(Urls.UNIT_TYPES)
+        val apiResponse = response.body<ApiResponse<List<UnitType>>>()
+        apiResponse.asResult()
     }
 
     override suspend fun createBranch(branch: Branch): Result<Branch> = tryWrapper {
