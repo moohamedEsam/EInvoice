@@ -11,7 +11,7 @@ import com.example.domain.branch.GetBranchUseCase
 import com.example.domain.branch.UpdateBranchUseCase
 import com.example.domain.company.GetCompaniesUseCase
 import com.example.models.Branch
-import com.example.models.Company
+import com.example.models.company.Company
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*

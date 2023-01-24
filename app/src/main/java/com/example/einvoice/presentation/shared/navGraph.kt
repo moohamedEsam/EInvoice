@@ -16,6 +16,8 @@ import com.example.client.screens.form.navigateToClientFormScreen
 import com.example.common.models.SnackBarEvent
 import com.example.company.screen.all.companiesScreen
 import com.example.company.screen.all.navigateToCompaniesScreen
+import com.example.company.screen.form.companyFormScreen
+import com.example.company.screen.form.navigateToCompanyFormScreen
 import com.example.einvoice.R
 import com.example.maplocation.latKey
 import com.example.maplocation.lngKey
@@ -48,9 +50,14 @@ fun EInvoiceNavGraph(
             onLoginClick = navController::popBackStack
         )
 
-        companiesScreen(onShowSnackbarEvent) {
+        companiesScreen(
+            onShowSnackBarEvent = onShowSnackbarEvent,
+            onCompanyClick = {},
+            onCreateNewCompany = navController::navigateToCompanyFormScreen,
+            onCompanyEditClick = { navController.navigateToCompanyFormScreen(it) }
+        )
 
-        }
+        companyFormScreen(onShowSnackbarEvent)
 
         branchFormScreen(onShowSnackbarEvent) {
             navController.navigateToMapScreen()

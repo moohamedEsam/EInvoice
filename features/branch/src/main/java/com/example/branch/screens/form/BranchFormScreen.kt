@@ -20,7 +20,9 @@ import com.example.common.models.Result
 import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
 import com.example.einvoicecomponents.*
-import com.example.models.Company
+import com.example.models.company.Company
+import com.example.models.company.CompanySettings
+import com.example.models.company.empty
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.viewModel
@@ -176,7 +178,16 @@ private fun BranchFormScreenContent(
 @Preview(showBackground = true)
 @Composable
 fun BranchFormScreenPreview() {
-    val companies = List(4) { Company("company", "123", "name", "012", null) }
+    val companies = List(4) {
+        Company(
+            "company",
+            "123",
+            "name",
+            "012",
+            null,
+            settings = CompanySettings.empty()
+        )
+    }
     val selectedCompany = companies[0]
     val name = MutableStateFlow("")
     val nameValidationResult = MutableStateFlow(ValidationResult.Valid)

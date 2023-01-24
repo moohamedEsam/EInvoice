@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "f5c3b13fa5816ee17ff36ca933e819d2",
+    "identityHash": "135bc27d1c18fa579e573a77b5d3fba1",
     "entities": [
       {
         "tableName": "Branch",
@@ -122,7 +122,7 @@
       },
       {
         "tableName": "Company",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `registrationNumber` TEXT NOT NULL, `ceo` TEXT NOT NULL, `phone` TEXT NOT NULL, `website` TEXT, `isDeleted` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isCreated` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `registrationNumber` TEXT NOT NULL, `ceo` TEXT NOT NULL, `phone` TEXT NOT NULL, `website` TEXT, `settings` TEXT NOT NULL, `isDeleted` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isCreated` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "name",
@@ -153,6 +153,12 @@
             "columnName": "website",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "settings",
+            "columnName": "settings",
+            "affinity": "TEXT",
+            "notNull": true
           },
           {
             "fieldPath": "isDeleted",
@@ -390,7 +396,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f5c3b13fa5816ee17ff36ca933e819d2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '135bc27d1c18fa579e573a77b5d3fba1')"
     ]
   }
 }

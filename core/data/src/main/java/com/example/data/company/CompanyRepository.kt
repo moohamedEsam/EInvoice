@@ -1,6 +1,6 @@
 package com.example.data.company
 
-import com.example.models.Company
+import com.example.models.company.Company
 import com.example.common.models.Result
 import com.example.data.sync.Syncable
 import kotlinx.coroutines.flow.Flow

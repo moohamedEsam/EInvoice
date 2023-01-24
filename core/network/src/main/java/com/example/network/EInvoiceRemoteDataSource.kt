@@ -3,7 +3,7 @@ package com.example.network
 import com.example.common.models.Result
 import com.example.models.Branch
 import com.example.models.Client
-import com.example.models.Company
+import com.example.models.company.Company
 import com.example.models.item.Item
 import com.example.models.auth.Credentials
 import com.example.models.auth.Register

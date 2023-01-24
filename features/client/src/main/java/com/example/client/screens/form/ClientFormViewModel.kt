@@ -1,7 +1,6 @@
 package com.example.client.screens.form
 
 import android.location.Address
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.common.models.Result
@@ -14,7 +13,7 @@ import com.example.domain.client.GetClientUseCase
 import com.example.domain.client.UpdateClientUseCase
 import com.example.domain.company.GetCompaniesUseCase
 import com.example.models.Client
-import com.example.models.Company
+import com.example.models.company.Company
 import com.example.models.OptionalAddress
 import com.example.models.utils.BusinessType
 import com.example.models.utils.TaxStatus

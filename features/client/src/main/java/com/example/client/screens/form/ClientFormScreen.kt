@@ -4,9 +4,6 @@ import android.location.Address
 import android.location.Geocoder
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -23,7 +20,7 @@ import com.example.common.models.Result
 import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
 import com.example.einvoicecomponents.*
-import com.example.models.Company
+import com.example.models.company.Company
 import com.example.models.OptionalAddress
 import com.example.models.utils.BusinessType
 import com.example.models.utils.TaxStatus

@@ -8,11 +8,10 @@ import com.example.database.models.CompanyEntity
 import com.example.database.models.asCompany
 import com.example.database.models.asCompanyEntity
 import com.example.database.room.EInvoiceDao
-import com.example.models.Company
+import com.example.models.company.Company
 import com.example.network.EInvoiceRemoteDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
 class OfflineFirstCompanyRepository(

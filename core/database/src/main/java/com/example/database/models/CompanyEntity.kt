@@ -2,7 +2,8 @@ package com.example.database.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.models.Company
+import com.example.models.company.Company
+import com.example.models.company.CompanySettings
 import java.util.UUID
 
 
@@ -13,6 +14,7 @@ data class CompanyEntity(
     val ceo: String,
     val phone: String,
     val website: String?,
+    val settings: CompanySettings,
     val isDeleted: Boolean = false,
     val isUpdated: Boolean = false,
     val isCreated: Boolean = false,
@@ -25,7 +27,8 @@ fun CompanyEntity.asCompany() = Company(
     ceo = ceo,
     phone = phone,
     website = website,
-    id = id
+    id = id,
+    settings = settings
 )
 
 fun Company.asCompanyEntity(
@@ -39,6 +42,7 @@ fun Company.asCompanyEntity(
     phone = phone,
     website = website,
     id = id,
+    settings = settings,
     isCreated = isCreated,
     isUpdated = isUpdated,
     isDeleted = isDeleted

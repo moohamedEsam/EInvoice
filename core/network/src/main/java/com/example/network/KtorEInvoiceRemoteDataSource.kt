@@ -4,7 +4,7 @@ import com.example.common.functions.tryWrapper
 import com.example.common.models.Result
 import com.example.models.Branch
 import com.example.models.Client
-import com.example.models.Company
+import com.example.models.company.Company
 import com.example.models.auth.Credentials
 import com.example.models.auth.Register
 import com.example.models.auth.Token
@@ -17,7 +17,6 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.auth.*
 import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.request.*
-import io.ktor.client.utils.EmptyContent.contentType
 import io.ktor.http.*
 
 class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRemoteDataSource {
@@ -156,8 +155,8 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
 
     override suspend fun getUnitTypes(): Result<List<UnitType>> = tryWrapper {
         val response = client.get(Urls.UNIT_TYPES)
-        val apiResponse = response.body<ApiResponse<List<UnitType>>>()
-        apiResponse.asResult()
+        val apiResponse = response.body<ApiResponse<List<NetworkUnitType>>>()
+        apiResponse.asResult().map { unitTypes -> unitTypes.map { it.asUnitType() } }
     }
 
     override suspend fun createBranch(branch: Branch): Result<Branch> = tryWrapper {

@@ -16,12 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import com.example.common.models.Result
 import com.example.common.models.SnackBarEvent
-import com.example.company.screen.form.CompanyFormScreenContent
 import com.example.einvoicecomponents.ListScreenContent
-import com.example.models.Company
+import com.example.models.company.Company
+import com.example.models.company.CompanySettings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.viewModel
@@ -29,18 +28,19 @@ import org.koin.androidx.compose.viewModel
 @Composable
 fun CompaniesScreen(
     onShowSnackBarEvent: (SnackBarEvent) -> Unit,
-    onCompanyClick: (Company) -> Unit
+    onCompanyClick: (Company) -> Unit,
+    onCreateNewCompanyClick: () -> Unit,
+    onCompanyEditClick: (Company) -> Unit,
 ) {
     val viewModel: CompaniesViewModel by viewModel()
     val companies by viewModel.companies.collectAsState()
-    val showDialog by viewModel.showCreateDialog.collectAsState()
     CompaniesScreenContent(
         companies = companies,
         onCompanyClick = onCompanyClick,
         queryState = viewModel.query,
         onQueryChange = viewModel::setQuery,
-        onCreateNewCompanyClick = viewModel::toggleCreateDialog,
-        onCompanyEditClick = { viewModel.editCompany(it.id) },
+        onCreateNewCompanyClick = onCreateNewCompanyClick,
+        onCompanyEditClick = onCompanyEditClick,
         onCompanyDeleteClick = {
             viewModel.deleteCompany(it) { result ->
                 val event = if (result is Result.Success)
@@ -58,52 +58,7 @@ fun CompaniesScreen(
             }
         }
     )
-    if (showDialog)
-        CreateCompanyDialog(viewModel, onShowSnackBarEvent)
 
-}
-
-@Composable
-private fun CreateCompanyDialog(
-    viewModel: CompaniesViewModel,
-    onShowSnackBarEvent: (SnackBarEvent) -> Unit
-) {
-    Dialog(onDismissRequest = viewModel::toggleCreateDialog) {
-        Card {
-            CompanyFormScreenContent(
-                nameState = viewModel.name,
-                onNameChange = viewModel::setName,
-                nameValidation = viewModel.nameValidationResult,
-                registrationNumberState = viewModel.registrationNumber,
-                onRegistrationNumberChange = viewModel::setRegistrationNumber,
-                registrationNumberValidation = viewModel.registrationNumberValidationResult,
-                ceoState = viewModel.ceo,
-                onCeoChange = viewModel::setCeo,
-                ceoValidation = viewModel.ceoValidationResult,
-                websiteState = viewModel.website,
-                onWebsiteChange = viewModel::setWebsite,
-                websiteValidation = viewModel.websiteValidationResult,
-                phoneNumberState = viewModel.phone,
-                onPhoneNumberChange = viewModel::setPhone,
-                phoneNumberValidation = viewModel.phoneValidationResult,
-                isFormValid = viewModel.isFormValid,
-                onCreateClick = {
-                    viewModel.saveCompany { result ->
-                        val event = if (result is Result.Success)
-                            SnackBarEvent("Company Saved successfully")
-                        else
-                            SnackBarEvent(
-                                (result as? Result.Error)?.exception ?: "Error creating company",
-                                actionLabel = "Retry"
-                            ) {
-                                viewModel.saveCompany()
-                            }
-                        onShowSnackBarEvent(event)
-                    }
-                }
-            )
-        }
-    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -203,6 +158,12 @@ fun CompaniesScreenPreview() {
             website = "https://www.google.com",
             phone = "123456789",
             ceo = "John Doe",
+            settings = CompanySettings(
+                clientId = "123456789",
+                clientSecret = "123",
+                tokenPin = "123456",
+                taxActivityCode = "123456789"
+            )
         )
     }
 
