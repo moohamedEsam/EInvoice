@@ -10,6 +10,7 @@ import com.example.data.di.dataModule
 import com.example.database.di.databaseModule
 import com.example.domain.di.domainModule
 import com.example.einvoice.di.appModule
+import com.example.item.di.itemModule
 import com.example.maplocation.mapLocationModule
 import com.example.network.di.networkModule
 import com.example.worker.SynchronizerWorker
@@ -37,7 +38,8 @@ class ApplicationClass : Application() {
                     mapLocationModule,
                     branchModule,
                     syncModule,
-                    clientModule
+                    clientModule,
+                    itemModule
                 )
             )
         }

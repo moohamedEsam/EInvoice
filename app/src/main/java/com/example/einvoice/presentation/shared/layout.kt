@@ -22,6 +22,8 @@ import com.example.common.models.SnackBarEvent
 import com.example.company.screen.all.CompaniesScreenRoute
 import com.example.company.screen.all.navigateToCompaniesScreen
 import com.example.functions.handleSnackBarEvent
+import com.example.item.screens.all.ItemsScreenRoute
+import com.example.item.screens.all.navigateToItemsScreen
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -117,6 +119,13 @@ private fun DrawerContent(navController: NavHostController) {
             label = { Text("Clients") },
             selected = currentRoute == ClientsScreenRoute,
             onClick = navController::navigateToClientsScreen
+        )
+
+         NavigationDrawerItem(
+            icon = { Icon(Icons.Outlined.Home, contentDescription = null) },
+            label = { Text("Items") },
+            selected = currentRoute == ItemsScreenRoute,
+            onClick = navController::navigateToItemsScreen
         )
     }
 }

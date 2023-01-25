@@ -6,9 +6,11 @@ import com.example.data.sync.Synchronizer
 import com.example.data.sync.handleSync
 import com.example.database.models.asItem
 import com.example.database.models.asItemEntity
+import com.example.database.models.asUnitType
 import com.example.database.models.asUnitTypeEntity
 import com.example.database.room.EInvoiceDao
 import com.example.models.item.Item
+import com.example.models.item.UnitType
 import com.example.network.EInvoiceRemoteDataSource
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -107,4 +109,7 @@ class OfflineFirstItemRepository(
             beforeLocalCreate = localSource::deleteAllItems,
             remoteFetcher = remoteSource::getItems
         )
+
+    override fun getUnitTypes(): Flow<List<UnitType>> =
+        localSource.getUnitTypes().map { unitTypes -> unitTypes.map { it.asUnitType() } }
 }

@@ -140,6 +140,9 @@ interface EInvoiceDao {
     @Insert
     suspend fun insertUnitType(unitType: UnitTypeEntity)
 
+    @Query("SELECT * FROM UnitType")
+    fun getUnitTypes(): Flow<List<UnitTypeEntity>>
+
     @Query("delete FROM UnitType")
     suspend fun deleteAllUnitTypes()
 }
