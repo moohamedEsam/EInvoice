@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.common.models.Result
 import com.example.common.models.ValidationResult
+import com.example.common.validators.notBlankValidator
 import com.example.common.validators.validateUsername
 import com.example.common.validators.validateWebsite
 import com.example.domain.company.CreateCompanyUseCase
@@ -49,39 +50,23 @@ class CompanyFormViewModel(
 
     private val _clientId = MutableStateFlow("")
     val clientId = _clientId.asStateFlow()
-    val clientIdValidationResult = clientId.map {
-        when {
-            it.isBlank() -> ValidationResult.Invalid("Client ID cannot be blank")
-            else -> ValidationResult.Valid
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
+    val clientIdValidationResult = clientId.map(::notBlankValidator)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
 
     private val _clientSecret = MutableStateFlow("")
     val clientSecret = _clientSecret.asStateFlow()
-    val clientSecretValidationResult = clientSecret.map {
-        when {
-            it.isBlank() -> ValidationResult.Invalid("Client Secret cannot be blank")
-            else -> ValidationResult.Valid
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
+    val clientSecretValidationResult = clientSecret.map(::notBlankValidator)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
 
     private val _tokenPin = MutableStateFlow("")
     val tokenPin = _tokenPin.asStateFlow()
-    val tokenPinValidationResult = tokenPin.map {
-        when {
-            it.isBlank() -> ValidationResult.Invalid("Token PIN cannot be blank")
-            else -> ValidationResult.Valid
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
+    val tokenPinValidationResult = tokenPin.map(::notBlankValidator)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
 
     private val _taxActivityCode = MutableStateFlow("")
     val taxActivityCode = _taxActivityCode.asStateFlow()
-    val taxActivityCodeValidationResult = taxActivityCode.map {
-        when {
-            it.isBlank() -> ValidationResult.Invalid("Tax Activity Code cannot be blank")
-            else -> ValidationResult.Valid
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
+    val taxActivityCodeValidationResult = taxActivityCode.map(::notBlankValidator)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
 
     val isFormValid = combine(
         nameValidationResult,
@@ -158,7 +143,7 @@ class CompanyFormViewModel(
                 name = name.value,
                 registrationNumber = registrationNumber.value,
                 ceo = ceo.value,
-                website = website.value,
+                website = website.value.ifBlank { null },
                 phone = phone.value,
                 settings = CompanySettings(
                     clientId = clientId.value,

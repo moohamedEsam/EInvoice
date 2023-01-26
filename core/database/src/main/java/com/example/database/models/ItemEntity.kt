@@ -1,12 +1,27 @@
 package com.example.database.models
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.example.models.item.Item
 import com.example.models.utils.TaxStatus
 import java.util.*
 
-@Entity(tableName = "Item")
+@Entity(
+    tableName = "Item",
+    foreignKeys = [
+        ForeignKey(
+            entity = BranchEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["branchId"],
+            onDelete = ForeignKey.RESTRICT
+        )
+    ],
+    indices = [
+        Index("branchId")
+    ]
+)
 data class ItemEntity(
     val name: String,
     val description: String,

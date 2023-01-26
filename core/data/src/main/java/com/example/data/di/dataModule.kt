@@ -13,7 +13,7 @@ import com.example.data.item.OfflineFirstItemRepository
 import org.koin.dsl.module
 
 val dataModule = module {
-    single<AuthRepository> { KtorAuthRepository(get()) }
+    single<AuthRepository> { KtorAuthRepository(get(), get()) }
     single<CompanyRepository> { OfflineFirstCompanyRepository(get(), get()) }
     single<BranchRepository> { OfflineFirstBranchRepository(get(), get()) }
     single<ClientRepository> { OfflineFirstClientRepository(get(), get()) }

@@ -21,11 +21,15 @@ import com.example.domain.client.UpdateClientUseCase
 
 import com.example.domain.company.*
 import com.example.domain.item.*
+import com.example.domain.sync.OneTimeSyncUseCase
+import com.example.domain.sync.oneTimeSyncUseCase
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val domainModule = module {
-    single { loginUseCase(get(), androidContext()) }
+    single { oneTimeSyncUseCase(androidContext()) }
+
+    single { loginUseCase(get(), androidContext(), get()) }
     single { logoutUseCase(get(), androidContext()) }
     single { registerUseCase(get(), androidContext()) }
     single { isUserLoggedInUseCase(androidContext()) }

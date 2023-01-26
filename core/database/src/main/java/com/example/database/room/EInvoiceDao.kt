@@ -37,6 +37,9 @@ interface EInvoiceDao {
     @Update
     suspend fun updateBranch(branch: BranchEntity)
 
+    @Query("update Branch set companyId =:newCompanyId where companyId = :oldCompanyId")
+    suspend fun updateBranchesCompanyId(oldCompanyId: String, newCompanyId: String)
+
     // Company
     @Query("SELECT * FROM Company where isDeleted = 0")
     fun getCompanies(): Flow<List<CompanyEntity>>
@@ -106,6 +109,9 @@ interface EInvoiceDao {
     @Update
     suspend fun updateClient(client: ClientEntity)
 
+    @Query("update Client set companyId =:newCompanyId where companyId = :oldCompanyId")
+    suspend fun updateClientsCompanyId(oldCompanyId: String, newCompanyId: String)
+
     // Item
     @Query("SELECT * FROM Item")
     fun getItems(): Flow<List<ItemEntity>>
@@ -124,6 +130,9 @@ interface EInvoiceDao {
 
     @Update
     suspend fun updateItem(item: ItemEntity)
+
+    @Query("update Item set branchId =:newBranchId where branchId = :oldBranchId")
+    suspend fun updateItemsBranchId(oldBranchId: String, newBranchId: String)
 
     @Query("SELECT * FROM Item WHERE isDeleted = 0 and isCreated = 1")
     suspend fun getCreatedItems(): List<ItemEntity>
@@ -145,4 +154,51 @@ interface EInvoiceDao {
 
     @Query("delete FROM UnitType")
     suspend fun deleteAllUnitTypes()
+
+    //invoice line
+    @Query("SELECT * FROM InvoiceLine")
+    fun getInvoiceLines(): Flow<List<InvoiceLineEntity>>
+
+    @Query("SELECT * FROM InvoiceLine WHERE id = :id")
+    fun getInvoiceLineById(id: String): Flow<InvoiceLineEntity>
+
+    @Insert
+    suspend fun insertInvoiceLine(invoiceLine: InvoiceLineEntity)
+
+    @Update
+    suspend fun updateInvoiceLine(invoiceLine: InvoiceLineEntity)
+
+    @Query("DELETE FROM InvoiceLine where id = :id")
+    suspend fun deleteInvoiceLine(id: String)
+
+    @Query("delete from InvoiceLine")
+    suspend fun deleteAllInvoiceLines()
+
+    //document
+    @Query("SELECT * FROM Document")
+    fun getDocuments(): Flow<List<DocumentEntity>>
+
+    @Query("SELECT * FROM Document WHERE id = :id")
+    fun getDocumentById(id: String): Flow<DocumentEntity>
+
+    @Insert
+    suspend fun insertDocument(document: DocumentEntity)
+
+    @Update
+    suspend fun updateDocument(document: DocumentEntity)
+
+    @Query("update document set issuerId =:newIssuerId where issuerId = :oldIssuerId")
+    suspend fun updateDocumentsIssuerId(oldIssuerId: String, newIssuerId: String)
+
+    @Query("update document set receiverId =:newReceiverId where receiverId = :oldReceiverId")
+    suspend fun updateDocumentsReceiverId(oldReceiverId: String, newReceiverId: String)
+
+    @Query("update document set branchId =:newBranchId where branchId = :oldBranchId")
+    suspend fun updateDocumentsBranchId(oldBranchId: String, newBranchId: String)
+
+    @Query("DELETE FROM Document where id = :id")
+    suspend fun deleteDocument(id: String)
+
+    @Query("delete from Document")
+    suspend fun deleteAllDocuments()
 }

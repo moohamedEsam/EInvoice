@@ -52,36 +52,49 @@ class OfflineFirstCompanyRepository(
         Result.Success(Unit)
     }
 
-    override suspend fun syncWith(synchronizer: Synchronizer): Boolean =
-        synchronizer.handleSync(
+    override suspend fun syncWith(synchronizer: Synchronizer): Boolean {
+        val companies = localDataSource.getCompanies().first()
+        val createdCompanies = companies.filter { it.isCreated }
+        val idMappings = createdCompanies.associate { it.id to it.id }.toMutableMap()
+        val isSuccessfulSync = synchronizer.handleSync(
             remoteFetcher = remoteDataSource::getCompanies,
             remoteDeleter = {
-                val companies = localDataSource.getDeletedCompanies()
-                companies.forEach { company ->
+                val deletedCompanies = companies.filter { it.isDeleted }
+                deletedCompanies.forEach { company ->
                     remoteDataSource.deleteCompany(company.id)
                 }
                 Result.Success(Unit)
             },
             remoteCreator = {
-                val companies = localDataSource.getCreatedCompanies()
-                companies.forEach { company ->
-                    remoteDataSource.createCompany(company.asCompany())
+                createdCompanies.forEach { company ->
+                    val result = remoteDataSource.createCompany(company.asCompany())
+                    if (result is Result.Success) {
+                        idMappings[company.id] = result.data.id
+                    }
                 }
                 Result.Success(Unit)
             },
             remoteUpdater = {
-                val companies = localDataSource.getUpdatedCompanies()
-                companies.forEach { company ->
+                val updatedCompanies = companies.filter { it.isUpdated }
+                updatedCompanies.forEach { company ->
                     remoteDataSource.updateCompany(company.asCompany())
                 }
                 Result.Success(Unit)
             },
             localCreator = { company ->
-                localDataSource.insertCompany(company.asCompanyEntity())
+                if (company.id !in companies.map { it.id })
+                    localDataSource.insertCompany(company.asCompanyEntity())
             },
             beforeLocalCreate = {
-                localDataSource.deleteAllCompanies()
+                idMappings.forEach { (oldId, newId) ->
+                    localDataSource.updateBranchesCompanyId(oldId, newId)
+                    localDataSource.updateClientsCompanyId(oldId, newId)
+                    localDataSource.updateDocumentsIssuerId(oldId, newId)
+                }
             }
         )
+        return isSuccessfulSync
+    }
+
 
 }

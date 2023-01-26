@@ -1,12 +1,25 @@
 package com.example.database.models
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.example.models.Branch
 import java.util.UUID
 
 
-@Entity(tableName = "Branch")
+@Entity(
+    tableName = "Branch",
+    foreignKeys = [
+        ForeignKey(
+            entity = CompanyEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["companyId"],
+            onDelete = ForeignKey.SET_NULL
+        )
+    ],
+    indices = [Index("companyId")]
+)
 data class BranchEntity(
     val name: String,
     val internalId: String,

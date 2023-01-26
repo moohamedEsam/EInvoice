@@ -3,9 +3,7 @@ package com.example.einvoice.presentation.shared
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -14,6 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.auth.login.LoginScreenRoute
+import com.example.auth.login.navigateToLoginScreen
 import com.example.branch.screens.all.navigateToBranchesScreen
 import com.example.branch.screens.form.BranchFormScreenRoute
 import com.example.client.screens.all.ClientsScreenRoute
@@ -21,10 +20,13 @@ import com.example.client.screens.all.navigateToClientsScreen
 import com.example.common.models.SnackBarEvent
 import com.example.company.screen.all.CompaniesScreenRoute
 import com.example.company.screen.all.navigateToCompaniesScreen
+import com.example.domain.auth.LogoutUseCase
+import com.example.domain.sync.OneTimeSyncUseCase
 import com.example.functions.handleSnackBarEvent
 import com.example.item.screens.all.ItemsScreenRoute
 import com.example.item.screens.all.navigateToItemsScreen
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.inject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -121,7 +123,7 @@ private fun DrawerContent(navController: NavHostController) {
             onClick = navController::navigateToClientsScreen
         )
 
-         NavigationDrawerItem(
+        NavigationDrawerItem(
             icon = { Icon(Icons.Outlined.Home, contentDescription = null) },
             label = { Text("Items") },
             selected = currentRoute == ItemsScreenRoute,
@@ -137,6 +139,8 @@ fun EInvoiceTopBar(navController: NavHostController, drawerState: DrawerState) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route ?: return
     val coroutine = rememberCoroutineScope()
+    val logoutUseCase: LogoutUseCase by inject()
+    val syncUseCase: OneTimeSyncUseCase by inject()
     if (currentRoute == LoginScreenRoute) return
     CenterAlignedTopAppBar(
         title = {
@@ -171,6 +175,31 @@ fun EInvoiceTopBar(navController: NavHostController, drawerState: DrawerState) {
                 Icon(
                     imageVector = Icons.Outlined.ArrowBack,
                     contentDescription = "Back"
+                )
+            }
+
+            IconButton(onClick = {
+                syncUseCase()
+            }) {
+                Icon(
+                    imageVector = Icons.Outlined.Sync,
+                    contentDescription = "Sync"
+                )
+            }
+
+            IconButton(
+                onClick = {
+                    coroutine.launch {
+                        val result = logoutUseCase()
+                        result.ifSuccess {
+                            navController.navigateToLoginScreen()
+                        }
+                    }
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Logout,
+                    contentDescription = "Logout"
                 )
             }
         }

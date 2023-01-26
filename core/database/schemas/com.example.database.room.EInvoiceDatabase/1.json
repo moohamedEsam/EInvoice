@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "135bc27d1c18fa579e573a77b5d3fba1",
+    "identityHash": "23d286cab1f10ea0de25f15cb804b852",
     "entities": [
       {
         "tableName": "Branch",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `internalId` TEXT NOT NULL, `companyId` TEXT NOT NULL, `street` TEXT NOT NULL, `country` TEXT NOT NULL, `governate` TEXT NOT NULL, `postalCode` TEXT NOT NULL, `regionCity` TEXT NOT NULL, `buildingNumber` TEXT NOT NULL, `floor` TEXT NOT NULL, `room` TEXT NOT NULL, `landmark` TEXT NOT NULL, `additionalInformation` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `internalId` TEXT NOT NULL, `companyId` TEXT NOT NULL, `street` TEXT NOT NULL, `country` TEXT NOT NULL, `governate` TEXT NOT NULL, `postalCode` TEXT NOT NULL, `regionCity` TEXT NOT NULL, `buildingNumber` TEXT NOT NULL, `floor` TEXT NOT NULL, `room` TEXT NOT NULL, `landmark` TEXT NOT NULL, `additionalInformation` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`companyId`) REFERENCES `Company`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
         "fields": [
           {
             "fieldPath": "name",
@@ -117,8 +117,30 @@
           ],
           "autoGenerate": false
         },
-        "indices": [],
-        "foreignKeys": []
+        "indices": [
+          {
+            "name": "index_Branch_companyId",
+            "unique": false,
+            "columnNames": [
+              "companyId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Branch_companyId` ON `${TABLE_NAME}` (`companyId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "Company",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "companyId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       },
       {
         "tableName": "Company",
@@ -196,7 +218,7 @@
       },
       {
         "tableName": "Client",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`registrationNumber` TEXT NOT NULL, `name` TEXT NOT NULL, `email` TEXT NOT NULL, `phone` TEXT NOT NULL, `address` TEXT, `businessType` TEXT NOT NULL, `status` TEXT NOT NULL, `companyId` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`registrationNumber` TEXT NOT NULL, `name` TEXT NOT NULL, `email` TEXT NOT NULL, `phone` TEXT NOT NULL, `address` TEXT, `businessType` TEXT NOT NULL, `status` TEXT NOT NULL, `companyId` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`companyId`) REFERENCES `Company`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
         "fields": [
           {
             "fieldPath": "registrationNumber",
@@ -277,12 +299,34 @@
           ],
           "autoGenerate": false
         },
-        "indices": [],
-        "foreignKeys": []
+        "indices": [
+          {
+            "name": "index_Client_companyId",
+            "unique": false,
+            "columnNames": [
+              "companyId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Client_companyId` ON `${TABLE_NAME}` (`companyId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "Company",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "companyId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       },
       {
         "tableName": "Item",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `description` TEXT NOT NULL, `price` REAL NOT NULL, `status` TEXT NOT NULL, `itemCode` TEXT NOT NULL, `unitTypeCode` TEXT NOT NULL, `branchId` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `description` TEXT NOT NULL, `price` REAL NOT NULL, `status` TEXT NOT NULL, `itemCode` TEXT NOT NULL, `unitTypeCode` TEXT NOT NULL, `branchId` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`branchId`) REFERENCES `Branch`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
         "fields": [
           {
             "fieldPath": "name",
@@ -357,8 +401,30 @@
           ],
           "autoGenerate": false
         },
-        "indices": [],
-        "foreignKeys": []
+        "indices": [
+          {
+            "name": "index_Item_branchId",
+            "unique": false,
+            "columnNames": [
+              "branchId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Item_branchId` ON `${TABLE_NAME}` (`branchId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "Branch",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "branchId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       },
       {
         "tableName": "UnitType",
@@ -391,12 +457,228 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "InvoiceLine",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` TEXT NOT NULL, `quantity` REAL NOT NULL, `unitValue` TEXT NOT NULL, `discountRate` REAL NOT NULL, `taxes` TEXT NOT NULL, `documentId` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`itemId`) REFERENCES `Item`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`documentId`) REFERENCES `Document`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "fields": [
+          {
+            "fieldPath": "itemId",
+            "columnName": "itemId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unitValue",
+            "columnName": "unitValue",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "discountRate",
+            "columnName": "discountRate",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "taxes",
+            "columnName": "taxes",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "documentId",
+            "columnName": "documentId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_InvoiceLine_itemId",
+            "unique": false,
+            "columnNames": [
+              "itemId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_InvoiceLine_itemId` ON `${TABLE_NAME}` (`itemId`)"
+          },
+          {
+            "name": "index_InvoiceLine_documentId",
+            "unique": false,
+            "columnNames": [
+              "documentId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_InvoiceLine_documentId` ON `${TABLE_NAME}` (`documentId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "Item",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "itemId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "Document",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "documentId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "Document",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`issuerId` TEXT NOT NULL, `receiverId` TEXT NOT NULL, `branchId` TEXT NOT NULL, `internalId` TEXT NOT NULL, `date` INTEGER NOT NULL, `referencedDocument` TEXT, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`issuerId`) REFERENCES `Company`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`receiverId`) REFERENCES `Client`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`branchId`) REFERENCES `Branch`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "fields": [
+          {
+            "fieldPath": "issuerId",
+            "columnName": "issuerId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "receiverId",
+            "columnName": "receiverId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "branchId",
+            "columnName": "branchId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "internalId",
+            "columnName": "internalId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "referencedDocument",
+            "columnName": "referencedDocument",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_Document_issuerId",
+            "unique": false,
+            "columnNames": [
+              "issuerId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Document_issuerId` ON `${TABLE_NAME}` (`issuerId`)"
+          },
+          {
+            "name": "index_Document_receiverId",
+            "unique": false,
+            "columnNames": [
+              "receiverId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Document_receiverId` ON `${TABLE_NAME}` (`receiverId`)"
+          },
+          {
+            "name": "index_Document_branchId",
+            "unique": false,
+            "columnNames": [
+              "branchId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Document_branchId` ON `${TABLE_NAME}` (`branchId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "Company",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "issuerId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "Client",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "receiverId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "Branch",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "branchId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '135bc27d1c18fa579e573a77b5d3fba1')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '23d286cab1f10ea0de25f15cb804b852')"
     ]
   }
 }

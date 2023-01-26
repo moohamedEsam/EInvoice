@@ -1,6 +1,8 @@
 package com.example.database.models
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.example.models.Client
 import com.example.models.utils.Address
@@ -8,7 +10,18 @@ import com.example.models.utils.BusinessType
 import com.example.models.utils.TaxStatus
 import java.util.UUID
 
-@Entity(tableName = "Client")
+@Entity(
+    tableName = "Client",
+    foreignKeys = [
+        ForeignKey(
+            entity = CompanyEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["companyId"],
+            onDelete = ForeignKey.SET_NULL
+        )
+    ],
+    indices = [Index("companyId")]
+)
 data class ClientEntity(
     val registrationNumber: String,
     val name: String,
