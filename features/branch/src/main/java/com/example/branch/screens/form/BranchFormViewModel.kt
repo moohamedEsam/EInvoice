@@ -158,7 +158,7 @@ class BranchFormViewModel(
     fun setAddress(address: Address) {
         address.let {
             _street.value = it.locality ?: it.getAddressLine(0) ?: ""
-            _country.value = it.countryName ?: ""
+            _country.value = it.countryCode ?: ""
             _governate.value = it.adminArea ?: ""
             _postalCode.value = it.postalCode ?: ""
             _regionCity.value = it.subAdminArea ?: ""

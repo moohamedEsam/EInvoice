@@ -50,35 +50,54 @@ class OfflineFirstClientRepository(
         localSource.getClientsByCompanyId(companyId)
             .map { clients -> clients.map { it.asClient() } }
 
-    override suspend fun syncWith(synchronizer: Synchronizer): Boolean =
-        synchronizer.handleSync(
+    override suspend fun syncWith(synchronizer: Synchronizer): Boolean {
+        val clients = localSource.getClients().first()
+        val idMappings = HashMap<String, String>()
+        return synchronizer.handleSync(
             remoteCreator = {
-                val clients = localSource.getCreatedClients()
-                clients.forEach { client ->
-                    remoteSource.createClient(client.asClient())
+                val createdClients = clients.filter { it.isCreated }
+                createdClients.forEach { client ->
+                    val result = remoteSource.createClient(client.asClient())
+                    if (result is Result.Success)
+                        idMappings[client.id] = result.data.id
+
                 }
                 Result.Success(Unit)
             },
             remoteDeleter = {
-                val clients = localSource.getDeletedClients()
-                clients.forEach { client ->
-                    remoteSource.deleteClient(client.id)
+                val deletedClients = clients.filter { it.isDeleted }
+                deletedClients.forEach { client ->
+                    val result = remoteSource.deleteClient(client.id)
+                    if (result is Result.Success)
+                        localSource.deleteClient(client.id)
                 }
                 Result.Success(Unit)
             },
             remoteUpdater = {
-                val clients = localSource.getUpdatedClients()
-                clients.forEach { client ->
-                    remoteSource.updateClient(client.asClient())
+                val updatedClients = clients.filter { it.isUpdated }
+                updatedClients.forEach { client ->
+                    val result = remoteSource.updateClient(client.asClient())
+                    if (result is Result.Success)
+                        localSource.updateClient(client.copy(isUpdated = false))
                 }
                 Result.Success(Unit)
             },
 
-            localCreator = localSource::insertClient,
-            beforeLocalCreate = { localSource.deleteAllClients() },
+            localCreator = { client ->
+                val ids = clients.map { it.id }
+                if (client.id in ids) return@handleSync
+                localSource.insertClient(client)
+            },
+            afterLocalCreate = {
+                idMappings.forEach { (old, new) ->
+                    localSource.updateDocumentsReceiverId(old, new)
+                    localSource.deleteClient(old)
+                }
+            },
             remoteFetcher = {
                 remoteSource.getClients().map { clients -> clients.map { it.asClientEntity() } }
             },
         )
+    }
 
 }

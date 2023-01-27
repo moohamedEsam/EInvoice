@@ -3,6 +3,7 @@ package com.example.database.room
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.example.database.models.*
 import kotlinx.coroutines.flow.Flow
@@ -168,6 +169,9 @@ interface EInvoiceDao {
     @Update
     suspend fun updateInvoiceLine(invoiceLine: InvoiceLineEntity)
 
+    @Query("update InvoiceLine set itemId =:newId where itemId = :oldId")
+    suspend fun updateInvoiceLinesItemId(oldId: String, newId: String)
+
     @Query("DELETE FROM InvoiceLine where id = :id")
     suspend fun deleteInvoiceLine(id: String)
 
@@ -201,4 +205,13 @@ interface EInvoiceDao {
 
     @Query("delete from Document")
     suspend fun deleteAllDocuments()
+
+    @Transaction
+    suspend fun deleteAll() {
+        deleteAllInvoiceLines()
+        deleteAllItems()
+        deleteAllClients()
+        deleteAllBranches()
+        deleteAllCompanies()
+    }
 }

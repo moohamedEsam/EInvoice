@@ -1,6 +1,7 @@
 package com.example.worker
 
 import android.content.Context
+import android.util.Log
 import androidx.work.*
 import com.example.data.branch.BranchRepository
 import com.example.data.client.ClientRepository
@@ -21,11 +22,11 @@ class SynchronizerWorker(
     override suspend fun doWork(): Result {
         return try {
             withContext(synchronizer.dispatcher) {
-                val isSyncSuccessful = awaitAll(
-                    async { companyRepository.syncWith(synchronizer) },
-                    async { branchRepository.syncWith(synchronizer) },
-                    async { clientRepository.syncWith(synchronizer) },
-                    async { itemRepository.syncWith(synchronizer) }
+                val isSyncSuccessful = listOf(
+                    companyRepository.syncWith(synchronizer),
+                    branchRepository.syncWith(synchronizer),
+                    clientRepository.syncWith(synchronizer),
+                    itemRepository.syncWith(synchronizer)
                 ).all { it }
                 if (!isSyncSuccessful)
                     Result.retry()
@@ -38,7 +39,7 @@ class SynchronizerWorker(
 
     override suspend fun getForegroundInfo(): ForegroundInfo = appContext.syncForegroundInfo()
 
-    companion object{
+    companion object {
         val workConstraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()

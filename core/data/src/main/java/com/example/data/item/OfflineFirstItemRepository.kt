@@ -60,7 +60,11 @@ class OfflineFirstItemRepository(
         return withContext(synchronizer.dispatcher) {
             awaitAll(
                 async { syncItems(synchronizer) },
-                async { syncUnitTypes(synchronizer) }
+                async {
+                    if (getUnitTypes().first().isEmpty())
+                        syncUnitTypes (synchronizer)
+                    else true
+                }
             ).all { it }
         }
     }
@@ -68,7 +72,7 @@ class OfflineFirstItemRepository(
     private suspend fun syncUnitTypes(synchronizer: Synchronizer) =
         synchronizer.handleSync(
             remoteFetcher = remoteSource::getUnitTypes,
-            beforeLocalCreate = localSource::deleteAllUnitTypes,
+            afterLocalCreate = localSource::deleteAllUnitTypes,
             localCreator = {
                 localSource.insertUnitType(it.asUnitTypeEntity())
                 Result.Success(Unit)
@@ -78,37 +82,56 @@ class OfflineFirstItemRepository(
             remoteDeleter = { Result.Success(Unit) }
         )
 
-    private suspend fun syncItems(synchronizer: Synchronizer) =
-        synchronizer.handleSync(
+    private suspend fun syncItems(synchronizer: Synchronizer): Boolean {
+        val items = localSource.getItems().first()
+        val idMappings = HashMap<String, String>()
+        return synchronizer.handleSync(
             remoteCreator = {
-                val items = localSource.getCreatedItems()
-                items.forEach { item ->
-                    remoteSource.createItem(item.asItem())
+                val createdItems = items.filter { it.isCreated }
+                createdItems.forEach { item ->
+                    val result = remoteSource.createItem(item.asItem())
+                    if (result is Result.Success) {
+                        idMappings[item.id] = result.data.id
+                    }
                 }
                 Result.Success(Unit)
             },
             remoteUpdater = {
-                val items = localSource.getUpdatedItems()
-                items.forEach { item ->
-                    remoteSource.updateItem(item.asItem())
+                val updatedItems = localSource.getUpdatedItems()
+                updatedItems.forEach { item ->
+                    val result = remoteSource.updateItem(item.asItem())
+                    if (result is Result.Success) {
+                        localSource.updateItem(item.copy(isUpdated = false))
+                    }
                 }
                 Result.Success(Unit)
             },
             remoteDeleter = {
-                val items = localSource.getDeletedItems()
-                items.forEach { item ->
-                    remoteSource.deleteItem(item.id)
+                val deletedItems = localSource.getDeletedItems()
+                deletedItems.forEach { item ->
+                    val result = remoteSource.deleteItem(item.id)
+                    if (result is Result.Success) {
+                        localSource.deleteItem(item.id)
+                    }
                 }
                 Result.Success(Unit)
             },
-            localCreator = {
-                localSource.insertItem(it.asItemEntity())
+            localCreator = { item ->
+                val ids = items.map { it.id }
+                if (item.id in ids) return@handleSync
+                localSource.insertItem(item.asItemEntity(isCreated = true))
                 Result.Success(Unit)
             },
 
-            beforeLocalCreate = localSource::deleteAllItems,
+            afterLocalCreate = {
+                idMappings.forEach { (oldId, newId) ->
+                    localSource.updateInvoiceLinesItemId(oldId, newId)
+                    localSource.deleteItem(oldId)
+                }
+            },
             remoteFetcher = remoteSource::getItems
         )
+    }
 
     override fun getUnitTypes(): Flow<List<UnitType>> =
         localSource.getUnitTypes().map { unitTypes -> unitTypes.map { it.asUnitType() } }
