@@ -85,8 +85,10 @@ class OfflineFirstClientRepository(
 
             localCreator = { client ->
                 val ids = clients.map { it.id }
-                if (client.id in ids) return@handleSync
-                localSource.insertClient(client)
+                if (client.id in ids)
+                    localSource.updateClient(client)
+                else
+                    localSource.insertClient(client)
             },
             afterLocalCreate = {
                 idMappings.forEach { (old, new) ->

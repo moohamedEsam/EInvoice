@@ -7,6 +7,7 @@ import java.util.Date
 
 @Serializable
 data class Document(
+    val id: String,
     val issuerId: String,
     val receiverId: String,
     val branchId: String,
@@ -15,4 +16,7 @@ data class Document(
     @Serializable(with = DateSerializer::class)
     val date: Date,
     val referencedDocument: String?,
+    val documentType: String,
+    val status: DocumentStatus,
+    val error: String? = null,
 )

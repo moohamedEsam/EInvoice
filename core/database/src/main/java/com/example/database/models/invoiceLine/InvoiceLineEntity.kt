@@ -1,9 +1,12 @@
-package com.example.database.models
+package com.example.database.models.invoiceLine
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.example.database.models.ItemEntity
+import com.example.database.models.document.DocumentEntity
+import com.example.models.invoiceLine.InvoiceLine
 import com.example.models.invoiceLine.InvoiceTax
 import java.util.UUID
 
@@ -20,7 +23,7 @@ import java.util.UUID
             entity = DocumentEntity::class,
             parentColumns = ["id"],
             childColumns = ["documentId"],
-            onDelete = ForeignKey.RESTRICT
+            onDelete = ForeignKey.CASCADE
         )
     ],
     indices = [
@@ -37,4 +40,24 @@ data class InvoiceLineEntity(
     val documentId: String,
     @PrimaryKey
     val id: String = UUID.randomUUID().toString()
+)
+
+fun InvoiceLineEntity.asInvoiceLine() = InvoiceLine(
+    itemId = itemId,
+    quantity = quantity,
+    unitValue = unitValue,
+    discountRate = discountRate,
+    taxes = taxes,
+    documentId = documentId,
+    id = id
+)
+
+fun InvoiceLine.asInvoiceLineEntity() = InvoiceLineEntity(
+    itemId = itemId,
+    quantity = quantity,
+    unitValue = unitValue,
+    discountRate = discountRate,
+    taxes = taxes,
+    documentId = documentId,
+    id = id
 )

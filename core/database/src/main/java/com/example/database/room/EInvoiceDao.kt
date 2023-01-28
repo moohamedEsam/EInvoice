@@ -6,6 +6,10 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.example.database.models.*
+import com.example.database.models.company.CompanyEntity
+import com.example.database.models.document.DocumentEntity
+import com.example.database.models.document.DocumentViewEntity
+import com.example.database.models.invoiceLine.InvoiceLineEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -166,11 +170,17 @@ interface EInvoiceDao {
     @Insert
     suspend fun insertInvoiceLine(invoiceLine: InvoiceLineEntity)
 
+    @Insert
+    suspend fun insertInvoiceLines(invoiceLines: List<InvoiceLineEntity>)
+
     @Update
     suspend fun updateInvoiceLine(invoiceLine: InvoiceLineEntity)
 
     @Query("update InvoiceLine set itemId =:newId where itemId = :oldId")
     suspend fun updateInvoiceLinesItemId(oldId: String, newId: String)
+
+    @Query("update InvoiceLine set documentId =:newId where documentId = :oldId")
+    suspend fun updateInvoiceLinesDocumentId(oldId: String, newId: String)
 
     @Query("DELETE FROM InvoiceLine where id = :id")
     suspend fun deleteInvoiceLine(id: String)
@@ -182,14 +192,33 @@ interface EInvoiceDao {
     @Query("SELECT * FROM Document")
     fun getDocuments(): Flow<List<DocumentEntity>>
 
+    @Transaction
+    @Query("SELECT * FROM Document")
+    fun getDocumentsView(): Flow<List<DocumentViewEntity>>
+
+    @Transaction
     @Query("SELECT * FROM Document WHERE id = :id")
-    fun getDocumentById(id: String): Flow<DocumentEntity>
+    fun getDocumentById(id: String): Flow<DocumentViewEntity>
 
     @Insert
     suspend fun insertDocument(document: DocumentEntity)
 
+    @Insert
+    suspend fun insertDocumentWithInvoices(
+        document: DocumentEntity,
+        invoiceLines: List<InvoiceLineEntity>
+    )
+
     @Update
     suspend fun updateDocument(document: DocumentEntity)
+
+    @Update
+    @Transaction
+    suspend fun updateDocument(document: DocumentEntity, invoiceLines: List<InvoiceLineEntity>) {
+        updateDocument(document)
+        deleteAllInvoiceLines()
+        insertInvoiceLines(invoiceLines)
+    }
 
     @Query("update document set issuerId =:newIssuerId where issuerId = :oldIssuerId")
     suspend fun updateDocumentsIssuerId(oldIssuerId: String, newIssuerId: String)
@@ -203,6 +232,17 @@ interface EInvoiceDao {
     @Query("DELETE FROM Document where id = :id")
     suspend fun deleteDocument(id: String)
 
+    @Query("update Document set isDeleted = 1 where id = :id")
+    suspend fun markDocumentAsDeleted(id: String)
+
+
+    @Query("update Document set isDeleted = 0 where id = :id")
+    suspend fun undoDeleteDocument(id: String)
+
+    @Query("DELETE FROM InvoiceLine where documentId = :id")
+    suspend fun deleteInvoicesByDocumentId(id: String)
+
+
     @Query("delete from Document")
     suspend fun deleteAllDocuments()
 
@@ -213,5 +253,6 @@ interface EInvoiceDao {
         deleteAllClients()
         deleteAllBranches()
         deleteAllCompanies()
+        deleteAllDocuments()
     }
 }

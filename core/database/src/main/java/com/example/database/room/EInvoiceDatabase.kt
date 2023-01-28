@@ -4,6 +4,9 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.database.models.*
+import com.example.database.models.company.CompanyEntity
+import com.example.database.models.document.DocumentEntity
+import com.example.database.models.invoiceLine.InvoiceLineEntity
 import com.example.database.room.typeConverters.AddressTypeConverter
 import com.example.database.room.typeConverters.CompanySettingsConverter
 import com.example.database.room.typeConverters.DateTypeConverter

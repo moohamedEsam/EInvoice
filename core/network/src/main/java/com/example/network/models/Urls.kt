@@ -11,11 +11,14 @@ object Urls {
     const val ITEM = "$BASE_URL/Item"
     private const val CONSTANTS = "$BASE_URL/Constants"
     const val UNIT_TYPES = "$CONSTANTS/unit_types"
+    const val DOCUMENT = "$BASE_URL/Document"
     fun getCompany(companyId: String) = "$COMPANY/$companyId"
     fun getClient(clientId: String) = "$CLIENT/$clientId"
     fun getBranch(branchId: String) = "$BRANCH/$branchId"
 
     fun getItem(itemId: String) = "$ITEM/$itemId"
+
+    fun getDocument(documentId: String) = "$DOCUMENT/$documentId"
 
 
 }

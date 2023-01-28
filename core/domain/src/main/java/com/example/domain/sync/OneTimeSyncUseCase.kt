@@ -13,6 +13,7 @@ fun oneTimeSyncUseCase(context: Context) = OneTimeSyncUseCase {
     val workRequest = OneTimeWorkRequestBuilder<SynchronizerWorker>()
         .setConstraints(SynchronizerWorker.workConstraints)
         .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+        .addTag(SynchronizerWorker.workName)
         .build()
 
     val workManager = WorkManager.getInstance(context)

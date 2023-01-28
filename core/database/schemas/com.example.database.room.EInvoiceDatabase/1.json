@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "23d286cab1f10ea0de25f15cb804b852",
+    "identityHash": "650686b09b1ce5f071af570b34ca62c2",
     "entities": [
       {
         "tableName": "Branch",
@@ -218,7 +218,7 @@
       },
       {
         "tableName": "Client",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`registrationNumber` TEXT NOT NULL, `name` TEXT NOT NULL, `email` TEXT NOT NULL, `phone` TEXT NOT NULL, `address` TEXT, `businessType` TEXT NOT NULL, `status` TEXT NOT NULL, `companyId` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`companyId`) REFERENCES `Company`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`registrationNumber` TEXT NOT NULL, `name` TEXT NOT NULL, `email` TEXT NOT NULL, `phone` TEXT NOT NULL, `businessType` TEXT NOT NULL, `status` TEXT NOT NULL, `companyId` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, `street` TEXT, `country` TEXT, `governate` TEXT, `postalCode` TEXT, `regionCity` TEXT, `buildingNumber` TEXT, `floor` TEXT, `room` TEXT, `landmark` TEXT, `additionalInformation` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`companyId`) REFERENCES `Company`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
         "fields": [
           {
             "fieldPath": "registrationNumber",
@@ -243,12 +243,6 @@
             "columnName": "phone",
             "affinity": "TEXT",
             "notNull": true
-          },
-          {
-            "fieldPath": "address",
-            "columnName": "address",
-            "affinity": "TEXT",
-            "notNull": false
           },
           {
             "fieldPath": "businessType",
@@ -291,6 +285,66 @@
             "columnName": "id",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "address.street",
+            "columnName": "street",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "address.country",
+            "columnName": "country",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "address.governate",
+            "columnName": "governate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "address.postalCode",
+            "columnName": "postalCode",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "address.regionCity",
+            "columnName": "regionCity",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "address.buildingNumber",
+            "columnName": "buildingNumber",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "address.floor",
+            "columnName": "floor",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "address.room",
+            "columnName": "room",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "address.landmark",
+            "columnName": "landmark",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "address.additionalInformation",
+            "columnName": "additionalInformation",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -558,7 +612,7 @@
       },
       {
         "tableName": "Document",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`issuerId` TEXT NOT NULL, `receiverId` TEXT NOT NULL, `branchId` TEXT NOT NULL, `internalId` TEXT NOT NULL, `date` INTEGER NOT NULL, `referencedDocument` TEXT, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`issuerId`) REFERENCES `Company`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`receiverId`) REFERENCES `Client`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`branchId`) REFERENCES `Branch`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`issuerId` TEXT NOT NULL, `receiverId` TEXT NOT NULL, `branchId` TEXT NOT NULL, `internalId` TEXT NOT NULL, `date` INTEGER NOT NULL, `referencedDocument` TEXT, `id` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`issuerId`) REFERENCES `Company`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`receiverId`) REFERENCES `Client`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`branchId`) REFERENCES `Branch`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
         "fields": [
           {
             "fieldPath": "issuerId",
@@ -600,6 +654,24 @@
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isCreated",
+            "columnName": "isCreated",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isUpdated",
+            "columnName": "isUpdated",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isDeleted",
+            "columnName": "isDeleted",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -678,7 +750,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '23d286cab1f10ea0de25f15cb804b852')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '650686b09b1ce5f071af570b34ca62c2')"
     ]
   }
 }

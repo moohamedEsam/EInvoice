@@ -8,9 +8,13 @@ import com.example.models.company.Company
 import com.example.models.auth.Credentials
 import com.example.models.auth.Register
 import com.example.models.auth.Token
+import com.example.network.models.document.DocumentViewDto
 import com.example.models.item.Item
 import com.example.models.item.UnitType
 import com.example.network.models.*
+import com.example.network.models.document.CreateDocumentDto
+import com.example.network.models.document.DocumentDto
+import com.example.network.models.document.UpdateDocumentDto
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
@@ -157,6 +161,42 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
         val response = client.get(Urls.UNIT_TYPES)
         val apiResponse = response.body<ApiResponse<List<NetworkUnitType>>>()
         apiResponse.asResult().map { unitTypes -> unitTypes.map { it.asUnitType() } }
+    }
+
+    override suspend fun createDocument(document: CreateDocumentDto): Result<DocumentDto> = tryWrapper {
+        val response = client.post(Urls.DOCUMENT) {
+            setBody(document)
+            contentType(ContentType.Application.Json)
+        }
+        val apiResponse = response.body<ApiResponse<DocumentDto>>()
+        apiResponse.asResult()
+    }
+
+    override suspend fun getDocument(documentId: String): Result<DocumentViewDto> = tryWrapper {
+        val response = client.get(Urls.getDocument(documentId))
+        val apiResponse = response.body<ApiResponse<DocumentViewDto>>()
+        apiResponse.asResult()
+    }
+
+    override suspend fun getDocuments(): Result<List<DocumentDto>> = tryWrapper {
+        val response = client.get(Urls.DOCUMENT)
+        val apiResponse = response.body<ApiResponse<List<DocumentDto>>>()
+        apiResponse.asResult()
+    }
+
+    override suspend fun updateDocument(document: UpdateDocumentDto): Result<DocumentDto> = tryWrapper {
+        val response = client.put(Urls.getDocument(document.id)) {
+            setBody(document)
+            contentType(ContentType.Application.Json)
+        }
+        val apiResponse = response.body<ApiResponse<DocumentDto>>()
+        apiResponse.asResult()
+    }
+
+    override suspend fun deleteDocument(documentId: String): Result<Unit> = tryWrapper{
+        val response = client.delete(Urls.getDocument(documentId))
+        val apiResponse = response.body<ApiResponse<Unit>>()
+        apiResponse.asResult()
     }
 
     override suspend fun createBranch(branch: Branch): Result<Branch> = tryWrapper {

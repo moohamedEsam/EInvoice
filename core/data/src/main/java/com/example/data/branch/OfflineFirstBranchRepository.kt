@@ -85,8 +85,10 @@ class OfflineFirstBranchRepository(
 
             localCreator = { branch ->
                 val ids = branches.map { it.id }
-                if (branch.id in ids) return@handleSync
-                localSource.insertBranch(branch)
+                if (branch.id in ids)
+                    localSource.updateBranch(branch)
+                else
+                    localSource.insertBranch(branch)
 
             },
             afterLocalCreate = {

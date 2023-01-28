@@ -4,9 +4,9 @@ import com.example.common.functions.tryWrapper
 import com.example.common.models.Result
 import com.example.data.sync.Synchronizer
 import com.example.data.sync.handleSync
-import com.example.database.models.CompanyEntity
-import com.example.database.models.asCompany
-import com.example.database.models.asCompanyEntity
+import com.example.database.models.company.CompanyEntity
+import com.example.database.models.company.asCompany
+import com.example.database.models.company.asCompanyEntity
 import com.example.database.room.EInvoiceDao
 import com.example.models.company.Company
 import com.example.network.EInvoiceRemoteDataSource
@@ -97,6 +97,8 @@ class OfflineFirstCompanyRepository(
             localCreator = { company ->
                 if (company.id !in companies.map { it.id })
                     localDataSource.insertCompany(company.asCompanyEntity())
+                else
+                    localDataSource.updateCompany(company.asCompanyEntity())
             }
         )
         return isSuccessfulSync

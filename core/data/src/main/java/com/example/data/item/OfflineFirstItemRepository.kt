@@ -62,7 +62,7 @@ class OfflineFirstItemRepository(
                 async { syncItems(synchronizer) },
                 async {
                     if (getUnitTypes().first().isEmpty())
-                        syncUnitTypes (synchronizer)
+                        syncUnitTypes(synchronizer)
                     else true
                 }
             ).all { it }
@@ -118,8 +118,10 @@ class OfflineFirstItemRepository(
             },
             localCreator = { item ->
                 val ids = items.map { it.id }
-                if (item.id in ids) return@handleSync
-                localSource.insertItem(item.asItemEntity(isCreated = true))
+                if (item.id in ids)
+                    localSource.updateItem(item.asItemEntity())
+                else
+                    localSource.insertItem(item.asItemEntity())
                 Result.Success(Unit)
             },
 

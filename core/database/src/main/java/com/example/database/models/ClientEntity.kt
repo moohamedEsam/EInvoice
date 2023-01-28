@@ -1,9 +1,11 @@
 package com.example.database.models
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.example.database.models.company.CompanyEntity
 import com.example.models.Client
 import com.example.models.utils.Address
 import com.example.models.utils.BusinessType
@@ -27,7 +29,7 @@ data class ClientEntity(
     val name: String,
     val email: String,
     val phone: String,
-    val address: Address?,
+    @Embedded val address: Address?,
     val businessType: BusinessType,
     val status: TaxStatus,
     val companyId: String,

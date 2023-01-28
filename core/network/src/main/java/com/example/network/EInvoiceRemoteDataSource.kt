@@ -8,7 +8,11 @@ import com.example.models.item.Item
 import com.example.models.auth.Credentials
 import com.example.models.auth.Register
 import com.example.models.auth.Token
+import com.example.network.models.document.DocumentViewDto
 import com.example.models.item.UnitType
+import com.example.network.models.document.CreateDocumentDto
+import com.example.network.models.document.DocumentDto
+import com.example.network.models.document.UpdateDocumentDto
 
 interface EInvoiceRemoteDataSource {
     //auth
@@ -48,5 +52,16 @@ interface EInvoiceRemoteDataSource {
     suspend fun deleteItem(itemId: String): Result<Item>
 
     suspend fun getUnitTypes(): Result<List<UnitType>>
+
+
+    suspend fun createDocument(document:CreateDocumentDto): Result<DocumentDto>
+
+    suspend fun getDocument(documentId: String): Result<DocumentViewDto>
+
+    suspend fun getDocuments(): Result<List<DocumentDto>>
+
+    suspend fun updateDocument(document: UpdateDocumentDto): Result<DocumentDto>
+
+    suspend fun deleteDocument(documentId: String): Result<Unit>
 
 }
