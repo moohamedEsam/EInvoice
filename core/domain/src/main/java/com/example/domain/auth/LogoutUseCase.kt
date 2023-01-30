@@ -10,6 +10,6 @@ fun interface LogoutUseCase : suspend () -> Result<Unit>
 fun logoutUseCase(authRepository: AuthRepository, context: Context) = LogoutUseCase {
     val result = authRepository.logout()
     result.ifSuccess {
-//        saveTokenToSharedPref(context, null)
+        saveTokenToSharedPref(context, null)
     }
 }
