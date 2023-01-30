@@ -7,7 +7,6 @@ import com.example.database.models.*
 import com.example.database.models.company.CompanyEntity
 import com.example.database.models.document.DocumentEntity
 import com.example.database.models.invoiceLine.InvoiceLineEntity
-import com.example.database.models.invoiceLine.InvoiceLineItemCrossRef
 import com.example.database.room.typeConverters.AddressTypeConverter
 import com.example.database.room.typeConverters.CompanySettingsConverter
 import com.example.database.room.typeConverters.DateTypeConverter
@@ -17,7 +16,7 @@ import com.example.database.room.typeConverters.InvoiceTaxTypeConverter
     entities = [
         BranchEntity::class, CompanyEntity::class, ClientEntity::class,
         ItemEntity::class, UnitTypeEntity::class, InvoiceLineEntity::class,
-        DocumentEntity::class, InvoiceLineItemCrossRef::class
+        DocumentEntity::class
     ],
     version = 1
 )

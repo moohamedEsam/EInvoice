@@ -20,6 +20,7 @@ import com.example.client.screens.all.navigateToClientsScreen
 import com.example.common.models.SnackBarEvent
 import com.example.company.screen.all.CompaniesScreenRoute
 import com.example.company.screen.all.navigateToCompaniesScreen
+import com.example.document.screens.all.navigateToDocumentsScreen
 import com.example.domain.auth.LogoutUseCase
 import com.example.domain.sync.OneTimeSyncUseCase
 import com.example.functions.handleSnackBarEvent
@@ -104,7 +105,7 @@ private fun DrawerContent(navController: NavHostController) {
     ) {
         NavigationDrawerItem(
             icon = { Icon(Icons.Outlined.Home, contentDescription = null) },
-            label = { Text("Home") },
+            label = { Text("Companies") },
             selected = currentRoute == CompaniesScreenRoute,
             onClick = navController::navigateToCompaniesScreen
         )
@@ -129,6 +130,13 @@ private fun DrawerContent(navController: NavHostController) {
             selected = currentRoute == ItemsScreenRoute,
             onClick = navController::navigateToItemsScreen
         )
+
+        NavigationDrawerItem(
+            icon = { Icon(Icons.Outlined.Home, contentDescription = null) },
+            label = { Text("Documents") },
+            selected = false,
+            onClick = navController::navigateToDocumentsScreen
+        )
     }
 }
 
@@ -142,7 +150,7 @@ fun EInvoiceTopBar(navController: NavHostController, drawerState: DrawerState) {
     val logoutUseCase: LogoutUseCase by inject()
     val syncUseCase: OneTimeSyncUseCase by inject()
     if (currentRoute == LoginScreenRoute) return
-    CenterAlignedTopAppBar(
+    TopAppBar(
         title = {
             Text(text = currentRoute.takeWhile { it != '/' })
         },

@@ -11,8 +11,6 @@ import com.example.database.models.invoiceLine.InvoiceLineViewEntity
 import com.example.database.models.invoiceLine.asInvoiceLineView
 import com.example.database.models.invoiceLine.asInvoiceLineViewEntity
 import com.example.models.document.DocumentView
-import com.example.models.invoiceLine.InvoiceLineView
-import com.example.models.invoiceLine.asInvoiceLine
 
 
 data class DocumentViewEntity(
@@ -53,7 +51,7 @@ fun DocumentViewEntity.asDocumentView() = DocumentView(
     date = documentEntity.date,
     client = client.asClient(),
     branch = branch.asBranch(),
-    invoices = emptyList(),
+    invoices = invoices.map { it.asInvoiceLineView() },
     company = companyEntity.asCompany(),
     internalId = documentEntity.internalId,
     documentType = documentEntity.documentType,

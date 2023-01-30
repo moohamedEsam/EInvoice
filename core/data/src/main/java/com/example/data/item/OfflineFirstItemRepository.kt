@@ -1,5 +1,6 @@
 package com.example.data.item
 
+import android.util.Log
 import com.example.common.functions.tryWrapper
 import com.example.common.models.Result
 import com.example.data.sync.Synchronizer
@@ -60,11 +61,7 @@ class OfflineFirstItemRepository(
         return withContext(synchronizer.dispatcher) {
             awaitAll(
                 async { syncItems(synchronizer) },
-                async {
-                    if (getUnitTypes().first().isEmpty())
-                        syncUnitTypes(synchronizer)
-                    else true
-                }
+                async { syncUnitTypes(synchronizer) }
             ).all { it }
         }
     }
@@ -72,7 +69,7 @@ class OfflineFirstItemRepository(
     private suspend fun syncUnitTypes(synchronizer: Synchronizer) =
         synchronizer.handleSync(
             remoteFetcher = remoteSource::getUnitTypes,
-            afterLocalCreate = localSource::deleteAllUnitTypes,
+            afterLocalCreate = {  },
             localCreator = {
                 localSource.insertUnitType(it.asUnitTypeEntity())
                 Result.Success(Unit)

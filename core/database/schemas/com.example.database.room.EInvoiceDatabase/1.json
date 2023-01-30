@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "148637a818b56d6717067f3a015a7cc0",
+    "identityHash": "e5906f133fb7bcc0334c906c86b950cf",
     "entities": [
       {
         "tableName": "Branch",
@@ -514,7 +514,7 @@
       },
       {
         "tableName": "InvoiceLine",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` TEXT NOT NULL, `quantity` REAL NOT NULL, `discountRate` REAL NOT NULL, `taxes` TEXT, `documentId` TEXT NOT NULL, `id` TEXT NOT NULL, `currencyEgp` TEXT NOT NULL, `currencySold` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`itemId`) REFERENCES `Item`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`documentId`) REFERENCES `Document`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` TEXT NOT NULL, `quantity` REAL NOT NULL, `discountRate` REAL NOT NULL, `taxes` TEXT NOT NULL, `documentId` TEXT NOT NULL, `id` TEXT NOT NULL, `currencyEgp` TEXT NOT NULL, `currencySold` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`itemId`) REFERENCES `Item`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`documentId`) REFERENCES `Document`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "itemId",
@@ -538,7 +538,7 @@
             "fieldPath": "taxes",
             "columnName": "taxes",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "documentId",
@@ -769,39 +769,12 @@
             ]
           }
         ]
-      },
-      {
-        "tableName": "InvoiceLineItemCrossRef",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` TEXT NOT NULL, `invoiceLineId` TEXT NOT NULL, PRIMARY KEY(`itemId`, `invoiceLineId`))",
-        "fields": [
-          {
-            "fieldPath": "itemId",
-            "columnName": "itemId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "invoiceLineId",
-            "columnName": "invoiceLineId",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "itemId",
-            "invoiceLineId"
-          ],
-          "autoGenerate": false
-        },
-        "indices": [],
-        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '148637a818b56d6717067f3a015a7cc0')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e5906f133fb7bcc0334c906c86b950cf')"
     ]
   }
 }

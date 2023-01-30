@@ -38,7 +38,7 @@ data class InvoiceLineEntity(
     val quantity: Float,
     @Embedded val unitValue: UnitValue,
     val discountRate: Float,
-    val taxes: List<InvoiceTax>?,
+    val taxes: List<InvoiceTax>,
     val documentId: String,
     @PrimaryKey
     val id: String = UUID.randomUUID().toString()

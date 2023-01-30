@@ -12,7 +12,7 @@ data class CreateInvoiceLineDto(
     val quantity: Float,
     val unitValue: UnitValue,
     val discountRate: Float,
-    val taxes: List<InvoiceTax>?,
+    val taxes: List<InvoiceTax>,
     val valueDifference: Float = 0f,
     val itemsDiscount: Float = 0f,
 )

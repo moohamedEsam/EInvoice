@@ -83,4 +83,5 @@ dependencies {
     implementation(project(":features:client"))
     implementation(project(":features:item"))
     implementation(project(":features:EInvoiceComponents"))
+    implementation(project(":features:document"))
 }

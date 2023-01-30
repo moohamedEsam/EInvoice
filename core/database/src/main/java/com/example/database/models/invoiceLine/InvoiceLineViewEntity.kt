@@ -1,7 +1,6 @@
 package com.example.database.models.invoiceLine
 
 import androidx.room.Embedded
-import androidx.room.Junction
 import androidx.room.Relation
 import com.example.database.models.ItemEntity
 import com.example.database.models.asItem
@@ -15,23 +14,9 @@ data class InvoiceLineViewEntity(
     @Relation(
         parentColumn = "itemId",
         entityColumn = "id",
-        associateBy = Junction(
-            value = InvoiceLineItemCrossRef::class,
-            parentColumn = "invoiceLineId",
-            entityColumn = "itemId"
-        )
+        entity = ItemEntity::class
     )
     val item: ItemEntity
-)
-
-fun InvoiceLineViewEntity.asInvoiceLineView() = InvoiceLineView(
-    id = invoiceLine.id,
-    quantity = invoiceLine.quantity,
-    unitValue = invoiceLine.unitValue,
-    discountRate = invoiceLine.discountRate,
-    taxes = invoiceLine.taxes,
-    documentId = invoiceLine.documentId,
-    item = item.asItem()
 )
 
 fun InvoiceLineView.asInvoiceLineViewEntity() = InvoiceLineViewEntity(
@@ -45,6 +30,16 @@ fun InvoiceLineView.asInvoiceLineViewEntity() = InvoiceLineViewEntity(
         itemId = item.id
     ),
     item = item.asItemEntity()
+)
+
+fun InvoiceLineViewEntity.asInvoiceLineView() = InvoiceLineView(
+    id = invoiceLine.id,
+    quantity = invoiceLine.quantity,
+    unitValue = invoiceLine.unitValue,
+    discountRate = invoiceLine.discountRate,
+    taxes = invoiceLine.taxes,
+    documentId = invoiceLine.documentId,
+    item = item.asItem()
 )
 
 fun InvoiceLineViewEntity.asInvoiceLineEntity() = InvoiceLineEntity(

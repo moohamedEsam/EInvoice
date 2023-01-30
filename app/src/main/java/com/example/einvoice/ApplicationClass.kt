@@ -8,6 +8,7 @@ import com.example.client.di.clientModule
 import com.example.company.di.companyModule
 import com.example.data.di.dataModule
 import com.example.database.di.databaseModule
+import com.example.document.di.documentsModule
 import com.example.domain.di.domainModule
 import com.example.einvoice.di.appModule
 import com.example.item.di.itemModule
@@ -39,7 +40,8 @@ class ApplicationClass : Application() {
                     branchModule,
                     syncModule,
                     clientModule,
-                    itemModule
+                    itemModule,
+                    documentsModule
                 )
             )
         }

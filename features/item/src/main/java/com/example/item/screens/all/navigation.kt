@@ -5,7 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.example.common.models.SnackBarEvent
 
-const val ItemsScreenRoute = "items screen"
+const val ItemsScreenRoute = "items"
 
 fun NavGraphBuilder.itemsScreen(
     onShowSnackBarEvent: (SnackBarEvent) -> Unit

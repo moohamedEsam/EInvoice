@@ -7,7 +7,7 @@ import com.example.common.models.SnackBarEvent
 import com.example.maplocation.latKey
 import com.example.maplocation.lngKey
 
-const val BranchFormScreenRoute = "Branch Form Screen"
+const val BranchFormScreenRoute = "Branch Form"
 const val branchIdKey = "id"
 
 fun NavGraphBuilder.branchFormScreen(

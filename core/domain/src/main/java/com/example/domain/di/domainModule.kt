@@ -3,6 +3,7 @@ package com.example.domain.di
 import com.example.data.branch.BranchRepository
 import com.example.data.client.ClientRepository
 import com.example.data.company.CompanyRepository
+import com.example.data.document.DocumentRepository
 import com.example.data.item.ItemRepository
 import com.example.domain.auth.isUserLoggedInUseCase
 import com.example.domain.auth.loginUseCase
@@ -20,6 +21,10 @@ import com.example.domain.client.GetClientsUseCase
 import com.example.domain.client.UpdateClientUseCase
 
 import com.example.domain.company.*
+import com.example.domain.document.CreateDocumentUseCase
+import com.example.domain.document.GetDocumentUseCase
+import com.example.domain.document.GetDocumentsUseCase
+import com.example.domain.document.UpdateDocumentUseCase
 import com.example.domain.item.*
 import com.example.domain.sync.OneTimeSyncUseCase
 import com.example.domain.sync.oneTimeSyncUseCase
@@ -61,5 +66,11 @@ val domainModule = module {
     single { UpdateItemUseCase(get<ItemRepository>()::updateItem) }
     single { DeleteItemUseCase(get<ItemRepository>()::deleteItem) }
     single { GetUnitTypesUseCase(get<ItemRepository>()::getUnitTypes) }
+
+    //document
+    single { GetDocumentsUseCase(get<DocumentRepository>()::getDocuments) }
+    single { GetDocumentUseCase(get<DocumentRepository>()::getDocument) }
+    single { CreateDocumentUseCase(get<DocumentRepository>()::createDocument) }
+    single { UpdateDocumentUseCase(get<DocumentRepository>()::updateDocument) }
 
 }

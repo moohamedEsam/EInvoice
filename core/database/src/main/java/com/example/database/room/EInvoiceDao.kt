@@ -10,7 +10,6 @@ import com.example.database.models.company.CompanyEntity
 import com.example.database.models.document.DocumentEntity
 import com.example.database.models.document.DocumentViewEntity
 import com.example.database.models.invoiceLine.InvoiceLineEntity
-import com.example.database.models.invoiceLine.InvoiceLineItemCrossRef
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -25,20 +24,14 @@ interface EInvoiceDao {
     @Query("SELECT * FROM Branch WHERE id = :id")
     fun getBranchById(id: String): Flow<BranchEntity>
 
-    @Query("SELECT * FROM Branch WHERE isDeleted = 0 and isCreated = 1")
-    suspend fun getCreatedBranches(): List<BranchEntity>
-
-    @Query("SELECT * FROM Branch WHERE isDeleted = 0 and isUpdated = 1")
-    suspend fun getUpdatedBranches(): List<BranchEntity>
-
-    @Query("SELECT * FROM Branch WHERE isDeleted = 1")
-    suspend fun getDeletedBranches(): List<BranchEntity>
-
     @Insert
     suspend fun insertBranch(branch: BranchEntity)
 
     @Query("DELETE FROM Branch where id = :id")
     suspend fun deleteBranch(id: String)
+
+    @Query("delete from branch")
+    suspend fun deleteAllBranches()
 
     @Update
     suspend fun updateBranch(branch: BranchEntity)
@@ -53,17 +46,6 @@ interface EInvoiceDao {
     @Query("SELECT * FROM Company WHERE id = :id and isDeleted = 0")
     fun getCompanyById(id: String): Flow<CompanyEntity>
 
-    @Query("SELECT * FROM Company WHERE isUpdated = 1 and isDeleted = 0")
-    suspend fun getUpdatedCompanies(): List<CompanyEntity>
-
-    @Query("delete from branch")
-    suspend fun deleteAllBranches()
-
-    @Query("SELECT * FROM Company WHERE isCreated = 1 and isDeleted = 0")
-    suspend fun getCreatedCompanies(): List<CompanyEntity>
-
-    @Query("SELECT * FROM Company WHERE isDeleted = 1")
-    suspend fun getDeletedCompanies(): List<CompanyEntity>
 
     @Insert
     suspend fun insertCompany(company: CompanyEntity)
@@ -93,15 +75,6 @@ interface EInvoiceDao {
 
     @Query("SELECT * FROM Client WHERE id = :id")
     fun getClientById(id: String): Flow<ClientEntity>
-
-    @Query("SELECT * FROM Client WHERE isDeleted = 0 and isCreated = 1")
-    suspend fun getCreatedClients(): List<ClientEntity>
-
-    @Query("SELECT * FROM Client WHERE isDeleted = 0 and isUpdated = 1")
-    suspend fun getUpdatedClients(): List<ClientEntity>
-
-    @Query("SELECT * FROM Client WHERE isDeleted = 1")
-    suspend fun getDeletedClients(): List<ClientEntity>
 
     @Insert
     suspend fun insertClient(client: ClientEntity)
@@ -139,9 +112,6 @@ interface EInvoiceDao {
 
     @Query("update Item set branchId =:newBranchId where branchId = :oldBranchId")
     suspend fun updateItemsBranchId(oldBranchId: String, newBranchId: String)
-
-    @Query("SELECT * FROM Item WHERE isDeleted = 0 and isCreated = 1")
-    suspend fun getCreatedItems(): List<ItemEntity>
 
     @Query("SELECT * FROM Item WHERE isDeleted = 0 and isUpdated = 1")
     suspend fun getUpdatedItems(): List<ItemEntity>
@@ -207,13 +177,7 @@ interface EInvoiceDao {
     @Insert
     suspend fun insertDocumentWithInvoices(
         document: DocumentEntity,
-        invoiceLines: List<InvoiceLineEntity>,
-        crossRefs: List<InvoiceLineItemCrossRef> = invoiceLines.map {
-            InvoiceLineItemCrossRef(
-                itemId = it.itemId,
-                invoiceLineId = it.id
-            )
-        }
+        invoiceLines: List<InvoiceLineEntity>
     )
 
 

@@ -9,7 +9,7 @@ import com.example.common.models.SnackBarEvent
 import com.example.maplocation.latKey
 import com.example.maplocation.lngKey
 
-const val ClientFormScreenRoute = "Client Form Screen"
+const val ClientFormScreenRoute = "Client Form"
 private const val clientIdKey = "clientId"
 fun NavGraphBuilder.clientsFormScreen(
     onLocationRequested: () -> Unit,
