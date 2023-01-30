@@ -1,14 +1,14 @@
 package com.example.data.document
 
+import android.util.Log
 import com.example.common.functions.tryWrapper
 import com.example.common.models.Result
 import com.example.data.sync.Synchronizer
 import com.example.data.sync.handleSync
-import com.example.database.models.document.DocumentEntity
-import com.example.database.models.document.asDocument
-import com.example.database.models.document.asDocumentEntity
-import com.example.database.models.document.asDocumentView
+import com.example.database.models.document.*
 import com.example.database.models.invoiceLine.asInvoiceLineEntity
+import com.example.database.models.invoiceLine.asInvoiceLineView
+import com.example.database.models.invoiceLine.asInvoiceLineViewEntity
 
 import com.example.database.room.EInvoiceDao
 import com.example.models.document.Document
@@ -18,7 +18,7 @@ import com.example.models.invoiceLine.asInvoiceLine
 import com.example.network.EInvoiceRemoteDataSource
 import com.example.network.models.document.asCreateDocumentDto
 import com.example.network.models.document.asDocumentView
-import com.example.network.models.document.asDocumentViewDto
+import com.example.network.models.document.asNetworkDocumentView
 import com.example.network.models.document.asUpdateDocumentDto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -88,7 +88,7 @@ class OfflineFirstDocumentRepository(
                 val updatedDocuments = documents.filter { it.documentEntity.isUpdated }
                 updatedDocuments.forEach { document ->
                     val result = remoteDataSource.updateDocument(
-                        document.asDocumentView().asDocumentViewDto().asUpdateDocumentDto()
+                        document.asDocumentView().asNetworkDocumentView().asUpdateDocumentDto()
                     )
                     if (result is Result.Success) {
                         localDataSource.updateDocument(
@@ -103,7 +103,7 @@ class OfflineFirstDocumentRepository(
                 val createdDocuments = documents.filter { it.documentEntity.isCreated }
                 createdDocuments.forEach { document ->
                     val result = remoteDataSource.createDocument(
-                        document.asDocumentView().asDocumentViewDto().asCreateDocumentDto()
+                        document.asDocumentView().asNetworkDocumentView().asCreateDocumentDto()
                     )
                     if (result is Result.Success) {
                         idMappings[document.documentEntity.id] = result.data.id
@@ -111,11 +111,14 @@ class OfflineFirstDocumentRepository(
                 }
                 Result.Success(Unit)
             },
-            localCreator = { documentEntity ->
-                if (documentEntity.id !in documents.map { it.documentEntity.id })
-                    localDataSource.insertDocument(documentEntity)
+            localCreator = { documentView ->
+                if (documentView.documentEntity.id !in documents.map { it.documentEntity.id })
+                    localDataSource.insertDocumentWithInvoices(
+                        documentView.documentEntity,
+                        documentView.invoices.map { it.asInvoiceLineEntity() }
+                    )
                 else
-                    localDataSource.updateDocument(documentEntity)
+                    localDataSource.updateDocument(documentView.documentEntity)
             },
             afterLocalCreate = {
                 idMappings.forEach { (oldId, newId) ->
@@ -126,9 +129,9 @@ class OfflineFirstDocumentRepository(
         )
     }
 
-    private suspend fun getDocumentEntityFromRemoteSource(id: String): DocumentEntity? {
-        val documentResult = remoteDataSource.getDocument(id)
-            .map { it.asDocumentView().asDocument().asDocumentEntity() }
+    private suspend fun getDocumentEntityFromRemoteSource(id: String): DocumentViewEntity? {
+        val documentResult =
+            remoteDataSource.getDocument(id).map(DocumentView::asDocumentViewEntity)
 
         return if (documentResult is Result.Success)
             documentResult.data

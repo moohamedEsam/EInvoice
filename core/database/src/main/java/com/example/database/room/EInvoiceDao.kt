@@ -10,6 +10,7 @@ import com.example.database.models.company.CompanyEntity
 import com.example.database.models.document.DocumentEntity
 import com.example.database.models.document.DocumentViewEntity
 import com.example.database.models.invoiceLine.InvoiceLineEntity
+import com.example.database.models.invoiceLine.InvoiceLineItemCrossRef
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -206,8 +207,15 @@ interface EInvoiceDao {
     @Insert
     suspend fun insertDocumentWithInvoices(
         document: DocumentEntity,
-        invoiceLines: List<InvoiceLineEntity>
+        invoiceLines: List<InvoiceLineEntity>,
+        crossRefs: List<InvoiceLineItemCrossRef> = invoiceLines.map {
+            InvoiceLineItemCrossRef(
+                itemId = it.itemId,
+                invoiceLineId = it.id
+            )
+        }
     )
+
 
     @Update
     suspend fun updateDocument(document: DocumentEntity)
@@ -248,11 +256,10 @@ interface EInvoiceDao {
 
     @Transaction
     suspend fun deleteAll() {
-        deleteAllInvoiceLines()
+        deleteAllDocuments()
         deleteAllItems()
         deleteAllClients()
         deleteAllBranches()
         deleteAllCompanies()
-        deleteAllDocuments()
     }
 }

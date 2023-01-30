@@ -17,7 +17,7 @@ data class CreateDocumentDto(
     val invoices: List<CreateInvoiceLineDto>
 )
 
-fun DocumentViewDto.asCreateDocumentDto() = CreateDocumentDto(
+fun NetworkDocumentView.asCreateDocumentDto() = CreateDocumentDto(
     branchId = branch.id,
     issuerId = company.id,
     receiverId = client.id,

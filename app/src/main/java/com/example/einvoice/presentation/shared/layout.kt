@@ -192,7 +192,7 @@ fun EInvoiceTopBar(navController: NavHostController, drawerState: DrawerState) {
                     coroutine.launch {
                         val result = logoutUseCase()
                         result.ifSuccess {
-                            navController.navigateToLoginScreen()
+//                            navController.navigateToLoginScreen()
                         }
                     }
                 }

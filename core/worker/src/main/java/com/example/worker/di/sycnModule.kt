@@ -15,6 +15,7 @@ val syncModule = module {
             branchRepository = get(),
             clientRepository = get(),
             itemRepository = get(),
+            documentRepository = get(),
             synchronizer = Synchronizer()
         )
     }

@@ -8,7 +8,8 @@ import com.example.models.item.Item
 import com.example.models.auth.Credentials
 import com.example.models.auth.Register
 import com.example.models.auth.Token
-import com.example.network.models.document.DocumentViewDto
+import com.example.models.document.DocumentView
+import com.example.network.models.document.NetworkDocumentView
 import com.example.models.item.UnitType
 import com.example.network.models.document.CreateDocumentDto
 import com.example.network.models.document.DocumentDto
@@ -56,7 +57,7 @@ interface EInvoiceRemoteDataSource {
 
     suspend fun createDocument(document:CreateDocumentDto): Result<DocumentDto>
 
-    suspend fun getDocument(documentId: String): Result<DocumentViewDto>
+    suspend fun getDocument(documentId: String): Result<DocumentView>
 
     suspend fun getDocuments(): Result<List<DocumentDto>>
 

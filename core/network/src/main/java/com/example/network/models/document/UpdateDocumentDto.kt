@@ -18,7 +18,7 @@ data class UpdateDocumentDto(
     val invoices: List<CreateInvoiceLineDto>
 )
 
-fun DocumentViewDto.asUpdateDocumentDto() = UpdateDocumentDto(
+fun NetworkDocumentView.asUpdateDocumentDto() = UpdateDocumentDto(
     id = id,
     branchId = branch.id,
     issuerId = company.id,

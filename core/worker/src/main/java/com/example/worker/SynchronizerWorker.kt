@@ -6,6 +6,7 @@ import androidx.work.*
 import com.example.data.branch.BranchRepository
 import com.example.data.client.ClientRepository
 import com.example.data.company.CompanyRepository
+import com.example.data.document.DocumentRepository
 import com.example.data.item.ItemRepository
 import com.example.data.sync.Synchronizer
 import kotlinx.coroutines.*
@@ -17,6 +18,7 @@ class SynchronizerWorker(
     private val branchRepository: BranchRepository,
     private val clientRepository: ClientRepository,
     private val itemRepository: ItemRepository,
+    private val documentRepository: DocumentRepository,
     private val synchronizer: Synchronizer
 ) : CoroutineWorker(appContext, workerParams) {
     override suspend fun doWork(): Result {
@@ -26,7 +28,8 @@ class SynchronizerWorker(
                     companyRepository.syncWith(synchronizer),
                     branchRepository.syncWith(synchronizer),
                     clientRepository.syncWith(synchronizer),
-                    itemRepository.syncWith(synchronizer)
+                    itemRepository.syncWith(synchronizer),
+                    documentRepository.syncWith(synchronizer)
                 ).all { it }
                 if (!isSyncSuccessful)
                     Result.retry()

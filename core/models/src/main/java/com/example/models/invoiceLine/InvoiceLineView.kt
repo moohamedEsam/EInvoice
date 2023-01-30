@@ -7,9 +7,9 @@ data class InvoiceLineView(
     val id: String,
     val item: Item,
     val quantity: Float,
-    val unitValue: String,
+    val unitValue: UnitValue,
     val discountRate: Float,
-    val taxes: List<InvoiceTax>,
+    val taxes: List<InvoiceTax>?,
     val documentId: String
 )
 

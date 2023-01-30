@@ -1,5 +1,6 @@
 package com.example.database.models.invoiceLine
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -8,6 +9,7 @@ import com.example.database.models.ItemEntity
 import com.example.database.models.document.DocumentEntity
 import com.example.models.invoiceLine.InvoiceLine
 import com.example.models.invoiceLine.InvoiceTax
+import com.example.models.invoiceLine.UnitValue
 import java.util.UUID
 
 @Entity(
@@ -34,9 +36,9 @@ import java.util.UUID
 data class InvoiceLineEntity(
     val itemId: String,
     val quantity: Float,
-    val unitValue: String,
+    @Embedded val unitValue: UnitValue,
     val discountRate: Float,
-    val taxes: List<InvoiceTax>,
+    val taxes: List<InvoiceTax>?,
     val documentId: String,
     @PrimaryKey
     val id: String = UUID.randomUUID().toString()

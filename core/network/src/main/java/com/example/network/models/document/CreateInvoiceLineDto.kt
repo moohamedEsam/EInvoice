@@ -1,7 +1,8 @@
 package com.example.network.models.document
 
-import com.example.models.invoiceLine.InvoiceLineView
 import com.example.models.invoiceLine.InvoiceTax
+import com.example.models.invoiceLine.UnitValue
+import com.example.network.models.NetworkInvoiceLineView
 import kotlinx.serialization.Serializable
 
 
@@ -9,15 +10,15 @@ import kotlinx.serialization.Serializable
 data class CreateInvoiceLineDto(
     val itemId: String,
     val quantity: Float,
-    val unitValue: String,
+    val unitValue: UnitValue,
     val discountRate: Float,
-    val taxes: List<InvoiceTax>,
+    val taxes: List<InvoiceTax>?,
     val valueDifference: Float = 0f,
     val itemsDiscount: Float = 0f,
 )
 
 
-fun InvoiceLineView.asCreateInvoiceLineDto() = CreateInvoiceLineDto(
+fun NetworkInvoiceLineView.asCreateInvoiceLineDto() = CreateInvoiceLineDto(
     itemId = item.id,
     quantity = quantity,
     unitValue = unitValue,

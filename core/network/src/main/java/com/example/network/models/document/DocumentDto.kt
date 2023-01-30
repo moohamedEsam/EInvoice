@@ -5,11 +5,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.util.*
 
+@Serializable
 data class DocumentDto(
     val id: String,
-    val branchName: String,
-    val issuerName: String,
-    val receiverName: String,
+    val branchName: String?,
+    val companyName: String?,
+    val clientName: String?,
     val internalId: String,
     @SerialName("dateTimeIssued")
     @Serializable(with = DateSerializer::class)

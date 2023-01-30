@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "650686b09b1ce5f071af570b34ca62c2",
+    "identityHash": "148637a818b56d6717067f3a015a7cc0",
     "entities": [
       {
         "tableName": "Branch",
@@ -514,7 +514,7 @@
       },
       {
         "tableName": "InvoiceLine",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` TEXT NOT NULL, `quantity` REAL NOT NULL, `unitValue` TEXT NOT NULL, `discountRate` REAL NOT NULL, `taxes` TEXT NOT NULL, `documentId` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`itemId`) REFERENCES `Item`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`documentId`) REFERENCES `Document`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` TEXT NOT NULL, `quantity` REAL NOT NULL, `discountRate` REAL NOT NULL, `taxes` TEXT, `documentId` TEXT NOT NULL, `id` TEXT NOT NULL, `currencyEgp` TEXT NOT NULL, `currencySold` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`itemId`) REFERENCES `Item`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`documentId`) REFERENCES `Document`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "itemId",
@@ -529,12 +529,6 @@
             "notNull": true
           },
           {
-            "fieldPath": "unitValue",
-            "columnName": "unitValue",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
             "fieldPath": "discountRate",
             "columnName": "discountRate",
             "affinity": "REAL",
@@ -544,7 +538,7 @@
             "fieldPath": "taxes",
             "columnName": "taxes",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "documentId",
@@ -555,6 +549,18 @@
           {
             "fieldPath": "id",
             "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unitValue.currencyEgp",
+            "columnName": "currencyEgp",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unitValue.currencySold",
+            "columnName": "currencySold",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -599,7 +605,7 @@
           },
           {
             "table": "Document",
-            "onDelete": "RESTRICT",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "documentId"
@@ -612,7 +618,7 @@
       },
       {
         "tableName": "Document",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`issuerId` TEXT NOT NULL, `receiverId` TEXT NOT NULL, `branchId` TEXT NOT NULL, `internalId` TEXT NOT NULL, `date` INTEGER NOT NULL, `referencedDocument` TEXT, `id` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`issuerId`) REFERENCES `Company`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`receiverId`) REFERENCES `Client`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`branchId`) REFERENCES `Branch`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`issuerId` TEXT NOT NULL, `receiverId` TEXT NOT NULL, `branchId` TEXT NOT NULL, `internalId` TEXT NOT NULL, `date` INTEGER NOT NULL, `referencedDocument` TEXT, `documentType` TEXT NOT NULL, `status` TEXT NOT NULL, `error` TEXT, `id` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`issuerId`) REFERENCES `Company`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`receiverId`) REFERENCES `Client`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`branchId`) REFERENCES `Branch`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
         "fields": [
           {
             "fieldPath": "issuerId",
@@ -647,6 +653,24 @@
           {
             "fieldPath": "referencedDocument",
             "columnName": "referencedDocument",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "documentType",
+            "columnName": "documentType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "error",
+            "columnName": "error",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -745,12 +769,39 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "InvoiceLineItemCrossRef",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` TEXT NOT NULL, `invoiceLineId` TEXT NOT NULL, PRIMARY KEY(`itemId`, `invoiceLineId`))",
+        "fields": [
+          {
+            "fieldPath": "itemId",
+            "columnName": "itemId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "invoiceLineId",
+            "columnName": "invoiceLineId",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "itemId",
+            "invoiceLineId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '650686b09b1ce5f071af570b34ca62c2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '148637a818b56d6717067f3a015a7cc0')"
     ]
   }
 }
