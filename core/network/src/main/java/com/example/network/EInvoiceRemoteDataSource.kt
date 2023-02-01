@@ -9,11 +9,8 @@ import com.example.models.auth.Credentials
 import com.example.models.auth.Register
 import com.example.models.auth.Token
 import com.example.models.document.DocumentView
-import com.example.network.models.document.NetworkDocumentView
 import com.example.models.item.UnitType
-import com.example.network.models.document.CreateDocumentDto
-import com.example.network.models.document.DocumentDto
-import com.example.network.models.document.UpdateDocumentDto
+import com.example.network.models.document.*
 
 interface EInvoiceRemoteDataSource {
     //auth

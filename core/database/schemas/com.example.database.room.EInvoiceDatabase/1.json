@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "e5906f133fb7bcc0334c906c86b950cf",
+    "identityHash": "a2b34da335a5812460871500121074e1",
     "entities": [
       {
         "tableName": "Branch",
@@ -380,7 +380,7 @@
       },
       {
         "tableName": "Item",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `description` TEXT NOT NULL, `price` REAL NOT NULL, `status` TEXT NOT NULL, `itemCode` TEXT NOT NULL, `unitTypeCode` TEXT NOT NULL, `branchId` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`branchId`) REFERENCES `Branch`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `description` TEXT NOT NULL, `price` REAL NOT NULL, `status` TEXT NOT NULL, `itemCode` TEXT NOT NULL, `unitTypeCode` TEXT NOT NULL, `internalCode` TEXT NOT NULL, `branchId` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`branchId`) REFERENCES `Branch`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
         "fields": [
           {
             "fieldPath": "name",
@@ -415,6 +415,12 @@
           {
             "fieldPath": "unitTypeCode",
             "columnName": "unitTypeCode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "internalCode",
+            "columnName": "internalCode",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -774,7 +780,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e5906f133fb7bcc0334c906c86b950cf')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a2b34da335a5812460871500121074e1')"
     ]
   }
 }

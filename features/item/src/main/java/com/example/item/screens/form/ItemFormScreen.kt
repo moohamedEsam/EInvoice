@@ -23,6 +23,9 @@ fun ItemFormScreenContent(
     name: StateFlow<String>,
     onNameChange: (String) -> Unit,
     nameValidationResult: StateFlow<ValidationResult>,
+    internalCode: StateFlow<String>,
+    onInternalCodeChange: (String) -> Unit,
+    internalCodeValidationResult: StateFlow<ValidationResult>,
     description: StateFlow<String>,
     onDescriptionChange: (String) -> Unit,
     price: StateFlow<String>,
@@ -45,7 +48,6 @@ fun ItemFormScreenContent(
 ) {
     Column(
         modifier = Modifier
-//            .fillMaxSize()
             .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -61,6 +63,13 @@ fun ItemFormScreenContent(
             validationState = nameValidationResult,
             label = "Name",
             onValueChange = onNameChange
+        )
+
+        ValidationOutlinedTextField(
+            valueState = internalCode,
+            label = "Internal Code",
+            onValueChange = onInternalCodeChange,
+            validationState = internalCodeValidationResult
         )
 
         EInvoiceOutlinedTextField(
@@ -254,7 +263,10 @@ fun ItemFormScreenPreview() {
                     onBranchChange = {},
                     onFormSubmit = {},
                     isEnabled = MutableStateFlow(true),
-                    isLoading = MutableStateFlow(false)
+                    isLoading = MutableStateFlow(false),
+                    internalCode = MutableStateFlow(""),
+                    onInternalCodeChange = {},
+                    internalCodeValidationResult = MutableStateFlow(ValidationResult.Valid),
                 )
             }
         }

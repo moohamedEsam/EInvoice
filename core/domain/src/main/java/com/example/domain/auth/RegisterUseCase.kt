@@ -12,6 +12,6 @@ fun interface RegisterUseCase : suspend (Register) -> Result<Token>
 fun registerUseCase(authRepository: AuthRepository, context: Context) = RegisterUseCase { register ->
     val result = authRepository.register(register)
     result.ifSuccess {
-        saveTokenToSharedPref(context, it.value)
+        saveTokenToSharedPref(context, it.token)
     }
 }

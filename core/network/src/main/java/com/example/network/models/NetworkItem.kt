@@ -16,7 +16,8 @@ data class NetworkItem(
     val status: Int,
     val itemCode: String,
     val unitTypeCode: String,
-    val branchId: String
+    val branchId: String,
+    val internalCode:String,
 )
 
 fun NetworkItem.asItem() = Item(
@@ -27,7 +28,8 @@ fun NetworkItem.asItem() = Item(
     status = TaxStatus.values().first { it.ordinal == status },
     itemCode = itemCode,
     unitTypeCode = unitTypeCode,
-    branchId = branchId
+    branchId = branchId,
+    internalCode = internalCode
 )
 
 fun Item.asNetworkItem() = NetworkItem(
@@ -38,5 +40,6 @@ fun Item.asNetworkItem() = NetworkItem(
     status = status.ordinal,
     itemCode = itemCode,
     unitTypeCode = unitTypeCode,
-    branchId = branchId
+    branchId = branchId,
+    internalCode = internalCode
 )

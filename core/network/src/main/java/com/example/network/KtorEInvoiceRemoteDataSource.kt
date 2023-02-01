@@ -179,8 +179,8 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
 
     override suspend fun getDocuments(): Result<List<DocumentDto>> = tryWrapper {
         val response = client.get(Urls.DOCUMENT)
-        val apiResponse = response.body<ApiResponse<List<DocumentDto>>>()
-        apiResponse.asResult()
+        val apiResponse = response.body<ApiResponse<PagedResponse<DocumentDto>>>()
+        apiResponse.asResult().map { it.data }
     }
 
     override suspend fun updateDocument(document: UpdateDocumentDto): Result<DocumentDto> =

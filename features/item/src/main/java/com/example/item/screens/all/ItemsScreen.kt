@@ -60,6 +60,9 @@ private fun ItemFormDialog(
                     name = viewModel.name,
                     onNameChange = viewModel::setName,
                     nameValidationResult = viewModel.nameValidationResult,
+                    internalCode = viewModel.internalCode,
+                    onInternalCodeChange = viewModel::setInternalCode,
+                    internalCodeValidationResult = viewModel.internalCodeValidationResult,
                     description = viewModel.description,
                     onDescriptionChange = viewModel::setDescription,
                     price = viewModel.price,
@@ -155,7 +158,8 @@ fun ItemsScreenPreview() {
             status = TaxStatus.Taxable,
             itemCode = "itemCode",
             unitTypeCode = "unitTypeCode",
-            branchId = "branchId"
+            branchId = "branchId",
+            internalCode = "internalCode"
         )
     }
 

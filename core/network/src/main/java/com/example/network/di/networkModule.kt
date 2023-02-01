@@ -58,8 +58,8 @@ fun Scope.provideHttpClient() = HttpClient(CIO) {
                     contentType(ContentType.Application.Json)
                     markAsRefreshTokenRequest()
                 }.body<ApiResponse<Token>>().data!!
-                if (token != refreshToken.value)
-                    saveTokenToSharedPref(androidContext(), refreshToken.value)
+                if (token != refreshToken.token)
+                    saveTokenToSharedPref(androidContext(), refreshToken.token)
                 BearerTokens(token, token)
             }
         }

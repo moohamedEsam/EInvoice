@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.common.models.Result
 import com.example.common.models.ValidationResult
+import com.example.common.validators.notBlankValidator
 import com.example.common.validators.validateEmail
 import com.example.common.validators.validatePhone
 import com.example.common.validators.validateUsername
@@ -47,54 +48,56 @@ class ClientFormViewModel(
         phone.map(::validatePhone)
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
 
+    private val _businessType = MutableStateFlow(BusinessType.B)
+    val businessType = _businessType.asStateFlow()
+
     private val _registrationNumber = MutableStateFlow("")
     val registrationNumber = _registrationNumber.asStateFlow()
+
     val registrationNumberValidationResult =
-        registrationNumber.map {
+        combine(registrationNumber, businessType) { registrationNumber, businessType ->
             when {
-                it.isBlank() -> ValidationResult.Empty
-                it.any { char -> !char.isDigit() } -> ValidationResult.Invalid("registrationNumber must be digits")
+                registrationNumber.isBlank() -> ValidationResult.Empty
+                registrationNumber.any { char -> !char.isDigit() } -> ValidationResult.Invalid("registrationNumber must be digits")
+
+                businessType == BusinessType.B && registrationNumber.length != 9 ->
+                    ValidationResult.Invalid("registrationNumber must be 9 digits")
+
+                businessType == BusinessType.P && registrationNumber.length != 14 ->
+                    ValidationResult.Invalid("registrationNumber must be 14 digits")
+
                 else -> ValidationResult.Valid
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
-
     private val _street = MutableStateFlow("")
-    val streetValidationResult = _street.map {
-        if (it.isBlank()) ValidationResult.Invalid("Street is required")
-        else ValidationResult.Valid
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
 
+
+    private val streetValidationResult = _street.map(::notBlankValidator)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
 
     private val _country = MutableStateFlow("")
-
     private val _governate = MutableStateFlow("")
-    val governateValidationResult = _governate.map {
-        if (it.isBlank()) ValidationResult.Invalid("Governate is required")
-        else ValidationResult.Valid
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
+
+    private val governateValidationResult = _governate.map(::notBlankValidator)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
 
     private val _postalCode = MutableStateFlow("")
-    val postalCode = _postalCode.asStateFlow()
-
 
     private val _regionCity = MutableStateFlow("")
-    val regionCityValidationResult = _regionCity.map {
-        if (it.isBlank()) ValidationResult.Invalid("Region/City is required")
-        else ValidationResult.Valid
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
+
+    private val regionCityValidationResult = _regionCity.map(::notBlankValidator)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
 
     private val _companies = MutableStateFlow(emptyList<Company>())
+
     val companies = _companies.asStateFlow()
-
     private val _selectedCompany = MutableStateFlow<Company?>(null)
+
+
     val selectedCompany = _selectedCompany.asStateFlow()
-
-
     private val _optionalAddress = MutableStateFlow(OptionalAddress("", "", "", "", ""))
-    val optionalAddress = _optionalAddress.asStateFlow()
 
-    private val _businessType = MutableStateFlow(BusinessType.B)
-    val businessType = _businessType.asStateFlow()
+    val optionalAddress = _optionalAddress.asStateFlow()
 
     private val _taxStatus = MutableStateFlow(TaxStatus.Taxable)
     val taxStatus = _taxStatus.asStateFlow()
@@ -268,7 +271,7 @@ class ClientFormViewModel(
                     street = _street.value,
                     country = _country.value,
                     governate = _governate.value,
-                    postalCode = postalCode.value,
+                    postalCode = _postalCode.value,
                     regionCity = _regionCity.value,
                     buildingNumber = optionalAddress.value.buildingNumber,
                     floor = optionalAddress.value.floor,
@@ -292,7 +295,7 @@ class ClientFormViewModel(
         }
     }
 
-    fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, R> combine(
+    private fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, R> combine(
         flow: Flow<T1>,
         flow2: Flow<T2>,
         flow3: Flow<T3>,

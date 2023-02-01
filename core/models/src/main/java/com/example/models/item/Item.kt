@@ -14,7 +14,8 @@ data class Item(
     val status: TaxStatus,
     val itemCode: String,
     val unitTypeCode: String,
-    val branchId: String
+    val branchId: String,
+    val internalCode: String,
 ) {
     companion object
 }
@@ -27,5 +28,6 @@ fun Item.Companion.empty() = Item(
     status = TaxStatus.Taxable,
     itemCode = "",
     unitTypeCode = "",
-    branchId = ""
+    branchId = "",
+    internalCode = "",
 )

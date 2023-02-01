@@ -80,7 +80,7 @@ private fun EInvoiceDrawer(
         drawerContent = { DrawerContent(navController = navController) },
         modifier = modifier.padding(paddingValues),
         drawerState = drawerState,
-        gesturesEnabled = false
+        gesturesEnabled = true
     ) {
         EInvoiceNavGraph(
             navController = navController,

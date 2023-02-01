@@ -29,6 +29,7 @@ data class ItemEntity(
     val status: TaxStatus,
     val itemCode: String,
     val unitTypeCode: String,
+    val internalCode: String,
     val branchId: String,
     val isCreated: Boolean = false,
     val isUpdated: Boolean = false,
@@ -44,7 +45,8 @@ fun ItemEntity.asItem() = Item(
     itemCode = itemCode,
     unitTypeCode = unitTypeCode,
     branchId = branchId,
-    id = id
+    id = id,
+    internalCode = internalCode
 )
 
 fun Item.asItemEntity(
@@ -62,6 +64,6 @@ fun Item.asItemEntity(
     id = id,
     isCreated = isCreated,
     isUpdated = isUpdated,
-    isDeleted = isDeleted
-
+    isDeleted = isDeleted,
+    internalCode = internalCode
 )

@@ -31,8 +31,15 @@ class CompanyFormViewModel(
     private val _registrationNumber = MutableStateFlow("")
     val registrationNumber = _registrationNumber.asStateFlow()
     val registrationNumberValidationResult =
-        registrationNumber.map(::validateUsername)
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
+        registrationNumber.map {
+            when {
+                it.isEmpty() -> ValidationResult.Empty
+                it.isBlank() -> ValidationResult.Invalid("Registration number is required")
+                it.any { char -> !char.isDigit() } -> ValidationResult.Invalid("Registration number must be a number")
+                it.length != 9 -> ValidationResult.Invalid("Registration number must be 9 digits long")
+                else -> ValidationResult.Valid
+            }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
 
     private val _ceo = MutableStateFlow("")
     val ceo = _ceo.asStateFlow()

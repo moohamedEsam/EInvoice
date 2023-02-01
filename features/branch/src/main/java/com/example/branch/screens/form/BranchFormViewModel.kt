@@ -3,26 +3,27 @@ package com.example.branch.screens.form
 import android.location.Address
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.models.OptionalAddress
 import com.example.common.models.ValidationResult
 import com.example.common.validators.validateUsername
 import com.example.domain.branch.CreateBranchUseCase
-import com.example.domain.branch.GetBranchUseCase
+import com.example.domain.branch.GetBranchesUseCase
 import com.example.domain.branch.UpdateBranchUseCase
 import com.example.domain.company.GetCompaniesUseCase
 import com.example.models.Branch
+import com.example.models.OptionalAddress
 import com.example.models.company.Company
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
 
 class BranchFormViewModel(
-    private val getBranchUseCase: GetBranchUseCase,
+    private val getBranchesUseCase: GetBranchesUseCase,
     private val getCompaniesUseCase: GetCompaniesUseCase,
     private val createBranchUseCase: CreateBranchUseCase,
     private val updateBranchUseCase: UpdateBranchUseCase,
     private val branchId: String,
 ) : ViewModel() {
+    private val _otherBranchesInternalIds = MutableStateFlow(emptyList<String>())
     private val isUpdating = branchId.isNotBlank()
     private val _name = MutableStateFlow("")
     val name = _name.asStateFlow()
@@ -33,17 +34,18 @@ class BranchFormViewModel(
     private val _internalId = MutableStateFlow("")
     val internalId = _internalId.asStateFlow()
     val internalIdValidationResult =
-        internalId.map {
+        combine(internalId, _otherBranchesInternalIds) { internalId, branchesInternalIds ->
             when {
-                it.isEmpty() -> ValidationResult.Empty
-                it.any { char -> !char.isDigit() } -> ValidationResult.Invalid("Must be a number")
+                internalId.isEmpty() -> ValidationResult.Empty
+                internalId.any { char -> !char.isDigit() } -> ValidationResult.Invalid("Must be a number")
+                branchesInternalIds.contains(internalId) -> ValidationResult.Invalid("Internal ID already exists")
                 else -> ValidationResult.Valid
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
 
 
     private val _street = MutableStateFlow("")
-    val streetValidationResult = _street.map {
+    private val streetValidationResult = _street.map {
         if (it.isBlank()) ValidationResult.Invalid("Street is required")
         else ValidationResult.Valid
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
@@ -52,17 +54,16 @@ class BranchFormViewModel(
     private val _country = MutableStateFlow("")
 
     private val _governate = MutableStateFlow("")
-    val governateValidationResult = _governate.map {
+    private val governateValidationResult = _governate.map {
         if (it.isBlank()) ValidationResult.Invalid("Governate is required")
         else ValidationResult.Valid
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
 
     private val _postalCode = MutableStateFlow("")
-    val postalCode = _postalCode.asStateFlow()
 
 
     private val _regionCity = MutableStateFlow("")
-    val regionCityValidationResult = _regionCity.map {
+    private val regionCityValidationResult = _regionCity.map {
         if (it.isBlank()) ValidationResult.Invalid("Region/City is required")
         else ValidationResult.Valid
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
@@ -114,16 +115,21 @@ class BranchFormViewModel(
 
     init {
         observerCompanies()
-        if (isUpdating) {
-            observerBranch()
+        observeBranches()
+    }
+
+    private fun observeBranches() {
+        viewModelScope.launch {
+            getBranchesUseCase().collectLatest { branches ->
+                _otherBranchesInternalIds.update { branches.filter { it.id != branchId }.map { it.internalId } }
+                if (isUpdating) {
+                    val branch = branches.find { it.id == branchId } ?: return@collectLatest
+                    fillForm(branch)
+                }
+            }
         }
     }
 
-    private fun observerBranch() {
-        viewModelScope.launch {
-            getBranchUseCase(branchId).collectLatest(::fillForm)
-        }
-    }
 
     private fun fillForm(branch: Branch) {
         _name.update { branch.name }
@@ -211,7 +217,7 @@ class BranchFormViewModel(
                 street = _street.value,
                 country = _country.value,
                 governate = _governate.value,
-                postalCode = postalCode.value,
+                postalCode = _postalCode.value,
                 regionCity = _regionCity.value,
                 buildingNumber = optionalAddress.value.buildingNumber,
                 floor = optionalAddress.value.floor,
@@ -230,7 +236,7 @@ class BranchFormViewModel(
         }
     }
 
-    fun <T1, T2, T3, T4, T5, T6, R> combine(
+    private fun <T1, T2, T3, T4, T5, T6, R> combine(
         flow: Flow<T1>,
         flow2: Flow<T2>,
         flow3: Flow<T3>,
