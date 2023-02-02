@@ -2,6 +2,7 @@ package com.example.data.item
 
 import com.example.common.models.Result
 import com.example.data.sync.Syncable
+import com.example.models.invoiceLine.TaxView
 import com.example.models.item.Item
 import com.example.models.item.UnitType
 import kotlinx.coroutines.flow.Flow
@@ -10,6 +11,8 @@ interface ItemRepository : Syncable<Item> {
     fun getItems(): Flow<List<Item>>
 
     fun getUnitTypes(): Flow<List<UnitType>>
+
+    fun getTaxTypes(): Flow<List<TaxView>>
 
     fun getItem(id: String): Flow<Item>
 

@@ -39,6 +39,7 @@ val domainModule = module {
     single { registerUseCase(get(), androidContext()) }
     single { isUserLoggedInUseCase(androidContext()) }
     single { GetCompaniesUseCase(get<CompanyRepository>()::getCompanies) }
+    single { GetCompaniesViewsUseCase(get<CompanyRepository>()::getCompaniesView) }
     single { GetCompanyUseCase(get<CompanyRepository>()::getCompany) }
     single { CreateCompanyUseCase(get<CompanyRepository>()::createCompany) }
     single { UpdateCompanyUseCase(get<CompanyRepository>()::updateCompany) }
@@ -66,6 +67,7 @@ val domainModule = module {
     single { UpdateItemUseCase(get<ItemRepository>()::updateItem) }
     single { DeleteItemUseCase(get<ItemRepository>()::deleteItem) }
     single { GetUnitTypesUseCase(get<ItemRepository>()::getUnitTypes) }
+    single { GetTaxTypesUseCase(get<ItemRepository>()::getTaxTypes) }
 
     //document
     single { GetDocumentsUseCase(get<DocumentRepository>()::getDocuments) }

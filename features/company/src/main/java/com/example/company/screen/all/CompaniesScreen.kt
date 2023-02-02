@@ -82,7 +82,7 @@ private fun CompaniesScreenContent(
         onFloatingButtonClick = onCreateNewCompanyClick,
         modifier = modifier
     ){
-        items(companies, key = { it.id }) { company ->
+        items(companies) { company ->
             CompanyItem(
                 company = company,
                 modifier = Modifier.fillMaxWidth(),

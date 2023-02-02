@@ -9,6 +9,7 @@ import com.example.models.auth.Credentials
 import com.example.models.auth.Register
 import com.example.models.auth.Token
 import com.example.models.document.DocumentView
+import com.example.models.invoiceLine.TaxView
 import com.example.models.item.UnitType
 import com.example.network.models.document.*
 
@@ -50,6 +51,8 @@ interface EInvoiceRemoteDataSource {
     suspend fun deleteItem(itemId: String): Result<Item>
 
     suspend fun getUnitTypes(): Result<List<UnitType>>
+
+    suspend fun getTaxTypes(): Result<List<TaxView>>
 
 
     suspend fun createDocument(document:CreateDocumentDto): Result<DocumentDto>

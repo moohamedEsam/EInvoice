@@ -12,4 +12,16 @@ data class Company(
     val website: String?,
     val settings: CompanySettings,
     val id: String = UUID.randomUUID().toString()
+){
+    companion object
+}
+
+
+fun Company.Companion.empty() = Company(
+    name = "",
+    registrationNumber = "",
+    ceo = "",
+    phone = "",
+    website = null,
+    settings = CompanySettings.empty()
 )

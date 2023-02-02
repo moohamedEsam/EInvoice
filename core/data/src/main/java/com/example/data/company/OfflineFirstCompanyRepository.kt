@@ -4,11 +4,10 @@ import com.example.common.functions.tryWrapper
 import com.example.common.models.Result
 import com.example.data.sync.Synchronizer
 import com.example.data.sync.handleSync
-import com.example.database.models.company.CompanyEntity
-import com.example.database.models.company.asCompany
-import com.example.database.models.company.asCompanyEntity
+import com.example.database.models.company.*
 import com.example.database.room.EInvoiceDao
 import com.example.models.company.Company
+import com.example.models.company.CompanyView
 import com.example.network.EInvoiceRemoteDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -28,6 +27,9 @@ class OfflineFirstCompanyRepository(
 
     override fun getCompanies(): Flow<List<Company>> = localDataSource.getCompanies()
         .map { companies -> companies.map(CompanyEntity::asCompany) }
+
+    override fun getCompaniesView(): Flow<List<CompanyView>> = localDataSource.getCompaniesViews()
+        .map { companies -> companies.map(CompanyViewEntity::asCompanyView) }
 
     override suspend fun updateCompany(company: Company): Result<Company> = tryWrapper {
         val companyEntity = localDataSource.getCompanyById(company.id).first()

@@ -1,9 +1,7 @@
 package com.example.einvoicecomponents
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -22,7 +20,8 @@ fun ValidationOutlinedTextField(
     modifier: Modifier = Modifier,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors()
 ) {
     val value by valueState.collectAsState()
     val validation by validationState.collectAsState()
@@ -34,7 +33,8 @@ fun ValidationOutlinedTextField(
             isError = validation is ValidationResult.Invalid,
             modifier = Modifier.fillMaxWidth(),
             trailingIcon = trailingIcon,
-            leadingIcon = leadingIcon
+            leadingIcon = leadingIcon,
+            colors = colors
         )
     }
 }

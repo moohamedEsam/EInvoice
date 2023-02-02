@@ -23,4 +23,22 @@ data class Branch(
     val landmark: String,
     val additionalInformation: String,
     val id: String = UUID.randomUUID().toString()
+){
+    companion object
+}
+
+fun Branch.Companion.empty() = Branch(
+    name = "",
+    internalId = "",
+    companyId = "",
+    street = "",
+    country = "",
+    governate = "",
+    postalCode = "",
+    regionCity = "",
+    buildingNumber = "",
+    floor = "",
+    room = "",
+    landmark = "",
+    additionalInformation = ""
 )

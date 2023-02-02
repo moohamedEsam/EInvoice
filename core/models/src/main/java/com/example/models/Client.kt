@@ -17,4 +17,17 @@ data class Client(
     val status: TaxStatus,
     val companyId: String,
     val id: String = UUID.randomUUID().toString()
+){
+    companion object
+}
+
+fun Client.Companion.empty() = Client(
+    registrationNumber = "",
+    name = "",
+    email = "",
+    phone = "",
+    address = null,
+    businessType = BusinessType.P,
+    status = TaxStatus.Taxable,
+    companyId = ""
 )

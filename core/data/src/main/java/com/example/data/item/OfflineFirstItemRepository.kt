@@ -1,6 +1,5 @@
 package com.example.data.item
 
-import android.util.Log
 import com.example.common.functions.tryWrapper
 import com.example.common.models.Result
 import com.example.data.sync.Synchronizer
@@ -9,7 +8,11 @@ import com.example.database.models.asItem
 import com.example.database.models.asItemEntity
 import com.example.database.models.asUnitType
 import com.example.database.models.asUnitTypeEntity
+import com.example.database.models.invoiceLine.tax.asSubTaxEntity
+import com.example.database.models.invoiceLine.tax.asTaxEntity
+import com.example.database.models.invoiceLine.tax.asTaxView
 import com.example.database.room.EInvoiceDao
+import com.example.models.invoiceLine.TaxView
 import com.example.models.item.Item
 import com.example.models.item.UnitType
 import com.example.network.EInvoiceRemoteDataSource
@@ -61,7 +64,8 @@ class OfflineFirstItemRepository(
         return withContext(synchronizer.dispatcher) {
             awaitAll(
                 async { syncItems(synchronizer) },
-                async { syncUnitTypes(synchronizer) }
+                async { syncUnitTypes(synchronizer) },
+                async { syncTaxTypes(synchronizer) }
             ).all { it }
         }
     }
@@ -69,9 +73,25 @@ class OfflineFirstItemRepository(
     private suspend fun syncUnitTypes(synchronizer: Synchronizer) =
         synchronizer.handleSync(
             remoteFetcher = remoteSource::getUnitTypes,
-            afterLocalCreate = {  },
+            afterLocalCreate = { },
             localCreator = {
                 localSource.insertUnitType(it.asUnitTypeEntity())
+                Result.Success(Unit)
+            },
+            remoteCreator = { Result.Success(Unit) },
+            remoteUpdater = { Result.Success(Unit) },
+            remoteDeleter = { Result.Success(Unit) }
+        )
+
+    private suspend fun syncTaxTypes(synchronizer: Synchronizer) =
+        synchronizer.handleSync(
+            remoteFetcher = remoteSource::getTaxTypes,
+            afterLocalCreate = { },
+            localCreator = {
+                val taxEntity = it.asTaxEntity()
+                localSource.insertTax(
+                    taxEntity,
+                    it.subTaxes.map { subTax -> subTax.asSubTaxEntity(taxId = taxEntity.id) })
                 Result.Success(Unit)
             },
             remoteCreator = { Result.Success(Unit) },
@@ -134,4 +154,7 @@ class OfflineFirstItemRepository(
 
     override fun getUnitTypes(): Flow<List<UnitType>> =
         localSource.getUnitTypes().map { unitTypes -> unitTypes.map { it.asUnitType() } }
+
+    override fun getTaxTypes(): Flow<List<TaxView>> =
+        localSource.getTaxTypes().map { taxTypes -> taxTypes.map { it.asTaxView() } }
 }

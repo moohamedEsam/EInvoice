@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "a2b34da335a5812460871500121074e1",
+    "identityHash": "3a805014937e83dcd6f70cd889554bde",
     "entities": [
       {
         "tableName": "Branch",
@@ -520,7 +520,7 @@
       },
       {
         "tableName": "InvoiceLine",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` TEXT NOT NULL, `quantity` REAL NOT NULL, `discountRate` REAL NOT NULL, `taxes` TEXT NOT NULL, `documentId` TEXT NOT NULL, `id` TEXT NOT NULL, `currencyEgp` TEXT NOT NULL, `currencySold` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`itemId`) REFERENCES `Item`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`documentId`) REFERENCES `Document`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` TEXT NOT NULL, `quantity` REAL NOT NULL, `discountRate` REAL NOT NULL, `taxes` TEXT NOT NULL, `documentId` TEXT NOT NULL, `id` TEXT NOT NULL, `currencyEgp` REAL NOT NULL, `currencySold` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`itemId`) REFERENCES `Item`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`documentId`) REFERENCES `Document`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "itemId",
@@ -561,7 +561,7 @@
           {
             "fieldPath": "unitValue.currencyEgp",
             "columnName": "currencyEgp",
-            "affinity": "TEXT",
+            "affinity": "REAL",
             "notNull": true
           },
           {
@@ -775,12 +775,104 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "Tax",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `code` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "SubTax",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `code` TEXT NOT NULL, `taxId` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`taxId`) REFERENCES `Tax`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "taxId",
+            "columnName": "taxId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_SubTax_taxId",
+            "unique": false,
+            "columnNames": [
+              "taxId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_SubTax_taxId` ON `${TABLE_NAME}` (`taxId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "Tax",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "taxId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a2b34da335a5812460871500121074e1')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3a805014937e83dcd6f70cd889554bde')"
     ]
   }
 }

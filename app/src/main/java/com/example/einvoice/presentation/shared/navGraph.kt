@@ -19,6 +19,8 @@ import com.example.company.screen.all.navigateToCompaniesScreen
 import com.example.company.screen.form.companyFormScreen
 import com.example.company.screen.form.navigateToCompanyFormScreen
 import com.example.document.screens.all.documentsScreen
+import com.example.document.screens.form.documentFormScreen
+import com.example.document.screens.form.navigateToDocumentFormScreen
 import com.example.einvoice.R
 import com.example.item.screens.all.itemsScreen
 import com.example.maplocation.latKey
@@ -92,8 +94,12 @@ fun EInvoiceNavGraph(
         itemsScreen(onShowSnackBarEvent = onShowSnackbarEvent)
 
         documentsScreen(
-            onDocumentClick = {},
+            onDocumentClick = {
+                navController.navigateToDocumentFormScreen(it)
+            },
             onAddDocumentClick = {}
         )
+
+        documentFormScreen(onShowSnackbarEvent)
     }
 }

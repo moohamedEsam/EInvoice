@@ -7,9 +7,13 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.example.database.models.*
 import com.example.database.models.company.CompanyEntity
+import com.example.database.models.company.CompanyViewEntity
 import com.example.database.models.document.DocumentEntity
 import com.example.database.models.document.DocumentViewEntity
 import com.example.database.models.invoiceLine.InvoiceLineEntity
+import com.example.database.models.invoiceLine.tax.SubTaxEntity
+import com.example.database.models.invoiceLine.tax.TaxEntity
+import com.example.database.models.invoiceLine.tax.TaxViewEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -42,6 +46,10 @@ interface EInvoiceDao {
     // Company
     @Query("SELECT * FROM Company where isDeleted = 0")
     fun getCompanies(): Flow<List<CompanyEntity>>
+
+    @Transaction
+    @Query("SELECT * FROM Company where isDeleted = 0")
+    fun getCompaniesViews(): Flow<List<CompanyViewEntity>>
 
     @Query("SELECT * FROM Company WHERE id = :id and isDeleted = 0")
     fun getCompanyById(id: String): Flow<CompanyEntity>
@@ -128,6 +136,14 @@ interface EInvoiceDao {
     @Query("SELECT * FROM UnitType")
     fun getUnitTypes(): Flow<List<UnitTypeEntity>>
 
+    @Insert
+    suspend fun insertTax(tax: TaxEntity, subTaxes: List<SubTaxEntity>)
+
+
+    @Query("SELECT * FROM Tax")
+    @Transaction
+    fun getTaxTypes(): Flow<List<TaxViewEntity>>
+
     @Query("delete FROM UnitType")
     suspend fun deleteAllUnitTypes()
 
@@ -164,7 +180,7 @@ interface EInvoiceDao {
     fun getDocuments(): Flow<List<DocumentEntity>>
 
     @Transaction
-    @Query("SELECT * FROM Document")
+    @Query("SELECT * FROM Document where isDeleted = 0")
     fun getDocumentsView(): Flow<List<DocumentViewEntity>>
 
     @Transaction

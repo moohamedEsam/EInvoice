@@ -9,6 +9,7 @@ import com.example.models.auth.Credentials
 import com.example.models.auth.Register
 import com.example.models.auth.Token
 import com.example.models.document.DocumentView
+import com.example.models.invoiceLine.TaxView
 import com.example.models.item.Item
 import com.example.models.item.UnitType
 import com.example.network.models.*
@@ -148,6 +149,13 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
         val apiResponse = response.body<ApiResponse<Item>>()
         apiResponse.asResult()
     }
+
+    override suspend fun getTaxTypes(): Result<List<TaxView>> = tryWrapper {
+        val response = client.get(Urls.TAX_TYPES)
+        val apiResponse = response.body<ApiResponse<List<TaxView>>>()
+        apiResponse.asResult()
+    }
+
 
     override suspend fun deleteItem(itemId: String): Result<Item> = tryWrapper {
         val response = client.delete(Urls.getItem(itemId))

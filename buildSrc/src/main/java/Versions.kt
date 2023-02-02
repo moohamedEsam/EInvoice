@@ -6,7 +6,7 @@ object Versions {
     const val kotlinCompilerExtensionVersion = "1.3.2"
     const val kotlinSerialization = "1.7.20"
     const val appCompact = "1.4.1"
-
+    const val accompanistVersion = "0.20.2"
     const val composeVersion = "1.2.1"
     const val composeMaterial3 = "material3:1.1.0-alpha02"
     const val activityCompose = "1.6.1"
