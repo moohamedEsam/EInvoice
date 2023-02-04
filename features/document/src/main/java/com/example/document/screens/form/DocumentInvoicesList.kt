@@ -1,6 +1,8 @@
 package com.example.document.screens.form
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.common.models.ValidationResult
 import com.example.einvoicecomponents.BaseExposedDropDownMenu
+import com.example.einvoicecomponents.OutlinedSearchTextField
 import com.example.einvoicecomponents.ValidationOutlinedTextField
 import com.example.models.invoiceLine.*
 import com.example.models.item.Item
@@ -27,51 +30,69 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.random.Random
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DocumentInvoicesList(
     invoicesState: StateFlow<List<InvoiceLineView>>,
+    queryState: StateFlow<String>,
+    onQueryChange: (String) -> Unit,
     onInvoiceRemove: (InvoiceLineView) -> Unit,
     onInvoiceEdit: (InvoiceLineView) -> Unit,
+    onShowItemTaxes: (InvoiceLineView) -> Unit,
     onAddClick: () -> Unit,
     onAddTaxClick: (InvoiceLineView) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val invoices by invoicesState.collectAsState()
     val columnState = rememberLazyListState()
-    LazyColumn(
-        modifier = modifier
+    Column(
+        modifier = Modifier
             .fillMaxSize()
-            .padding(8.dp)
-            .animateContentSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        state = columnState,
+            .padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = "Invoices", style = MaterialTheme.typography.headlineSmall)
-                IconButton(onClick = onAddClick) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add invoice"
-                    )
+        OutlinedSearchTextField(
+            queryState = queryState,
+            onQueryChange = onQueryChange,
+            modifier = Modifier.fillMaxWidth(),
+            label = "Search by Item Name"
+        )
+        LazyColumn(
+            modifier = modifier
+                .weight(1f)
+                .animateContentSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            state = columnState
+        ) {
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "Invoices", style = MaterialTheme.typography.headlineSmall)
+                    IconButton(onClick = onAddClick) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Add invoice"
+                        )
+                    }
                 }
             }
-        }
-
-        items(invoices) { invoice ->
-            InvoiceLineItem(
-                invoiceLineView = invoice,
-                onInvoiceEdit = {
-                    onInvoiceEdit(invoice)
-                },
-                onInvoiceDelete = onInvoiceRemove,
-                onAddTaxClick = onAddTaxClick,
-                modifier = Modifier.heightIn(max = 280.dp)
-            )
+            items(invoices, key = { it.id }) { invoice ->
+                InvoiceLineItem(
+                    invoiceLineView = invoice,
+                    onInvoiceEdit = {
+                        onInvoiceEdit(invoice)
+                    },
+                    onInvoiceDelete = onInvoiceRemove,
+                    onAddTaxClick = onAddTaxClick,
+                    onShowItemTaxes = onShowItemTaxes,
+                    modifier = Modifier
+                        .heightIn(max = 280.dp)
+                        .animateItemPlacement()
+                )
+            }
         }
     }
 }
@@ -83,10 +104,14 @@ private fun InvoiceLineItem(
     onInvoiceEdit: (InvoiceLineView) -> Unit,
     onInvoiceDelete: (InvoiceLineView) -> Unit,
     onAddTaxClick: (InvoiceLineView) -> Unit,
+    onShowItemTaxes: (InvoiceLineView) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val totals by remember {
+    var totals by remember {
         mutableStateOf(invoiceLineView.getTotals())
+    }
+    LaunchedEffect(key1 = invoiceLineView) {
+        totals = invoiceLineView.getTotals()
     }
     OutlinedCard(modifier = modifier.fillMaxWidth()) {
         Column(
@@ -120,9 +145,12 @@ private fun InvoiceLineItem(
                 Text("Total: %.2f".format(totals.total))
             }
             Row(
-                modifier = Modifier.align(Alignment.End),
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
+
                 AssistChip(
                     onClick = { onAddTaxClick(invoiceLineView) },
                     label = { Text(text = "Add Tax") },
@@ -134,11 +162,15 @@ private fun InvoiceLineItem(
                     }
                 )
 
-
                 AssistChip(
                     onClick = { onInvoiceEdit(invoiceLineView) },
                     label = { Text("Edit") },
                     leadingIcon = { Icon(Icons.Default.Edit, contentDescription = "Edit") },
+                )
+
+                AssistChip(
+                    onClick = { onShowItemTaxes(invoiceLineView) },
+                    label = { Text(text = "Show Taxes") },
                 )
 
                 AssistChip(
@@ -162,54 +194,6 @@ private fun InvoiceLineItem(
 }
 
 
-@Composable
-private fun EmptyInvoiceLineItem(
-    itemsState: StateFlow<List<Item>>,
-    itemState: StateFlow<Item?>,
-    onItemChange: (Item) -> Unit,
-    quantityState: StateFlow<String>,
-    quantityValidationResult: StateFlow<ValidationResult>,
-    onQuantityChange: (String) -> Unit,
-    unitValueState: StateFlow<String>,
-    unitValueValidationResult: StateFlow<ValidationResult>,
-    onUnitValueChange: (String) -> Unit,
-    onAddClick: () -> Unit,
-) {
-    OutlinedCard {
-        Column(modifier = Modifier.padding(8.dp)) {
-            BaseExposedDropDownMenu(
-                optionsState = itemsState,
-                selectedOptionState = itemState,
-                onOptionSelect = onItemChange,
-                textFieldValue = { it?.name ?: "" },
-                textFieldLabel = "Item",
-                optionsLabel = { it.name },
-            )
-
-            ValidationOutlinedTextField(
-                valueState = quantityState,
-                validationState = quantityValidationResult,
-                label = "Quantity",
-                onValueChange = onQuantityChange,
-            )
-
-            ValidationOutlinedTextField(
-                valueState = unitValueState,
-                validationState = unitValueValidationResult,
-                label = "Price",
-                onValueChange = onUnitValueChange,
-            )
-
-            Button(
-                onClick = onAddClick,
-                modifier = Modifier.align(Alignment.End)
-            ) {
-                Text(text = "Add")
-            }
-        }
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun DocumentInvoicesListPreview() {
@@ -223,7 +207,8 @@ fun DocumentInvoicesListPreview() {
                     Random.nextDouble(5000.0),
                     ""
                 ),
-                discountRate = Random.nextInt(1, 100).toFloat()
+                discountRate = Random.nextInt(1, 100).toFloat(),
+                id = it.toString()
             )
     }
     Box(
@@ -236,7 +221,10 @@ fun DocumentInvoicesListPreview() {
             invoicesState = MutableStateFlow(invoiceLineView),
             modifier = Modifier.fillMaxSize(),
             onAddTaxClick = {},
-            onAddClick = {}
+            onAddClick = {},
+            onShowItemTaxes = {},
+            queryState = MutableStateFlow(""),
+            onQueryChange = {}
         )
     }
 }

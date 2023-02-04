@@ -97,7 +97,7 @@ fun EInvoiceNavGraph(
             onDocumentClick = {
                 navController.navigateToDocumentFormScreen(it)
             },
-            onAddDocumentClick = {}
+            onAddDocumentClick = navController::navigateToDocumentFormScreen
         )
 
         documentFormScreen(onShowSnackbarEvent)

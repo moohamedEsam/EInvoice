@@ -172,6 +172,9 @@ interface EInvoiceDao {
     @Query("DELETE FROM InvoiceLine where id = :id")
     suspend fun deleteInvoiceLine(id: String)
 
+    @Query("delete from InvoiceLine where documentId = :documentId")
+    suspend fun deleteInvoiceLinesByDocumentId(documentId: String)
+
     @Query("delete from InvoiceLine")
     suspend fun deleteAllInvoiceLines()
 
@@ -180,7 +183,7 @@ interface EInvoiceDao {
     fun getDocuments(): Flow<List<DocumentEntity>>
 
     @Transaction
-    @Query("SELECT * FROM Document where isDeleted = 0")
+    @Query("SELECT * FROM Document where isDeleted = 0 order by date desc")
     fun getDocumentsView(): Flow<List<DocumentViewEntity>>
 
     @Transaction
@@ -204,7 +207,7 @@ interface EInvoiceDao {
     @Transaction
     suspend fun updateDocument(document: DocumentEntity, invoiceLines: List<InvoiceLineEntity>) {
         updateDocument(document)
-        deleteAllInvoiceLines()
+        deleteInvoicesByDocumentId(document.id)
         insertInvoiceLines(invoiceLines)
     }
 

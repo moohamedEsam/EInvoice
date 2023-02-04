@@ -1,11 +1,13 @@
 package com.example.einvoicecomponents
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.common.models.ValidationResult
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +23,8 @@ fun ValidationOutlinedTextField(
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     onValueChange: (String) -> Unit,
-    colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors()
+    colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors(),
+    keyboardOptions: KeyboardOptions = KeyboardOptions(),
 ) {
     val value by valueState.collectAsState()
     val validation by validationState.collectAsState()
@@ -34,7 +37,8 @@ fun ValidationOutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             trailingIcon = trailingIcon,
             leadingIcon = leadingIcon,
-            colors = colors
+            colors = colors,
+            keyboardOptions = keyboardOptions,
         )
     }
 }

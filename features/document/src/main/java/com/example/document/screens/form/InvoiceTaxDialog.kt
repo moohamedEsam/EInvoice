@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
-fun InvoiceTaxManager(
+fun InvoiceTaxDialog(
     taxViewState: StateFlow<TaxView?>,
     onTaxChange: (TaxView) -> Unit,
     subTaxState: StateFlow<SubTax?>,
@@ -43,7 +43,7 @@ fun InvoiceTaxManager(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(text = "Add Invoice Taxes", style = MaterialTheme.typography.headlineMedium)
-                InvoiceTaxManager(
+                InvoiceTaxDialogContent(
                     availableTaxesState = availableTaxes,
                     onSaveTax = onSaveTax,
                     taxViewState = taxViewState,
@@ -61,7 +61,7 @@ fun InvoiceTaxManager(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun InvoiceTaxManager(
+private fun InvoiceTaxDialogContent(
     availableTaxesState: StateFlow<List<TaxView>>,
     taxViewState: StateFlow<TaxView?>,
     onTaxChange: (TaxView) -> Unit,
@@ -82,17 +82,23 @@ private fun InvoiceTaxManager(
             optionsState = availableTaxesState,
             selectedOptionState = MutableStateFlow(newTax),
             onOptionSelect = onTaxChange,
-            textFieldValue = { it?.name ?: "" },
+            textFieldValue = {
+                if (it == null) ""
+                else "${it.name} (${it.code})"
+            },
             textFieldLabel = "Tax Code",
-            optionsLabel = { it.name },
+            optionsLabel = { "${it.name} - ${it.code}" },
         )
         BaseExposedDropDownMenu(
             optionsState = MutableStateFlow(newTax?.subTaxes ?: emptyList()),
             selectedOptionState = MutableStateFlow(newTaxSubCode),
             onOptionSelect = onSubTaxChange,
-            textFieldValue = { it?.name ?: "" },
+            textFieldValue = {
+                if (it == null) ""
+                else "${it.name} (${it.code})"
+            },
             textFieldLabel = "Tax Sub Code",
-            optionsLabel = { it.name },
+            optionsLabel = { "${it.name} - ${it.code}" },
         )
         ValidationTextFieldContainer(
             validation = taxRateValidationResult

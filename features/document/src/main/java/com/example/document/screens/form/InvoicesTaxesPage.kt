@@ -4,7 +4,9 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
@@ -13,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.einvoicecomponents.OutlinedSearchTextField
 import com.example.models.invoiceLine.InvoiceLineView
 import com.example.models.invoiceLine.InvoiceTax
 import com.example.models.invoiceLine.empty
@@ -22,51 +25,64 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.random.Random
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun InvoicesTaxesPage(
     invoicesState: StateFlow<List<InvoiceLineView>>,
+    queryState: StateFlow<String>,
+    onQueryChange: (String) -> Unit,
     taxMapper: (InvoiceTax) -> Pair<String, String>,
     onRemoveTax: (InvoiceLineView, InvoiceTax) -> Unit,
     onAddTax: (InvoiceLineView) -> Unit,
     onEditTax: (InvoiceLineView, InvoiceTax) -> Unit,
     modifier: Modifier = Modifier,
+    listState: LazyListState = rememberLazyListState(),
 ) {
     val invoices by invoicesState.collectAsState()
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        invoices.forEach { invoice ->
-            stickyHeader {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.primaryContainer),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = invoice.item.name,
-                        style = MaterialTheme.typography.headlineMedium,
-                    )
-
-                    IconButton(onClick = { onAddTax(invoice) }) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Add tax",
+    Column(modifier = modifier.fillMaxSize()) {
+        OutlinedSearchTextField(
+            queryState = queryState,
+            onQueryChange = onQueryChange,
+            label = "Search By Tax Code",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp, start = 4.dp, end = 4.dp)
+        )
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.weight(1f),
+            state = listState,
+        ) {
+            invoices.forEach { invoice ->
+                stickyHeader {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.primaryContainer),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = invoice.item.name,
+                            style = MaterialTheme.typography.headlineMedium,
                         )
+
+                        IconButton(onClick = { onAddTax(invoice) }) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Add tax",
+                            )
+                        }
                     }
                 }
-            }
 
-            items(invoice.taxes) { tax ->
-                InvoiceTaxItem(
-                    tax = tax,
-                    onEditTax = { onEditTax(invoice, tax) },
-                    onRemoveTax = { onRemoveTax(invoice, tax) },
-                    mapper = taxMapper
-                )
+                items(invoice.taxes) { tax ->
+                    InvoiceTaxItem(
+                        tax = tax,
+                        onEditTax = { onEditTax(invoice, tax) },
+                        onRemoveTax = { onRemoveTax(invoice, tax) },
+                        mapper = taxMapper
+                    )
+                }
             }
         }
     }
@@ -132,7 +148,7 @@ private fun InvoiceTaxItem(
 
 @Preview(showBackground = true)
 @Composable
-fun DocumentInvoicesTaxesPagePreview() {
+fun InvoicesTaxesPagePreview() {
     val invoicesState = MutableStateFlow(
         List(10) {
             InvoiceLineView.empty().copy(
@@ -149,6 +165,8 @@ fun DocumentInvoicesTaxesPagePreview() {
     )
     InvoicesTaxesPage(
         invoicesState = invoicesState,
+        queryState = MutableStateFlow(""),
+        onQueryChange = {},
         onRemoveTax = { _, _ -> },
         onAddTax = {},
         onEditTax = { _, _ -> },

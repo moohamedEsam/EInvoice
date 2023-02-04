@@ -7,6 +7,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.common.models.Result
 import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
 import com.example.einvoicecomponents.OneTimeEventButton
@@ -27,6 +28,8 @@ import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
 import java.util.*
 import kotlin.random.Random
+
+private const val UNKNOWN_ERROR = "Unknown error"
 
 @Composable
 fun DocumentFormScreen(
@@ -50,36 +53,88 @@ fun DocumentFormScreen(
         internalId = viewModel.internalId,
         onInternalIdChanged = viewModel::setInternalId,
         internalIdValidationResult = viewModel.internalIdValidationResult,
-        invoices = viewModel.invoices,
+        invoicePageInvoices = viewModel.invoicesFilteredByInvoicePageQuery,
+        invoicePageQuery = viewModel.invoicePageQuery,
+        onInvoicePageQueryChanged = viewModel::setInvoicePageQuery,
+        taxPageInvoices = viewModel.invoicesFilteredByTaxPageQuery,
+        taxPageQuery = viewModel.taxPageQuery,
+        onTaxPageQueryChanged = viewModel::setTaxPageQuery,
         invoicesTaxMapper = viewModel::getInvoiceTaxNames,
         onInvoiceRemove = viewModel::removeInvoice,
-        onInvoiceEdit = viewModel::onEditInvoice,
-        isEnabled = viewModel.isEnabled,
-        isLoading = viewModel.isLoading,
+        onInvoiceAdd = viewModel::showInvoiceDialog,
+        onInvoiceEdit = { viewModel.showInvoiceDialog(it) },
         onAddTaxClick = { viewModel.showTaxDialog(invoiceTax = null, invoiceLineView = it) },
-        onEditTax = { invoiceLineView, invoiceTax ->
-            viewModel.showTaxDialog(invoiceTax = invoiceTax, invoiceLineView = invoiceLineView)
-        },
         onRemoveTax = { invoiceLineView, invoiceTax ->
             viewModel.removeTax(invoiceLineView, invoiceTax)
         },
+        onEditTax = { invoiceLineView, invoiceTax ->
+            viewModel.showTaxDialog(invoiceTax = invoiceTax, invoiceLineView = invoiceLineView)
+        },
+        isEnabled = viewModel.isEnabled,
+        isLoading = viewModel.isLoading,
         onFormSubmit = {
+            viewModel.save { result ->
+                val snackBarEvent = if (result is Result.Error)
+                    SnackBarEvent(
+                        message = result.exception ?: UNKNOWN_ERROR,
+                        actionLabel = "Retry",
+                        action = { viewModel.save {} }
+                    )
+                else
+                    SnackBarEvent(message = "Saved successfully",)
 
+                onShowSnackBarEvent(snackBarEvent)
+            }
         }
     )
 
     if (showTaxDialog) {
-        InvoiceTaxManager(
+        InvoiceTaxDialog(
             taxViewState = viewModel.taxView,
             onTaxChange = viewModel::setTaxView,
             subTaxState = viewModel.subTax,
             onSubTaxChange = viewModel::setSubTax,
             taxRateState = viewModel.taxRate,
             onTaxRateChange = viewModel::setTaxRate,
-            onSaveTax = viewModel::addTax,
+            onSaveTax = {
+                viewModel.saveTax { result ->
+                    if (result !is Result.Error) return@saveTax
+                    val snackBarEvent = SnackBarEvent(
+                        message = result.exception ?: UNKNOWN_ERROR,
+                    )
+                    onShowSnackBarEvent(snackBarEvent)
+                }
+            },
             availableTaxes = viewModel.taxTypes,
             onDismiss = viewModel::dismissTaxDialog,
             taxRateValidationResult = viewModel.taxRateValidationResult
+        )
+    }
+
+    if (showInvoiceDialog) {
+        InvoiceDialog(
+            itemsState = viewModel.items,
+            selectedItemState = viewModel.selectedItem,
+            onItemSelect = viewModel::setItem,
+            priceState = viewModel.price,
+            onPriceChange = viewModel::setPrice,
+            priceValidationResult = viewModel.priceValidationResult,
+            quantityState = viewModel.quantity,
+            onQuantityChange = viewModel::setQuantity,
+            quantityValidationResult = viewModel.quantityValidationResult,
+            discountState = viewModel.discount,
+            onDiscountChange = viewModel::setDiscount,
+            discountValidationResult = viewModel.discountValidationResult,
+            onAddClick = {
+                viewModel.saveInvoice { result ->
+                    if (result !is Result.Error) return@saveInvoice
+                    val snackBarEvent = SnackBarEvent(
+                        message = result.exception ?: UNKNOWN_ERROR,
+                    )
+                    onShowSnackBarEvent(snackBarEvent)
+                }
+            },
+            onDismiss = viewModel::dismissInvoiceDialog,
         )
     }
 
@@ -100,9 +155,15 @@ private fun DocumentFormScreenContent(
     internalId: StateFlow<String>,
     onInternalIdChanged: (String) -> Unit,
     internalIdValidationResult: StateFlow<ValidationResult>,
-    invoices: StateFlow<List<InvoiceLineView>>,
+    invoicePageInvoices: StateFlow<List<InvoiceLineView>>,
+    invoicePageQuery: StateFlow<String>,
+    onInvoicePageQueryChanged: (String) -> Unit,
+    taxPageInvoices: StateFlow<List<InvoiceLineView>>,
+    taxPageQuery: StateFlow<String>,
+    onTaxPageQueryChanged: (String) -> Unit,
     invoicesTaxMapper: (InvoiceTax) -> Pair<String, String>,
     onInvoiceRemove: (InvoiceLineView) -> Unit,
+    onInvoiceAdd: () -> Unit,
     onInvoiceEdit: (InvoiceLineView) -> Unit,
     onAddTaxClick: (InvoiceLineView) -> Unit,
     onRemoveTax: (InvoiceLineView, InvoiceTax) -> Unit,
@@ -158,24 +219,32 @@ private fun DocumentFormScreenContent(
                 )
 
                 1 -> DocumentInvoicesList(
-                    invoicesState = invoices,
+                    invoicesState = invoicePageInvoices,
+                    queryState = invoicePageQuery,
+                    onQueryChange = onInvoicePageQueryChanged,
                     onInvoiceRemove = onInvoiceRemove,
                     onInvoiceEdit = onInvoiceEdit,
-                    onAddClick = { },
-                    onAddTaxClick = onAddTaxClick
+                    onAddClick = onInvoiceAdd,
+                    onAddTaxClick = onAddTaxClick,
+                    onShowItemTaxes = {
+                        pageToScroll = 2
+                    }
                 )
 
+
                 else -> InvoicesTaxesPage(
-                    invoicesState = invoices,
+                    invoicesState = taxPageInvoices,
                     onRemoveTax = onRemoveTax,
                     onAddTax = onAddTaxClick,
                     onEditTax = onEditTax,
-                    taxMapper = invoicesTaxMapper
+                    taxMapper = invoicesTaxMapper,
+                    queryState = taxPageQuery,
+                    onQueryChange = onTaxPageQueryChanged
                 )
             }
         }
 
-        DocumentSummery(invoicesState = invoices, modifier = Modifier.fillMaxWidth())
+        DocumentSummery(invoicesState = invoicePageInvoices, modifier = Modifier.fillMaxWidth())
 
         OneTimeEventButton(
             enabled = isEnabled,
@@ -218,15 +287,21 @@ fun DocumentFormScreenPreview() {
         internalId = MutableStateFlow("123"),
         onInternalIdChanged = {},
         internalIdValidationResult = MutableStateFlow(ValidationResult.Valid),
-        invoices = MutableStateFlow(List(10) { invoiceLineView }),
+        invoicePageInvoices = MutableStateFlow(List(10) { invoiceLineView.copy(id = it.toString()) }),
+        invoicesTaxMapper = { Pair(it.taxTypeCode, it.taxSubTypeCode) },
         onInvoiceRemove = {},
+        onInvoiceAdd = {},
         onInvoiceEdit = {},
-        isEnabled = MutableStateFlow(true),
-        isLoading = MutableStateFlow(false),
         onAddTaxClick = {},
         onRemoveTax = { _, _ -> },
         onEditTax = { _, _ -> },
-        invoicesTaxMapper = { Pair(it.taxTypeCode, it.taxSubTypeCode) },
+        isEnabled = MutableStateFlow(true),
+        isLoading = MutableStateFlow(false),
+        taxPageInvoices = MutableStateFlow(List(10) { invoiceLineView.copy(id = it.toString()) }),
+        taxPageQuery = MutableStateFlow(""),
+        onTaxPageQueryChanged = {},
+        invoicePageQuery = MutableStateFlow(""),
+        onInvoicePageQueryChanged = {},
     ) {}
 
 }

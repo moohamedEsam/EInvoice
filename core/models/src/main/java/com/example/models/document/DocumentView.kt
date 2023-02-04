@@ -20,10 +20,10 @@ data class DocumentView(
     @Serializable(with = DateSerializer::class)
     val date: Date,
     val documentType: String,
-    val referencedDocument: String?,
+    val referencedDocument: String? = null,
     val invoices: List<InvoiceLineView>,
     val error: String? = null,
-    val status: DocumentStatus,
+    val status: DocumentStatus = DocumentStatus.Initial,
 )
 
 fun DocumentView.asDocument() = Document(

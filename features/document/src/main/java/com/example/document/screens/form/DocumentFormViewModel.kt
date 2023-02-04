@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.common.models.Result
 import com.example.common.models.ValidationResult
+import com.example.common.validators.notBlankValidator
 import com.example.common.validators.numberValidator
 import com.example.common.validators.percentValidator
 import com.example.domain.company.GetCompaniesViewsUseCase
@@ -16,13 +17,12 @@ import com.example.models.Branch
 import com.example.models.Client
 import com.example.models.company.Company
 import com.example.models.company.CompanyView
-import com.example.models.document.Document
 import com.example.models.document.DocumentView
 import com.example.models.invoiceLine.*
 import com.example.models.item.Item
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.util.UUID
+import java.util.*
 
 class DocumentFormViewModel(
     private val getDocumentsUseCase: GetDocumentsUseCase,
@@ -33,7 +33,9 @@ class DocumentFormViewModel(
     private val getTaxTypesUseCase: GetTaxTypesUseCase,
     private val documentId: String,
 ) : ViewModel() {
-    private val isUpdate = documentId.isNotBlank()
+    private val isUpdatingDocument = documentId.isNotBlank()
+    private val newDocumentId = if (isUpdatingDocument) documentId else UUID.randomUUID().toString()
+    private val _documents = MutableStateFlow(emptyList<DocumentView>())
     private val _companiesViews = MutableStateFlow(emptyList<CompanyView>())
     val companies = _companiesViews.map { companies ->
         companies.map { it.company }
@@ -94,32 +96,63 @@ class DocumentFormViewModel(
 
     private val _internalId = MutableStateFlow("")
     val internalId = _internalId.asStateFlow()
-    val internalIdValidationResult = internalId.map { internalId ->
-        ValidationResult.Valid
+    val internalIdValidationResult = combine(_internalId, _documents) { internalId, documents ->
+        val internalIdAlreadyExists = documents.any { it.id != newDocumentId && it.internalId == internalId }
+        if (internalIdAlreadyExists) ValidationResult.Invalid("Internal ID already exists")
+        else notBlankValidator(internalId)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
 
+    private val _invoicePageQuery = MutableStateFlow("")
+    val invoicePageQuery = _invoicePageQuery.asStateFlow()
+
+    private val _taxPageQuery = MutableStateFlow("")
+    val taxPageQuery = _taxPageQuery.asStateFlow()
+
     private val _invoices = MutableStateFlow(emptyList<InvoiceLineView>())
-    val invoices = _invoices.asStateFlow()
+    val invoicesFilteredByInvoicePageQuery =
+        combine(_invoices, invoicePageQuery) { invoices, query ->
+            if (query.isBlank()) return@combine invoices
+            invoices.filter { invoice -> invoice.item.name.contains(query, true) }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+
+    val invoicesFilteredByTaxPageQuery =
+        combine(_invoices, taxPageQuery) { invoices, query ->
+            invoices.filter { invoice ->
+                if (query.isBlank()) return@combine invoices
+                invoice.taxes.any { tax ->
+                    tax.taxSubTypeCode.contains(query, true)
+                            || tax.taxTypeCode.contains(query, true)
+                }
+            }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     val isEnabled = combine(
-        selectedBranch, selectedCompany, selectedClient, internalIdValidationResult
-    ) { branch, company, client, validationResult ->
-        branch != null && company != null && client != null && validationResult == ValidationResult.Valid
+        selectedBranch, selectedCompany, selectedClient, internalIdValidationResult, _invoices
+    ) { branch, company, client, validationResult, invoices ->
+        branch != null && company != null && client != null &&
+                validationResult == ValidationResult.Valid && invoices.isNotEmpty()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
     private val _isInvoiceDialogVisible = MutableStateFlow(false)
     val isInvoiceDialogVisible = _isInvoiceDialogVisible.asStateFlow()
-    private val isUpdatingInvoice = false
 
     private val _isTaxDialogVisible = MutableStateFlow(false)
     val isTaxDialogVisible = _isTaxDialogVisible.asStateFlow()
-    private val isUpdatingTax = false
+    private var isUpdatingTax = false
     private var invoiceLineId: String? = null
 
     fun setInternalId(value: String) = viewModelScope.launch {
         _internalId.update { value }
+    }
+
+    fun setInvoicePageQuery(value: String) = viewModelScope.launch {
+        _invoicePageQuery.update { value }
+    }
+
+    fun setTaxPageQuery(value: String) = viewModelScope.launch {
+        _taxPageQuery.update { value }
     }
 
     fun setCompany(company: Company) = viewModelScope.launch {
@@ -143,39 +176,50 @@ class DocumentFormViewModel(
             _price.update { item.price.toString() }
     }
 
-    fun addInvoice() = viewModelScope.launch {
-        val invoiceLineView = InvoiceLineView(
-            id = UUID.randomUUID().toString(),
-            item = selectedItem.value ?: return@launch,
-            quantity = quantity.value.toFloatOrNull() ?: return@launch,
+    fun saveInvoice(onResult: (Result<Unit>) -> Unit) = viewModelScope.launch {
+        val item = selectedItem.value ?: return@launch
+        val itemAlreadyExists =
+            _invoices.value.any { it.item.id == item.id && it.id != invoiceLineId }
+
+        if (itemAlreadyExists) {
+            onResult(Result.Error("Item already exists"))
+            return@launch
+        }
+
+        val invoiceLineView = getCurrentInvoiceLine() ?: return@launch
+        insertOrUpdateInvoiceLine(invoiceLineView)
+        dismissInvoiceDialog()
+    }
+
+    private fun insertOrUpdateInvoiceLine(invoiceLineView: InvoiceLineView) {
+        val oldInvoice = _invoices.value.find { it.id == invoiceLineView.id }
+        _invoices.update { invoices ->
+            if (oldInvoice == null)
+                invoices + invoiceLineView
+            else
+                invoices - oldInvoice + invoiceLineView
+        }
+    }
+
+    private fun getCurrentInvoiceLine(): InvoiceLineView? {
+        val taxes = _invoices.value.find { it.id == invoiceLineId }?.taxes ?: emptyList()
+        return InvoiceLineView(
+            id = invoiceLineId ?: UUID.randomUUID().toString(),
+            item = selectedItem.value ?: return null,
+            quantity = quantity.value.toFloatOrNull() ?: return null,
             unitValue = UnitValue(
-                currencyEgp = price.value.toDoubleOrNull() ?: return@launch,
+                currencyEgp = price.value.toDoubleOrNull() ?: return null,
                 currencySold = "EGP"
             ),
-            taxes = emptyList(),
-            discountRate = 0.0f,
-            documentId = "",
+            taxes = taxes,
+            discountRate = _discount.value.toFloatOrNull() ?: 0f,
+            documentId = newDocumentId,
         )
-        _invoices.update { invoices ->
-            if (invoices.map { it.id }.contains(invoiceLineView.id))
-                invoices
-            else
-                invoices + invoiceLineView
-        }
     }
 
     fun removeInvoice(invoice: InvoiceLineView) = viewModelScope.launch {
         _invoices.update { invoices ->
             invoices - invoice
-        }
-    }
-
-    fun updateInvoice(invoice: InvoiceLineView) = viewModelScope.launch {
-        _invoices.update { invoices ->
-            invoices.map {
-                if (it.id == invoice.id) invoice
-                else it
-            }
         }
     }
 
@@ -187,11 +231,29 @@ class DocumentFormViewModel(
         _price.update { value }
     }
 
-    fun addTax() = viewModelScope.launch {
+    fun setDiscount(value: String) = viewModelScope.launch {
+        _discount.update { value }
+    }
+
+    fun saveTax(onResult: (Result<Unit>) -> Unit) = viewModelScope.launch {
         val tax = getCurrentInvoiceTax() ?: return@launch
         val invoiceLine = _invoices.value.find { it.id == invoiceLineId } ?: return@launch
-        val newInvoiceLine = invoiceLine.copy(taxes = invoiceLine.taxes + tax)
-        updateInvoice(newInvoiceLine)
+        val taxAlreadyExists =
+            invoiceLine.taxes.any { it.taxSubTypeCode == tax.taxSubTypeCode && !isUpdatingTax }
+        if (taxAlreadyExists) {
+            onResult(Result.Error("Tax already exists"))
+            return@launch
+        }
+
+        val newInvoiceLine = invoiceLine.copy(
+            taxes = if (isUpdatingTax)
+                invoiceLine.taxes.map {
+                    if (it.taxSubTypeCode == tax.taxSubTypeCode) tax
+                    else it
+                }
+            else invoiceLine.taxes + tax
+        )
+        insertOrUpdateInvoiceLine(newInvoiceLine)
         dismissTaxDialog()
     }
 
@@ -218,6 +280,7 @@ class DocumentFormViewModel(
 
     fun dismissInvoiceDialog() = viewModelScope.launch {
         _isInvoiceDialogVisible.update { false }
+        invoiceLineId = null
     }
 
     fun getInvoiceTaxNames(invoiceTax: InvoiceTax): Pair<String, String> {
@@ -237,7 +300,8 @@ class DocumentFormViewModel(
         if (invoiceTax != null) {
             _taxView.update { _ -> taxTypes.value.find { it.code == invoiceTax.taxTypeCode } }
             _subTax.update { _ -> _taxView.value?.subTaxes?.find { it.code == invoiceTax.taxSubTypeCode } }
-            _taxRate.update { _ -> invoiceTax.rate.toString() }
+            _taxRate.update { invoiceTax.rate.toString() }
+            isUpdatingTax = true
         }
         invoiceLineId = invoiceLineView.id
         _isTaxDialogVisible.update { true }
@@ -245,7 +309,7 @@ class DocumentFormViewModel(
 
     fun removeTax(invoiceLineView: InvoiceLineView, invoiceTax: InvoiceTax) {
         val newInvoiceLine = invoiceLineView.copy(taxes = invoiceLineView.taxes - invoiceTax)
-        updateInvoice(newInvoiceLine)
+        insertOrUpdateInvoiceLine(newInvoiceLine)
     }
 
     fun dismissTaxDialog() = viewModelScope.launch {
@@ -253,6 +317,8 @@ class DocumentFormViewModel(
         _subTax.update { null }
         _taxRate.update { "" }
         _isTaxDialogVisible.update { false }
+        invoiceLineId = null
+        isUpdatingTax = false
     }
 
     init {
@@ -265,7 +331,8 @@ class DocumentFormViewModel(
     private fun observeDocuments() {
         viewModelScope.launch {
             getDocumentsUseCase().collectLatest {
-                if (isUpdate) {
+                _documents.update { _ -> it }
+                if (isUpdatingDocument) {
                     val document = it.firstOrNull { document -> document.id == documentId }
                         ?: return@collectLatest
                     setForm(document)
@@ -307,13 +374,48 @@ class DocumentFormViewModel(
         _invoices.update { document.invoices }
     }
 
-    fun onEditInvoice(invoice: InvoiceLineView) {
+    fun showInvoiceDialog(invoice: InvoiceLineView? = null) {
+        if (invoice == null) {
+            _selectedItem.update { null }
+            _quantity.update { "" }
+            _price.update { "" }
+            _discount.update { "" }
+            invoiceLineId = null
+            _isInvoiceDialogVisible.update { true }
+            return
+        }
         _selectedItem.update { invoice.item }
         _quantity.update { invoice.quantity.toString() }
         _price.update { invoice.unitValue.currencyEgp.toString() }
+        _discount.update { invoice.discountRate.toString() }
+        invoiceLineId = invoice.id
+        _isInvoiceDialogVisible.update { true }
     }
 
-    fun save(onResult: (Result<Document>) -> Unit) {
-
+    fun save(onResult: (Result<DocumentView>) -> Unit) {
+        viewModelScope.launch {
+            val document = getCurrentDocumentView() ?: return@launch
+            val result = insertOrUpdateDocument(document)
+            onResult(result)
+        }
     }
+
+    private fun getCurrentDocumentView(): DocumentView? {
+        return DocumentView(
+            id = newDocumentId,
+            company = _selectedCompany.value ?: return null,
+            branch = _selectedBranch.value ?: return null,
+            client = _selectedClient.value ?: return null,
+            internalId = _internalId.value,
+            invoices = _invoices.value,
+            date = Date(),
+            documentType = "I",
+        )
+    }
+
+    private suspend fun insertOrUpdateDocument(document: DocumentView) = if (isUpdatingDocument)
+        updateDocumentUseCase(document)
+    else
+        createDocumentUseCase(document)
+
 }
