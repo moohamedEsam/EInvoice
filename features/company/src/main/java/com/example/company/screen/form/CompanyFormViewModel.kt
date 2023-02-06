@@ -92,15 +92,15 @@ class CompanyFormViewModel(
         if (isUpdating) {
             viewModelScope.launch {
                 getCompanyUseCase(companyId).collectLatest {
-                    _name.value = it.name
-                    _registrationNumber.value = it.registrationNumber
-                    _ceo.value = it.ceo
-                    _website.value = it.website ?: ""
-                    _phone.value = it.phone
-                    _clientId.value = it.settings.clientId
-                    _clientSecret.value = it.settings.clientSecret
-                    _tokenPin.value = it.settings.tokenPin
-                    _taxActivityCode.value = it.settings.taxActivityCode
+                    _name.value = it.company.name
+                    _registrationNumber.value = it.company.registrationNumber
+                    _ceo.value = it.company.ceo
+                    _website.value = it.company.website ?: ""
+                    _phone.value = it.company.phone
+                    _clientId.value = it.company.settings.clientId
+                    _clientSecret.value = it.company.settings.clientSecret
+                    _tokenPin.value = it.company.settings.tokenPin
+                    _taxActivityCode.value = it.company.settings.taxActivityCode
 
                 }
             }

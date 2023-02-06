@@ -200,7 +200,8 @@ private fun DocumentFormScreenContent(
         HorizontalPager(
             count = pages.size,
             state = state,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+            itemSpacing = 8.dp,
         ) { index ->
             when (index) {
                 0 -> GeneralPage(

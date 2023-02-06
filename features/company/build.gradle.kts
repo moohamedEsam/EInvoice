@@ -43,6 +43,8 @@ dependencies {
     implementation(Dependencies.coroutinesCore)
     implementation(Dependencies.viewModelCompose)
     implementation(Dependencies.composeNavigation)
+    implementation(Dependencies.composePager)
+    implementation(Dependencies.composePagerIndicators)
     implementation(project(":common"))
     implementation(project(":core:models"))
     implementation(project(":core:domain"))

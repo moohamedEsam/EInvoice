@@ -5,7 +5,7 @@ import com.example.common.functions.saveTokenToSharedPref
 import com.example.models.auth.Register
 import com.example.models.auth.Token
 import com.example.common.models.Result
-import com.example.data.AuthRepository
+import com.example.data.auth.AuthRepository
 
 fun interface RegisterUseCase : suspend (Register) -> Result<Token>
 

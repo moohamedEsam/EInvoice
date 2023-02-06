@@ -2,9 +2,11 @@ package com.example.models.company
 
 import com.example.models.Branch
 import com.example.models.Client
+import com.example.models.document.Document
 
 data class CompanyView(
     val company: Company,
     val branches: List<Branch>,
     val clients: List<Client>,
+    val documents:List<Document>
 )

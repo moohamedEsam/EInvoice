@@ -9,4 +9,16 @@ data class InvoiceLine(
     val discountRate: Float,
     val taxes: List<InvoiceTax>,
     val documentId: String
+){
+    companion object
+}
+
+fun InvoiceLine.Companion.empty() = InvoiceLine(
+    id = "",
+    itemId = "",
+    quantity = 0f,
+    unitValue = UnitValue.empty(),
+    discountRate = 0f,
+    taxes = listOf(),
+    documentId = ""
 )

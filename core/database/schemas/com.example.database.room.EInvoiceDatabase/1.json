@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "3a805014937e83dcd6f70cd889554bde",
+    "identityHash": "53d61bc31f677b249910659d63590a48",
     "entities": [
       {
         "tableName": "Branch",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `internalId` TEXT NOT NULL, `companyId` TEXT NOT NULL, `street` TEXT NOT NULL, `country` TEXT NOT NULL, `governate` TEXT NOT NULL, `postalCode` TEXT NOT NULL, `regionCity` TEXT NOT NULL, `buildingNumber` TEXT NOT NULL, `floor` TEXT NOT NULL, `room` TEXT NOT NULL, `landmark` TEXT NOT NULL, `additionalInformation` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`companyId`) REFERENCES `Company`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `internalId` TEXT NOT NULL, `companyId` TEXT NOT NULL, `street` TEXT NOT NULL, `country` TEXT NOT NULL, `governate` TEXT NOT NULL, `postalCode` TEXT NOT NULL, `regionCity` TEXT NOT NULL, `buildingNumber` TEXT NOT NULL, `floor` TEXT NOT NULL, `room` TEXT NOT NULL, `landmark` TEXT NOT NULL, `additionalInformation` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`companyId`) REFERENCES `Company`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "name",
@@ -131,7 +131,7 @@
         "foreignKeys": [
           {
             "table": "Company",
-            "onDelete": "SET NULL",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "companyId"
@@ -218,7 +218,7 @@
       },
       {
         "tableName": "Client",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`registrationNumber` TEXT NOT NULL, `name` TEXT NOT NULL, `email` TEXT NOT NULL, `phone` TEXT NOT NULL, `businessType` TEXT NOT NULL, `status` TEXT NOT NULL, `companyId` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, `street` TEXT, `country` TEXT, `governate` TEXT, `postalCode` TEXT, `regionCity` TEXT, `buildingNumber` TEXT, `floor` TEXT, `room` TEXT, `landmark` TEXT, `additionalInformation` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`companyId`) REFERENCES `Company`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`registrationNumber` TEXT NOT NULL, `name` TEXT NOT NULL, `email` TEXT NOT NULL, `phone` TEXT NOT NULL, `businessType` TEXT NOT NULL, `status` TEXT NOT NULL, `companyId` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, `street` TEXT, `country` TEXT, `governate` TEXT, `postalCode` TEXT, `regionCity` TEXT, `buildingNumber` TEXT, `floor` TEXT, `room` TEXT, `landmark` TEXT, `additionalInformation` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`companyId`) REFERENCES `Company`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "registrationNumber",
@@ -367,7 +367,7 @@
         "foreignKeys": [
           {
             "table": "Company",
-            "onDelete": "SET NULL",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "companyId"
@@ -380,7 +380,7 @@
       },
       {
         "tableName": "Item",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `description` TEXT NOT NULL, `price` REAL NOT NULL, `status` TEXT NOT NULL, `itemCode` TEXT NOT NULL, `unitTypeCode` TEXT NOT NULL, `internalCode` TEXT NOT NULL, `branchId` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`branchId`) REFERENCES `Branch`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `description` TEXT NOT NULL, `price` REAL NOT NULL, `status` TEXT NOT NULL, `itemCode` TEXT NOT NULL, `unitTypeCode` TEXT NOT NULL, `internalCode` TEXT NOT NULL, `branchId` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`branchId`) REFERENCES `Branch`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "name",
@@ -475,7 +475,7 @@
         "foreignKeys": [
           {
             "table": "Branch",
-            "onDelete": "RESTRICT",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "branchId"
@@ -520,7 +520,7 @@
       },
       {
         "tableName": "InvoiceLine",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` TEXT NOT NULL, `quantity` REAL NOT NULL, `discountRate` REAL NOT NULL, `taxes` TEXT NOT NULL, `documentId` TEXT NOT NULL, `id` TEXT NOT NULL, `currencyEgp` REAL NOT NULL, `currencySold` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`itemId`) REFERENCES `Item`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`documentId`) REFERENCES `Document`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` TEXT NOT NULL, `quantity` REAL NOT NULL, `discountRate` REAL NOT NULL, `taxes` TEXT NOT NULL, `documentId` TEXT NOT NULL, `id` TEXT NOT NULL, `currencyEgp` REAL NOT NULL, `currencySold` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`itemId`) REFERENCES `Item`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`documentId`) REFERENCES `Document`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "itemId",
@@ -600,7 +600,7 @@
         "foreignKeys": [
           {
             "table": "Item",
-            "onDelete": "RESTRICT",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "itemId"
@@ -624,7 +624,7 @@
       },
       {
         "tableName": "Document",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`issuerId` TEXT NOT NULL, `receiverId` TEXT NOT NULL, `branchId` TEXT NOT NULL, `internalId` TEXT NOT NULL, `date` INTEGER NOT NULL, `referencedDocument` TEXT, `documentType` TEXT NOT NULL, `status` TEXT NOT NULL, `error` TEXT, `id` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`issuerId`) REFERENCES `Company`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`receiverId`) REFERENCES `Client`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`branchId`) REFERENCES `Branch`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`issuerId` TEXT NOT NULL, `receiverId` TEXT NOT NULL, `branchId` TEXT NOT NULL, `internalId` TEXT NOT NULL, `date` INTEGER NOT NULL, `referencedDocument` TEXT, `documentType` TEXT NOT NULL, `status` TEXT NOT NULL, `error` TEXT, `id` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`issuerId`) REFERENCES `Company`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`receiverId`) REFERENCES `Client`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`branchId`) REFERENCES `Branch`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "issuerId",
@@ -743,7 +743,7 @@
         "foreignKeys": [
           {
             "table": "Company",
-            "onDelete": "RESTRICT",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "issuerId"
@@ -754,7 +754,7 @@
           },
           {
             "table": "Client",
-            "onDelete": "RESTRICT",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "receiverId"
@@ -765,7 +765,7 @@
           },
           {
             "table": "Branch",
-            "onDelete": "RESTRICT",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "branchId"
@@ -872,7 +872,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3a805014937e83dcd6f70cd889554bde')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '53d61bc31f677b249910659d63590a48')"
     ]
   }
 }

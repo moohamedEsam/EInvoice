@@ -16,6 +16,8 @@ import com.example.client.screens.form.navigateToClientFormScreen
 import com.example.common.models.SnackBarEvent
 import com.example.company.screen.all.companiesScreen
 import com.example.company.screen.all.navigateToCompaniesScreen
+import com.example.company.screen.dashboard.companyDashboardScreen
+import com.example.company.screen.dashboard.navigateToCompanyDashboardScreen
 import com.example.company.screen.form.companyFormScreen
 import com.example.company.screen.form.navigateToCompanyFormScreen
 import com.example.document.screens.all.documentsScreen
@@ -56,12 +58,19 @@ fun EInvoiceNavGraph(
 
         companiesScreen(
             onShowSnackBarEvent = onShowSnackbarEvent,
-            onCompanyClick = {},
+            onCompanyClick = {navController.navigateToCompanyDashboardScreen(it)},
             onCreateNewCompany = navController::navigateToCompanyFormScreen,
             onCompanyEditClick = { navController.navigateToCompanyFormScreen(it) }
         )
 
         companyFormScreen(onShowSnackbarEvent)
+
+        companyDashboardScreen(
+            onClientClick = navController::navigateToClientFormScreen,
+            onBranchClick = navController::navigateToBranchFormScreen,
+            onDocumentClick = navController::navigateToDocumentFormScreen,
+            onEditClick = navController::navigateToCompanyFormScreen
+        )
 
         branchFormScreen(onShowSnackbarEvent) {
             navController.navigateToMapScreen()

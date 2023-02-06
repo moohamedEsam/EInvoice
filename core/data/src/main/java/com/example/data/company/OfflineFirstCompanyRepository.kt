@@ -5,7 +5,7 @@ import com.example.common.models.Result
 import com.example.data.sync.Synchronizer
 import com.example.data.sync.handleSync
 import com.example.database.models.company.*
-import com.example.database.room.EInvoiceDao
+import com.example.database.room.dao.CompanyDao
 import com.example.models.company.Company
 import com.example.models.company.CompanyView
 import com.example.network.EInvoiceRemoteDataSource
@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class OfflineFirstCompanyRepository(
-    private val localDataSource: EInvoiceDao,
+    private val localDataSource: CompanyDao,
     private val remoteDataSource: EInvoiceRemoteDataSource
 ) : CompanyRepository {
     override suspend fun createCompany(company: Company): Result<Company> = tryWrapper {
@@ -22,14 +22,15 @@ class OfflineFirstCompanyRepository(
         Result.Success(company)
     }
 
-    override fun getCompany(id: String): Flow<Company> = localDataSource.getCompanyById(id)
-        .map(CompanyEntity::asCompany)
+    override fun getCompany(id: String): Flow<CompanyView> = localDataSource.getCompanyViewById(id)
+        .map(CompanyViewEntity::asCompanyView)
+
+    override fun getCompaniesViews(): Flow<List<CompanyView>> = localDataSource.getCompaniesViews()
+        .map { companies -> companies.map(CompanyViewEntity::asCompanyView) }
 
     override fun getCompanies(): Flow<List<Company>> = localDataSource.getCompanies()
         .map { companies -> companies.map(CompanyEntity::asCompany) }
 
-    override fun getCompaniesView(): Flow<List<CompanyView>> = localDataSource.getCompaniesViews()
-        .map { companies -> companies.map(CompanyViewEntity::asCompanyView) }
 
     override suspend fun updateCompany(company: Company): Result<Company> = tryWrapper {
         val companyEntity = localDataSource.getCompanyById(company.id).first()

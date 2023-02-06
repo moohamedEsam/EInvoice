@@ -4,17 +4,17 @@ import com.example.common.functions.tryWrapper
 import com.example.data.sync.Synchronizer
 import com.example.database.models.asClient
 import com.example.database.models.asClientEntity
-import com.example.database.room.EInvoiceDao
 import com.example.models.Client
 import com.example.network.EInvoiceRemoteDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import com.example.common.models.Result
 import com.example.data.sync.handleSync
+import com.example.database.room.dao.ClientDao
 import kotlinx.coroutines.flow.first
 
 class OfflineFirstClientRepository(
-    private val localSource: EInvoiceDao,
+    private val localSource: ClientDao,
     private val remoteSource: EInvoiceRemoteDataSource
 ) : ClientRepository {
     override fun getClients(): Flow<List<Client>> =

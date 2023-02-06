@@ -1,21 +1,20 @@
 package com.example.data.document
 
-import android.util.Log
 import com.example.common.functions.tryWrapper
 import com.example.common.models.Result
 import com.example.data.sync.Synchronizer
 import com.example.data.sync.handleSync
-import com.example.database.models.document.*
+import com.example.database.models.document.DocumentViewEntity
+import com.example.database.models.document.asDocumentEntity
+import com.example.database.models.document.asDocumentView
+import com.example.database.models.document.asDocumentViewEntity
 import com.example.database.models.invoiceLine.asInvoiceLineEntity
-
-import com.example.database.room.EInvoiceDao
-import com.example.models.document.Document
+import com.example.database.room.dao.DocumentDao
 import com.example.models.document.DocumentView
 import com.example.models.document.asDocument
 import com.example.models.invoiceLine.asInvoiceLine
 import com.example.network.EInvoiceRemoteDataSource
 import com.example.network.models.document.asCreateDocumentDto
-import com.example.network.models.document.asDocumentView
 import com.example.network.models.document.asNetworkDocumentView
 import com.example.network.models.document.asUpdateDocumentDto
 import kotlinx.coroutines.flow.Flow
@@ -23,7 +22,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class OfflineFirstDocumentRepository(
-    private val localDataSource: EInvoiceDao,
+    private val localDataSource: DocumentDao,
     private val remoteDataSource: EInvoiceRemoteDataSource
 ) : DocumentRepository {
     override suspend fun createDocument(document: DocumentView): Result<DocumentView> = tryWrapper {
@@ -56,6 +55,10 @@ class OfflineFirstDocumentRepository(
     override fun getDocuments(): Flow<List<DocumentView>> =
         localDataSource.getDocumentsView()
             .map { documents -> documents.map { it.asDocumentView() } }
+
+    override fun getDocumentsByCompany(companyId: String): Flow<List<DocumentView>> = localDataSource
+        .getDocumentsByCompany(companyId)
+        .map { documents -> documents.map { it.asDocumentView() } }
 
     override suspend fun syncWith(synchronizer: Synchronizer): Boolean {
         val documents = localDataSource.getDocumentsView().first()

@@ -11,7 +11,7 @@ import com.example.database.models.asUnitTypeEntity
 import com.example.database.models.invoiceLine.tax.asSubTaxEntity
 import com.example.database.models.invoiceLine.tax.asTaxEntity
 import com.example.database.models.invoiceLine.tax.asTaxView
-import com.example.database.room.EInvoiceDao
+import com.example.database.room.dao.ItemDao
 import com.example.models.invoiceLine.TaxView
 import com.example.models.item.Item
 import com.example.models.item.UnitType
@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class OfflineFirstItemRepository(
-    private val localSource: EInvoiceDao,
+    private val localSource: ItemDao,
     private val remoteSource: EInvoiceRemoteDataSource
 ) : ItemRepository {
     override fun getItems(): Flow<List<Item>> =

@@ -16,7 +16,7 @@ import java.util.UUID
             entity = CompanyEntity::class,
             parentColumns = ["id"],
             childColumns = ["companyId"],
-            onDelete = ForeignKey.SET_NULL
+            onDelete = ForeignKey.CASCADE
         )
     ],
     indices = [Index("companyId")]

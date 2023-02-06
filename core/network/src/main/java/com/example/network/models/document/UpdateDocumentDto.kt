@@ -1,6 +1,6 @@
 package com.example.network.models.document
 
-import com.example.customSerializers.DateSerializer
+import com.example.network.serializers.DateSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.util.*

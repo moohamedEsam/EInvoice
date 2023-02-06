@@ -18,4 +18,6 @@ interface DocumentRepository : Syncable<Document> {
     suspend fun undoDeleteDocument(id: String): Result<Unit>
 
     fun getDocuments(): Flow<List<DocumentView>>
+
+    fun getDocumentsByCompany(companyId: String): Flow<List<DocumentView>>
 }

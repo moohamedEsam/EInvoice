@@ -18,19 +18,19 @@ import java.util.*
             entity = CompanyEntity::class,
             parentColumns = ["id"],
             childColumns = ["issuerId"],
-            onDelete = ForeignKey.RESTRICT
+            onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
             entity = ClientEntity::class,
             parentColumns = ["id"],
             childColumns = ["receiverId"],
-            onDelete = ForeignKey.RESTRICT
+            onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
             entity = BranchEntity::class,
             parentColumns = ["id"],
             childColumns = ["branchId"],
-            onDelete = ForeignKey.RESTRICT
+            onDelete = ForeignKey.CASCADE
         )
     ],
     indices = [

@@ -1,12 +1,10 @@
 package com.example.network.models.document
 
-import com.example.customSerializers.DateSerializer
+import com.example.network.serializers.DateSerializer
 import com.example.models.Branch
-import com.example.models.Client
 import com.example.models.company.Company
 import com.example.models.document.DocumentStatus
 import com.example.models.document.DocumentView
-import com.example.models.invoiceLine.InvoiceLineView
 import com.example.network.models.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

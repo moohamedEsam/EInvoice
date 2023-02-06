@@ -9,6 +9,7 @@ import com.example.database.models.document.DocumentEntity
 import com.example.database.models.invoiceLine.InvoiceLineEntity
 import com.example.database.models.invoiceLine.tax.SubTaxEntity
 import com.example.database.models.invoiceLine.tax.TaxEntity
+import com.example.database.room.dao.*
 import com.example.database.room.typeConverters.AddressTypeConverter
 import com.example.database.room.typeConverters.CompanySettingsConverter
 import com.example.database.room.typeConverters.DateTypeConverter
@@ -29,5 +30,12 @@ import com.example.database.room.typeConverters.InvoiceTaxTypeConverter
     DateTypeConverter::class
 )
 abstract class EInvoiceDatabase : RoomDatabase() {
-    abstract fun getEInvoiceDao(): EInvoiceDao
+    abstract fun getCompanyDao(): CompanyDao
+
+    abstract fun getBranchDao(): BranchDao
+
+    abstract fun getClientDao(): ClientDao
+    abstract fun getItemDao(): ItemDao
+
+    abstract fun getDocumentDao(): DocumentDao
 }

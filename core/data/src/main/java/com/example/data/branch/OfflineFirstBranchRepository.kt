@@ -4,17 +4,17 @@ import com.example.common.functions.tryWrapper
 import com.example.data.sync.Synchronizer
 import com.example.database.models.asBranch
 import com.example.database.models.asBranchEntity
-import com.example.database.room.EInvoiceDao
 import com.example.models.Branch
 import com.example.network.EInvoiceRemoteDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import com.example.common.models.Result
 import com.example.data.sync.handleSync
+import com.example.database.room.dao.BranchDao
 import kotlinx.coroutines.flow.first
 
 class OfflineFirstBranchRepository(
-    private val localSource: EInvoiceDao,
+    private val localSource: BranchDao,
     private val remoteSource: EInvoiceRemoteDataSource
 ) : BranchRepository {
     override fun getBranches(): Flow<List<Branch>> =

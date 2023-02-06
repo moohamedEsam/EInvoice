@@ -19,7 +19,7 @@ import java.util.UUID
             entity = ItemEntity::class,
             parentColumns = ["id"],
             childColumns = ["itemId"],
-            onDelete = ForeignKey.RESTRICT
+            onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
             entity = DocumentEntity::class,

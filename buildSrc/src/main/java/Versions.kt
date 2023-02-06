@@ -13,6 +13,7 @@ object Versions {
     const val lifeCycleRuntimeKtx = "2.5.1"
     const val coroutinesVersion = "1.6.4"
     const val composeNavigation = "2.5.2"
+    const val materialDialogsVersion = "0.8.1-rc"
 
     const val splashScreen = "1.0.0-beta02"
     const val koin = "3.1.6"
@@ -24,6 +25,10 @@ object Versions {
 
 
     const val jUnit = "4.13.2"
+    const val jUnitExt = "1.1.5"
+    const val espresso = "3.4.0"
+    const val androidXTest = "1.4.0"
+    const val androidXTestRunner = "1.4.0"
     const val truth = "1.1.3"
     const val turbine = "0.12.0"
 

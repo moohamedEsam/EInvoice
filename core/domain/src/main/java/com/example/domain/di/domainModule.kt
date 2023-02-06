@@ -21,10 +21,7 @@ import com.example.domain.client.GetClientsUseCase
 import com.example.domain.client.UpdateClientUseCase
 
 import com.example.domain.company.*
-import com.example.domain.document.CreateDocumentUseCase
-import com.example.domain.document.GetDocumentUseCase
-import com.example.domain.document.GetDocumentsUseCase
-import com.example.domain.document.UpdateDocumentUseCase
+import com.example.domain.document.*
 import com.example.domain.item.*
 import com.example.domain.sync.OneTimeSyncUseCase
 import com.example.domain.sync.oneTimeSyncUseCase
@@ -39,7 +36,7 @@ val domainModule = module {
     single { registerUseCase(get(), androidContext()) }
     single { isUserLoggedInUseCase(androidContext()) }
     single { GetCompaniesUseCase(get<CompanyRepository>()::getCompanies) }
-    single { GetCompaniesViewsUseCase(get<CompanyRepository>()::getCompaniesView) }
+    single { GetCompaniesViewsUseCase(get<CompanyRepository>()::getCompaniesViews) }
     single { GetCompanyUseCase(get<CompanyRepository>()::getCompany) }
     single { CreateCompanyUseCase(get<CompanyRepository>()::createCompany) }
     single { UpdateCompanyUseCase(get<CompanyRepository>()::updateCompany) }
@@ -71,6 +68,7 @@ val domainModule = module {
 
     //document
     single { GetDocumentsUseCase(get<DocumentRepository>()::getDocuments) }
+    single { GetDocumentsByCompanyUseCase(get<DocumentRepository>()::getDocumentsByCompany) }
     single { GetDocumentUseCase(get<DocumentRepository>()::getDocument) }
     single { CreateDocumentUseCase(get<DocumentRepository>()::createDocument) }
     single { UpdateDocumentUseCase(get<DocumentRepository>()::updateDocument) }

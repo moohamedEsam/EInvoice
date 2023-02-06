@@ -10,14 +10,14 @@ const val CompaniesScreenRoute = "companies"
 
 fun NavGraphBuilder.companiesScreen(
     onShowSnackBarEvent: (SnackBarEvent) -> Unit,
-    onCompanyClick: (Company) -> Unit,
+    onCompanyClick: (String) -> Unit,
     onCreateNewCompany: () -> Unit,
     onCompanyEditClick: (String) -> Unit,
 ) {
     composable(CompaniesScreenRoute) {
         CompaniesScreen(
             onShowSnackBarEvent = onShowSnackBarEvent,
-            onCompanyClick = onCompanyClick,
+            onCompanyClick = { onCompanyClick(it.id) },
             onCreateNewCompanyClick = onCreateNewCompany,
             onCompanyEditClick = { onCompanyEditClick(it.id) }
         )

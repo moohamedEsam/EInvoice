@@ -1,4 +1,4 @@
-package com.example.data
+package com.example.data.auth
 
 import com.example.common.models.Result
 import com.example.models.auth.*

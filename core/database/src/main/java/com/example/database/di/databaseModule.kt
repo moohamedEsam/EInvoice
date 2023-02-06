@@ -8,7 +8,11 @@ import org.koin.dsl.module
 
 val databaseModule = module {
     single { provideEInvoiceDatabase() }
-    single { get<EInvoiceDatabase>().getEInvoiceDao() }
+    single { get<EInvoiceDatabase>().getCompanyDao() }
+    single { get<EInvoiceDatabase>().getBranchDao() }
+    single { get<EInvoiceDatabase>().getClientDao() }
+    single { get<EInvoiceDatabase>().getItemDao() }
+    single { get<EInvoiceDatabase>().getDocumentDao() }
 }
 
 private fun Scope.provideEInvoiceDatabase() = Room.databaseBuilder(

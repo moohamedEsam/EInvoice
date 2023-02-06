@@ -69,10 +69,17 @@ object Dependencies {
     const val composePagerIndicators =
         "com.google.accompanist:accompanist-pager-indicators:${Versions.accompanistVersion}"
 
+    const val materialDialogCore = "io.github.vanpra.compose-material-dialogs:core:${Versions.materialDialogsVersion}"
+    const val materialDialogsDateTime = "io.github.vanpra.compose-material-dialogs:datetime:${Versions.materialDialogsVersion}"
+
     const val workManager = "androidx.work:work-runtime-ktx:${Versions.workVersion}"
 
-
+    const val espressoCore = "androidx.test.espresso:espresso-core:${Versions.espresso}"
+    const val androidXtestCore = "androidx.test:core:${Versions.androidXTest}"
+    const val androidXtestRunner = "androidx.test:runner:${Versions.androidXTestRunner}"
+    const val androidXtestRules = "androidx.test:rules:${Versions.androidXTestRunner}"
     const val junit = "junit:junit:${Versions.jUnit}"
+    const val junitExt = "androidx.test.ext:junit:${Versions.jUnitExt}"
     const val truth = "com.google.truth:truth:${Versions.truth}"
     const val turbine = "app.cash.turbine:turbine:${Versions.turbine}"
 

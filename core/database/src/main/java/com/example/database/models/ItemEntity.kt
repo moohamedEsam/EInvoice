@@ -15,7 +15,7 @@ import java.util.*
             entity = BranchEntity::class,
             parentColumns = ["id"],
             childColumns = ["branchId"],
-            onDelete = ForeignKey.RESTRICT
+            onDelete = ForeignKey.CASCADE
         )
     ],
     indices = [

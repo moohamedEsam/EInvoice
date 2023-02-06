@@ -1,7 +1,7 @@
 package com.example.data.di
 
-import com.example.data.AuthRepository
-import com.example.data.KtorAuthRepository
+import com.example.data.auth.AuthRepository
+import com.example.data.auth.KtorAuthRepository
 import com.example.data.branch.BranchRepository
 import com.example.data.branch.OfflineFirstBranchRepository
 import com.example.data.client.ClientRepository
