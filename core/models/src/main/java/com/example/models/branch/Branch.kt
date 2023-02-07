@@ -1,4 +1,4 @@
-package com.example.models
+package com.example.models.branch
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

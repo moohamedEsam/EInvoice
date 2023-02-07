@@ -9,11 +9,7 @@ import com.example.domain.auth.isUserLoggedInUseCase
 import com.example.domain.auth.loginUseCase
 import com.example.domain.auth.logoutUseCase
 import com.example.domain.auth.registerUseCase
-import com.example.domain.branch.CreateBranchUseCase
-import com.example.domain.branch.DeleteBranchUseCase
-import com.example.domain.branch.GetBranchUseCase
-import com.example.domain.branch.GetBranchesUseCase
-import com.example.domain.branch.UpdateBranchUseCase
+import com.example.domain.branch.*
 import com.example.domain.client.CreateClientUseCase
 import com.example.domain.client.DeleteClientUseCase
 import com.example.domain.client.GetClientUseCase
@@ -46,9 +42,11 @@ val domainModule = module {
     //branch
     single { GetBranchesUseCase(get<BranchRepository>()::getBranches) }
     single { GetBranchUseCase(get<BranchRepository>()::getBranch) }
+    single { GetBranchViewUseCase(get<BranchRepository>()::getBranchView) }
     single { CreateBranchUseCase(get<BranchRepository>()::createBranch) }
     single { UpdateBranchUseCase(get<BranchRepository>()::updateBranch) }
     single { DeleteBranchUseCase(get<BranchRepository>()::deleteBranch) }
+    single { UndoDeleteBranchUseCase(get<BranchRepository>()::undoDeleteBranch) }
 
     //client
     single { GetClientsUseCase(get<ClientRepository>()::getClients) }
@@ -69,6 +67,7 @@ val domainModule = module {
     //document
     single { GetDocumentsUseCase(get<DocumentRepository>()::getDocuments) }
     single { getDocumentsByCompanyUseCase(get()) }
+    single { getDocumentsByBranchUseCase(get()) }
     single { GetDocumentUseCase(get<DocumentRepository>()::getDocument) }
     single { CreateDocumentUseCase(get<DocumentRepository>()::createDocument) }
     single { UpdateDocumentUseCase(get<DocumentRepository>()::updateDocument) }

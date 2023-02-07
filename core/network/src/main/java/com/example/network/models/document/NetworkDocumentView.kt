@@ -1,7 +1,7 @@
 package com.example.network.models.document
 
 import com.example.network.serializers.DateSerializer
-import com.example.models.Branch
+import com.example.models.branch.Branch
 import com.example.models.company.Company
 import com.example.models.document.DocumentStatus
 import com.example.models.document.DocumentView

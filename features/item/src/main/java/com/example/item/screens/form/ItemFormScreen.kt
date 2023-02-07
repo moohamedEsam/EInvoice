@@ -12,7 +12,7 @@ import com.example.common.models.ValidationResult
 import com.example.einvoicecomponents.EInvoiceOutlinedTextField
 import com.example.einvoicecomponents.OneTimeEventButton
 import com.example.einvoicecomponents.ValidationOutlinedTextField
-import com.example.models.Branch
+import com.example.models.branch.Branch
 import com.example.models.item.UnitType
 import com.example.models.utils.TaxStatus
 import kotlinx.coroutines.flow.MutableStateFlow

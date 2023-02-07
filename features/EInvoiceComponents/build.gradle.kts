@@ -34,6 +34,8 @@ dependencies {
     implementation(Dependencies.coil)
     implementation(Dependencies.coilCompose)
     implementation(Dependencies.coilGifs)
+    implementation(Dependencies.materialDialogCore)
+    implementation(Dependencies.materialDialogsDateTime)
     implementation(project(":common"))
     implementation(project(":core:models"))
 }

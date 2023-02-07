@@ -9,11 +9,13 @@ const val BranchesScreenRoute = "branches"
 fun NavGraphBuilder.branchesScreen(
     onCreateBranchClick: () -> Unit,
     onBranchClick: (String) -> Unit,
+    onBranchEditClick: (String) -> Unit,
 ) {
     composable(BranchesScreenRoute) {
         BranchesScreen(
             onBranchClick = onBranchClick,
-            onAddBranchClick = onCreateBranchClick
+            onAddBranchClick = onCreateBranchClick,
+            onBranchEditClick = onBranchEditClick
         )
     }
 }

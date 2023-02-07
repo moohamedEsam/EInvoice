@@ -13,8 +13,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.common.models.Result
 import com.example.common.models.SnackBarEvent
-import com.example.models.Branch
+import com.example.models.branch.Branch
 import com.example.models.Client
+import com.example.models.branch.empty
 import com.example.models.company.Company
 import com.example.models.company.CompanyView
 import com.example.models.company.empty

@@ -13,7 +13,7 @@ import com.example.domain.document.GetDocumentsUseCase
 import com.example.domain.document.UpdateDocumentUseCase
 import com.example.domain.item.GetItemsUseCase
 import com.example.domain.item.GetTaxTypesUseCase
-import com.example.models.Branch
+import com.example.models.branch.Branch
 import com.example.models.Client
 import com.example.models.company.Company
 import com.example.models.company.CompanyView

@@ -1,6 +1,6 @@
 package com.example.models.company
 
-import com.example.models.Branch
+import com.example.models.branch.Branch
 import com.example.models.Client
 import com.example.models.document.Document
 

@@ -3,13 +3,16 @@ package com.example.branch.screens.all
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.einvoicecomponents.ListScreenContent
-import com.example.models.Branch
+import com.example.models.branch.Branch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.viewModel
@@ -17,6 +20,7 @@ import org.koin.androidx.compose.viewModel
 @Composable
 fun BranchesScreen(
     onBranchClick: (String) -> Unit,
+    onBranchEditClick: (String) -> Unit,
     onAddBranchClick: () -> Unit
 ) {
     val viewModel: BranchesViewModel by viewModel()
@@ -26,7 +30,8 @@ fun BranchesScreen(
         onBranchClick = { onBranchClick(it.id) },
         onCreateBranchClick = onAddBranchClick,
         queryState = viewModel.query,
-        onQueryChange = viewModel::setQuery
+        onQueryChange = viewModel::setQuery,
+        onBranchEditClick = onBranchEditClick
     )
 }
 
@@ -36,6 +41,7 @@ private fun BranchesScreenContent(
     branches: List<Branch>,
     onBranchClick: (Branch) -> Unit,
     onCreateBranchClick: () -> Unit,
+    onBranchEditClick: (String) -> Unit,
     queryState: StateFlow<String>,
     onQueryChange: (String) -> Unit,
 ) {
@@ -50,7 +56,8 @@ private fun BranchesScreenContent(
             BranchItem(
                 branch = branch,
                 onBranchClick = { onBranchClick(branch) },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                onBranchEditClick = { onBranchEditClick(branch.id) }
             )
         }
     }
@@ -61,6 +68,7 @@ private fun BranchesScreenContent(
 private fun BranchItem(
     branch: Branch,
     onBranchClick: () -> Unit,
+    onBranchEditClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     OutlinedCard(modifier = modifier, onClick = onBranchClick) {
@@ -104,6 +112,15 @@ private fun BranchItem(
                 text = "Street: ${branch.street}",
                 style = MaterialTheme.typography.bodySmall
             )
+            IconButton(
+                onClick = onBranchEditClick,
+                modifier = Modifier.align(Alignment.End)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = "Edit Branch"
+                )
+            }
         }
     }
 }
@@ -136,7 +153,8 @@ fun BranchesScreenPreview() {
         onBranchClick = {},
         onCreateBranchClick = {},
         queryState = MutableStateFlow(""),
-        onQueryChange = {}
+        onQueryChange = {},
+        onBranchEditClick = {}
     )
 
 }

@@ -8,6 +8,8 @@ import com.example.auth.login.loginScreen
 import com.example.auth.register.navigateToRegister
 import com.example.auth.register.registerScreen
 import com.example.branch.screens.all.branchesScreen
+import com.example.branch.screens.dashboard.branchDashboardScreen
+import com.example.branch.screens.dashboard.navigateToBranchDashboardScreen
 import com.example.branch.screens.form.branchFormScreen
 import com.example.branch.screens.form.navigateToBranchFormScreen
 import com.example.client.screens.all.clientsScreen
@@ -65,7 +67,7 @@ fun EInvoiceNavGraph(
 
         companyDashboardScreen(
             onClientClick = navController::navigateToClientFormScreen,
-            onBranchClick = navController::navigateToBranchFormScreen,
+            onBranchClick = navController::navigateToBranchDashboardScreen,
             onDocumentClick = navController::navigateToDocumentFormScreen,
             onEditClick = navController::navigateToCompanyFormScreen,
             onShowSnackbar = onShowSnackbarEvent
@@ -83,9 +85,14 @@ fun EInvoiceNavGraph(
 
         branchesScreen(
             onCreateBranchClick = navController::navigateToBranchFormScreen,
-            onBranchClick = {
-                navController.navigateToBranchFormScreen(id = it)
-            }
+            onBranchEditClick = navController::navigateToBranchFormScreen,
+            onBranchClick = navController::navigateToBranchDashboardScreen
+        )
+
+        branchDashboardScreen(
+            onDocumentClick = navController::navigateToDocumentFormScreen,
+            onEditClick = navController::navigateToBranchFormScreen,
+            onShowSnackBarEvent = onShowSnackbarEvent
         )
 
         clientsScreen(

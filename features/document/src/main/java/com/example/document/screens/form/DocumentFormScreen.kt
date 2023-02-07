@@ -13,8 +13,9 @@ import com.example.common.models.Result
 import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
 import com.example.einvoicecomponents.OneTimeEventButton
-import com.example.models.Branch
+import com.example.models.branch.Branch
 import com.example.models.Client
+import com.example.models.branch.empty
 import com.example.models.company.Company
 import com.example.models.company.empty
 import com.example.models.empty

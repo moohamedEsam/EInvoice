@@ -10,7 +10,7 @@ import com.example.domain.item.CreateItemUseCase
 import com.example.domain.item.GetItemsUseCase
 import com.example.domain.item.GetUnitTypesUseCase
 import com.example.domain.item.UpdateItemUseCase
-import com.example.models.Branch
+import com.example.models.branch.Branch
 import com.example.models.item.Item
 import com.example.models.item.UnitType
 import com.example.models.utils.TaxStatus

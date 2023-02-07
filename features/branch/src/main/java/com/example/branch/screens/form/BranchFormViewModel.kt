@@ -9,7 +9,7 @@ import com.example.domain.branch.CreateBranchUseCase
 import com.example.domain.branch.GetBranchesUseCase
 import com.example.domain.branch.UpdateBranchUseCase
 import com.example.domain.company.GetCompaniesUseCase
-import com.example.models.Branch
+import com.example.models.branch.Branch
 import com.example.models.OptionalAddress
 import com.example.models.company.Company
 import kotlinx.coroutines.flow.*

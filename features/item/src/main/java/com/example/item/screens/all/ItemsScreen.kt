@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.common.models.Result
 import com.example.common.models.SnackBarEvent
+import com.example.einvoicecomponents.ItemCard
 import com.example.einvoicecomponents.ListScreenContent
 import com.example.item.screens.form.ItemFormScreenContent
 import com.example.models.item.Item
@@ -122,28 +123,6 @@ private fun ItemsScreenContent(
             }
         }
     )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun ItemCard(
-    item: Item,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    OutlinedCard(modifier = modifier, onClick = onClick) {
-        Column(
-            modifier = Modifier.padding(8.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Text(text = item.name, style = MaterialTheme.typography.headlineSmall)
-            Text(text = item.description, maxLines = 2)
-            Text(text = "price: ${item.price}")
-            Text(text = "taxStatus: ${item.status}")
-            Text(text = "itemCode: ${item.itemCode}")
-            Text(text = "unitTypeCode: ${item.unitTypeCode}")
-        }
-    }
 }
 
 @Preview(showBackground = true)

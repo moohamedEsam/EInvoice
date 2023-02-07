@@ -24,4 +24,10 @@ interface DocumentRepository : Syncable<Document> {
         fromDateMillis: Long,
         toDateMillis: Long
     ): Flow<List<DocumentView>>
+
+    fun getDocumentsByBranch(
+        branchId: String,
+        fromDateMillis: Long,
+        toDateMillis: Long
+    ): Flow<List<DocumentView>>
 }

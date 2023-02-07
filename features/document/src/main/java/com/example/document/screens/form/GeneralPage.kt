@@ -8,7 +8,7 @@ import androidx.compose.ui.unit.dp
 import com.example.common.models.ValidationResult
 import com.example.einvoicecomponents.CompanyDropDownMenuBox
 import com.example.einvoicecomponents.ValidationTextField
-import com.example.models.Branch
+import com.example.models.branch.Branch
 import com.example.models.Client
 import com.example.models.company.Company
 import kotlinx.coroutines.flow.StateFlow

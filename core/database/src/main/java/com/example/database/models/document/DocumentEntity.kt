@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.example.database.models.BranchEntity
+import com.example.database.models.branch.BranchEntity
 import com.example.database.models.ClientEntity
 import com.example.database.models.company.CompanyEntity
 import com.example.models.document.Document

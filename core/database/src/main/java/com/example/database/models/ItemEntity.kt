@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.example.database.models.branch.BranchEntity
 import com.example.models.item.Item
 import com.example.models.utils.TaxStatus
 import java.util.*

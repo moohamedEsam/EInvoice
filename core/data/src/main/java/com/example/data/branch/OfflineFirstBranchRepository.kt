@@ -2,16 +2,20 @@ package com.example.data.branch
 
 import com.example.common.functions.tryWrapper
 import com.example.data.sync.Synchronizer
-import com.example.database.models.asBranch
-import com.example.database.models.asBranchEntity
-import com.example.models.Branch
 import com.example.network.EInvoiceRemoteDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import com.example.common.models.Result
 import com.example.data.sync.handleSync
+import com.example.database.models.branch.*
 import com.example.database.room.dao.BranchDao
+import com.example.models.branch.Branch
+import com.example.models.branch.BranchView
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+
+private const val BRANCH_NOT_FOUND = "Branch not found"
+
 
 class OfflineFirstBranchRepository(
     private val localSource: BranchDao,
@@ -21,7 +25,10 @@ class OfflineFirstBranchRepository(
         localSource.getBranches().map { branches -> branches.map { it.asBranch() } }
 
     override fun getBranch(id: String): Flow<Branch> =
-        localSource.getBranchById(id).map { it.asBranch() }
+        localSource.getBranchById(id).filterNotNull().map(BranchEntity::asBranch)
+
+    override fun getBranchView(id: String): Flow<BranchView> =
+        localSource.getBranchViewById(id).filterNotNull().map(BranchViewEntity::asBranchView)
 
     override suspend fun createBranch(branch: Branch): Result<Branch> = tryWrapper {
         localSource.insertBranch(branch.asBranchEntity(isCreated = true))
@@ -29,7 +36,9 @@ class OfflineFirstBranchRepository(
     }
 
     override suspend fun updateBranch(branch: Branch): Result<Branch> = tryWrapper {
-        val branchEntity = localSource.getBranchById(branch.id).first()
+        val branchEntity = localSource.getBranchById(branch.id).first() ?: return@tryWrapper Result.Error(
+            BRANCH_NOT_FOUND
+        )
         if (branchEntity.isCreated)
             localSource.updateBranch(branch.asBranchEntity(isCreated = true))
         else
@@ -38,7 +47,7 @@ class OfflineFirstBranchRepository(
     }
 
     override suspend fun deleteBranch(id: String): Result<Unit> = tryWrapper {
-        val branchEntity = localSource.getBranchById(id).first()
+        val branchEntity = localSource.getBranchById(id).first() ?: return@tryWrapper Result.Error(BRANCH_NOT_FOUND)
         if (branchEntity.isCreated)
             localSource.deleteBranch(id)
         else
@@ -104,6 +113,11 @@ class OfflineFirstBranchRepository(
             },
         )
         return syncResult
+    }
+
+    override suspend fun undoDeleteBranch(id: String): Result<Unit> = tryWrapper {
+        localSource.markBranchAsNotDeleted(id)
+        Result.Success(Unit)
     }
 
 }

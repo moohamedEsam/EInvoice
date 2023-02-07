@@ -1,11 +1,11 @@
-package com.example.database.models
+package com.example.database.models.branch
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.example.database.models.company.CompanyEntity
-import com.example.models.Branch
+import com.example.models.branch.Branch
 import java.util.UUID
 
 

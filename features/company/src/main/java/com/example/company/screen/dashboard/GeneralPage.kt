@@ -1,8 +1,5 @@
 package com.example.company.screen.dashboard
 
-import android.os.Build
-import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,20 +7,24 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Today
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.models.Branch
+import com.example.einvoicecomponents.ChipCard
+import com.example.einvoicecomponents.DocumentTransaction
+import com.example.einvoicecomponents.InvoiceStartDatePicker
 import com.example.models.Client
+import com.example.models.branch.Branch
+import com.example.models.branch.empty
 import com.example.models.company.Company
 import com.example.models.company.CompanyView
 import com.example.models.company.empty
@@ -31,15 +32,11 @@ import com.example.models.document.Document
 import com.example.models.document.DocumentView
 import com.example.models.document.empty
 import com.example.models.empty
-import com.example.models.invoiceLine.*
-import com.vanpra.composematerialdialogs.MaterialDialog
-import com.vanpra.composematerialdialogs.MaterialDialogState
-import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
-import com.vanpra.composematerialdialogs.datetime.date.datepicker
-import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import com.example.models.invoiceLine.InvoiceLineView
+import com.example.models.invoiceLine.UnitValue
+import com.example.models.invoiceLine.empty
+import com.example.models.invoiceLine.getTotals
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.ZoneId
 import java.util.*
 import kotlin.random.Random
 
@@ -81,76 +78,6 @@ fun GeneralPage(
     }
 }
 
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-private fun InvoiceStartDatePicker(
-    pickedDate: Date,
-    simpleDateFormatter: SimpleDateFormat,
-    onDatePicked: (Date) -> Unit,
-    minDate: Date,
-    maxDate: Date,
-    modifier: Modifier = Modifier
-) {
-    val dialogState = rememberMaterialDialogState()
-    AssistChip(
-        onClick = dialogState::show,
-        label = { Text(simpleDateFormatter.format(pickedDate)) },
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Outlined.CalendarMonth,
-                contentDescription = "Delete"
-            )
-        },
-        modifier = modifier
-    )
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        DatePickerDialog(
-            dialogState = dialogState,
-            yearRange = minDate.toLocalDate().year..maxDate.toLocalDate().year,
-            onDatePicked = onDatePicked,
-            currentDate = pickedDate,
-            minDate = minDate.toLocalDate()
-        )
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-private fun DatePickerDialog(
-    dialogState: MaterialDialogState,
-    yearRange: IntRange,
-    minDate: LocalDate,
-    currentDate: Date = Date(),
-    onDatePicked: (Date) -> Unit
-) {
-    MaterialDialog(
-        dialogState = dialogState,
-        buttons = {
-            positiveButton("OK") {}
-            negativeButton("Cancel"){}
-        }
-    ) {
-        datepicker(
-            initialDate = currentDate.toLocalDate(),
-            yearRange = yearRange,
-            allowedDateValidator = {
-                it.isBefore(LocalDate.now().plusDays(1)) &&
-                        it.isAfter(minDate)
-            },
-            colors = DatePickerDefaults.colors(
-                headerBackgroundColor = MaterialTheme.colorScheme.primary,
-                headerTextColor = MaterialTheme.colorScheme.onPrimary,
-                calendarHeaderTextColor = MaterialTheme.colorScheme.onPrimary,
-                dateActiveBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
-                dateActiveTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            ),
-            waitForPositiveButton = true,
-        ) {
-            onDatePicked(it.toDate())
-        }
-    }
-}
 
 
 @Composable
@@ -228,7 +155,7 @@ private fun CompanyTransactions(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(documents.sortedByDescending { it.date }) {
-            CompanyTransaction(
+            DocumentTransaction(
                 document = it,
                 simpleDateFormatter = simpleDateFormatter,
                 onClick = { onDocumentClick(it.id) }
@@ -236,67 +163,8 @@ private fun CompanyTransactions(
         }
     }
 
-
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun CompanyTransaction(
-    document: DocumentView,
-    modifier: Modifier = Modifier,
-    simpleDateFormatter: SimpleDateFormat,
-    onClick: () -> Unit
-) {
-    val total by remember {
-        mutableStateOf(document.invoices.sumOf { it.getTotals().total })
-    }
-    OutlinedCard(
-        modifier = modifier.fillMaxWidth(),
-        onClick = onClick
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(text = document.client.name, style = MaterialTheme.typography.bodyLarge)
-                Text(text = document.branch.name, style = MaterialTheme.typography.bodySmall)
-            }
-
-            Text(text = document.status.toString(), style = MaterialTheme.typography.bodyLarge)
-
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(text = "%.2f $".format(total), style = MaterialTheme.typography.bodyLarge)
-                Text(
-                    text = simpleDateFormatter.format(document.date),
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun ChipCard(mainLabel: String, supportingLabel: String, modifier: Modifier = Modifier) {
-    OutlinedCard {
-        Column(
-            modifier = modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(text = supportingLabel)
-            Text(
-                text = mainLabel,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
-    }
-}
 
 @Composable
 private fun CompanyDeleteButton(
@@ -354,19 +222,3 @@ private fun randomInvoiceLineView() = InvoiceLineView.empty().copy(
         currencySold = "EGP"
     )
 )
-
-@RequiresApi(Build.VERSION_CODES.O)
-fun Date.toLocalDate(): LocalDate {
-    val calendar = Calendar.getInstance().apply { time = this@toLocalDate }
-    return LocalDate.of(
-        calendar.get(Calendar.YEAR),
-        calendar.get(Calendar.MONTH) + 1,
-        calendar.get(Calendar.DAY_OF_MONTH)
-    )
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-fun LocalDate.toDate(): Date {
-   val instant = atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()
-    return Date.from(instant)
-}
