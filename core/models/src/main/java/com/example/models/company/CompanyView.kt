@@ -9,4 +9,13 @@ data class CompanyView(
     val branches: List<Branch>,
     val clients: List<Client>,
     val documents:List<Document>
+){
+    companion object
+}
+
+fun CompanyView.Companion.empty() = CompanyView(
+    company = Company.empty(),
+    branches = emptyList(),
+    clients = emptyList(),
+    documents = emptyList()
 )

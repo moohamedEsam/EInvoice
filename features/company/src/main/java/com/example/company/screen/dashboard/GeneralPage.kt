@@ -1,5 +1,8 @@
 package com.example.company.screen.dashboard
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,7 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.outlined.Today
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -29,8 +32,14 @@ import com.example.models.document.DocumentView
 import com.example.models.document.empty
 import com.example.models.empty
 import com.example.models.invoiceLine.*
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.MaterialDialogState
+import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
+import com.vanpra.composematerialdialogs.datetime.date.datepicker
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.*
 import kotlin.random.Random
 
@@ -38,9 +47,9 @@ import kotlin.random.Random
 fun GeneralPage(
     state: CompanyDashboardState,
     onDeleteClick: () -> Unit,
-    isDeleteEnabledState: MutableStateFlow<Boolean>,
     onEditClick: () -> Unit,
     onDocumentClick: (String) -> Unit,
+    onDatePicked: (Date) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val simpleDateFormatter = remember {
@@ -48,12 +57,26 @@ fun GeneralPage(
     }
 
     Column(
-        modifier = modifier.fillMaxSize().padding(8.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        PageHeader(state.companyView.company, onEditClick, isDeleteEnabledState, onDeleteClick)
-        InvoiceStartDatePicker(simpleDateFormatter, modifier = Modifier.align(Alignment.End))
-        CompanyOverview(state.companyView, state.invoices)
+        PageHeader(
+            company = state.companyView.company,
+            onEditClick = onEditClick,
+            isDeleteEnabled = state.isDeleteEnabled,
+            onDeleteClick = onDeleteClick
+        )
+        InvoiceStartDatePicker(
+            pickedDate = state.pickedDate,
+            simpleDateFormatter = simpleDateFormatter,
+            onDatePicked = onDatePicked,
+            modifier = Modifier.align(Alignment.End),
+            minDate = state.documents.minOfOrNull { it.date } ?: Date(),
+            maxDate = state.documents.maxOfOrNull { it.date } ?: Date()
+        )
+        CompanyOverview(state.companyView, state.documents, state.invoices)
         CompanyTransactions(state.documents, simpleDateFormatter, onDocumentClick)
     }
 }
@@ -61,12 +84,17 @@ fun GeneralPage(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun InvoiceStartDatePicker(
+    pickedDate: Date,
     simpleDateFormatter: SimpleDateFormat,
+    onDatePicked: (Date) -> Unit,
+    minDate: Date,
+    maxDate: Date,
     modifier: Modifier = Modifier
 ) {
+    val dialogState = rememberMaterialDialogState()
     AssistChip(
-        onClick = { },
-        label = { Text(simpleDateFormatter.format(Date())) },
+        onClick = dialogState::show,
+        label = { Text(simpleDateFormatter.format(pickedDate)) },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Outlined.CalendarMonth,
@@ -75,13 +103,61 @@ private fun InvoiceStartDatePicker(
         },
         modifier = modifier
     )
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        DatePickerDialog(
+            dialogState = dialogState,
+            yearRange = minDate.toLocalDate().year..maxDate.toLocalDate().year,
+            onDatePicked = onDatePicked,
+            currentDate = pickedDate,
+            minDate = minDate.toLocalDate()
+        )
+    }
 }
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+private fun DatePickerDialog(
+    dialogState: MaterialDialogState,
+    yearRange: IntRange,
+    minDate: LocalDate,
+    currentDate: Date = Date(),
+    onDatePicked: (Date) -> Unit
+) {
+    MaterialDialog(
+        dialogState = dialogState,
+        buttons = {
+            positiveButton("OK") {}
+            negativeButton("Cancel"){}
+        }
+    ) {
+        datepicker(
+            initialDate = currentDate.toLocalDate(),
+            yearRange = yearRange,
+            allowedDateValidator = {
+                it.isBefore(LocalDate.now().plusDays(1)) &&
+                        it.isAfter(minDate)
+            },
+            colors = DatePickerDefaults.colors(
+                headerBackgroundColor = MaterialTheme.colorScheme.primary,
+                headerTextColor = MaterialTheme.colorScheme.onPrimary,
+                calendarHeaderTextColor = MaterialTheme.colorScheme.onPrimary,
+                dateActiveBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
+                dateActiveTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            ),
+            waitForPositiveButton = true,
+        ) {
+            onDatePicked(it.toDate())
+        }
+    }
+}
+
 
 @Composable
 private fun PageHeader(
     company: Company,
     onEditClick: () -> Unit,
-    isDeleteEnabledState: MutableStateFlow<Boolean>,
+    isDeleteEnabled: Boolean,
     onDeleteClick: () -> Unit
 ) {
     Row(
@@ -98,19 +174,26 @@ private fun PageHeader(
         }
 
         CompanyDeleteButton(
-            isDeleteEnabledState = isDeleteEnabledState,
+            isDeleteEnabled = isDeleteEnabled,
             onDeleteClick = onDeleteClick
         )
     }
 }
 
 @Composable
-private fun CompanyOverview(companyView: CompanyView, invoices: List<InvoiceLineView>) {
-    val invoicesTotals by remember {
+private fun CompanyOverview(
+    companyView: CompanyView,
+    documents: List<DocumentView>,
+    invoices: List<InvoiceLineView>
+) {
+    var invoicesTotals by remember {
         mutableStateOf(invoices.sumOf { it.getTotals().total })
     }
+    LaunchedEffect(key1 = invoices) {
+        invoicesTotals = invoices.sumOf { it.getTotals().total }
+    }
     val chipValues = buildList {
-        add(companyView.documents.count().toString() to "Invoices")
+        add(documents.count().toString() to "Invoices")
         add("%.2f $".format(invoicesTotals) to "Total")
         add(companyView.clients.count().toString() to "Clients")
         add(companyView.branches.count().toString() to "Branches")
@@ -120,8 +203,8 @@ private fun CompanyOverview(companyView: CompanyView, invoices: List<InvoiceLine
     ) {
         items(chipValues) {
             ChipCard(
-                it.first,
-                it.second,
+                mainLabel = it.first,
+                supportingLabel = it.second,
                 modifier = Modifier.widthIn((LocalConfiguration.current.screenWidthDp / 3).dp)
             )
         }
@@ -217,10 +300,9 @@ private fun ChipCard(mainLabel: String, supportingLabel: String, modifier: Modif
 
 @Composable
 private fun CompanyDeleteButton(
-    isDeleteEnabledState: MutableStateFlow<Boolean>,
+    isDeleteEnabled: Boolean,
     onDeleteClick: () -> Unit
 ) {
-    val isDeleteEnabled by isDeleteEnabledState.collectAsState()
     IconButton(onClick = onDeleteClick, enabled = isDeleteEnabled) {
         Icon(
             imageVector = Icons.Outlined.Delete,
@@ -253,12 +335,14 @@ fun GeneralPagePreview() {
                     date = Date(),
                     invoices = List(Random.nextInt(0, 100)) { randomInvoiceLineView() }
                 )
-            }
+            },
+            isDeleteEnabled = true,
+            pickedDate = Date()
         ),
         onDeleteClick = {},
         onEditClick = {},
-        isDeleteEnabledState = MutableStateFlow(true),
-        onDocumentClick = {}
+        onDocumentClick = {},
+        onDatePicked = {}
     )
 }
 
@@ -270,3 +354,19 @@ private fun randomInvoiceLineView() = InvoiceLineView.empty().copy(
         currencySold = "EGP"
     )
 )
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun Date.toLocalDate(): LocalDate {
+    val calendar = Calendar.getInstance().apply { time = this@toLocalDate }
+    return LocalDate.of(
+        calendar.get(Calendar.YEAR),
+        calendar.get(Calendar.MONTH) + 1,
+        calendar.get(Calendar.DAY_OF_MONTH)
+    )
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun LocalDate.toDate(): Date {
+   val instant = atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()
+    return Date.from(instant)
+}

@@ -11,6 +11,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.common.models.Result
+import com.example.common.models.SnackBarEvent
 import com.example.models.Branch
 import com.example.models.Client
 import com.example.models.company.Company
@@ -19,15 +21,12 @@ import com.example.models.company.empty
 import com.example.models.document.Document
 import com.example.models.document.empty
 import com.example.models.empty
-import com.example.models.invoiceLine.InvoiceLine
-import com.example.models.invoiceLine.empty
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
+import java.util.*
 
 @Composable
 fun CompanyDashboardScreen(
@@ -36,6 +35,7 @@ fun CompanyDashboardScreen(
     onBranchClick: (String) -> Unit,
     onDocumentClick: (String) -> Unit,
     onEditClick: (String) -> Unit,
+    onShowSnackBarEvent: (SnackBarEvent) -> Unit
 ) {
     val viewModel: CompanyDashboardViewModel by viewModel { parametersOf(companyId) }
     val state by viewModel.uiState.collectAsState()
@@ -46,9 +46,31 @@ fun CompanyDashboardScreen(
         onClientClick = onClientClick,
         onBranchClick = onBranchClick,
         onEditClick = { onEditClick(companyId) },
-        onDeleteClick = { onDocumentClick(companyId) },
-        onDocumentClick = onDocumentClick
+        onDeleteClick = {
+            viewModel.deleteCompany { result ->
+                val event = getSnackBarEventFromResult(result, viewModel)
+                onShowSnackBarEvent(event)
+            }
+        },
+        onDocumentClick = onDocumentClick,
+        onDatePicked = { viewModel.setPickedDate(it) }
     )
+}
+
+private fun getSnackBarEventFromResult(
+    result: Result<Unit>,
+    viewModel: CompanyDashboardViewModel
+) = when (result) {
+    is Result.Success -> SnackBarEvent(
+        message = "Company deleted",
+        actionLabel = "Undo"
+    ) {
+        viewModel.undoDeleteCompany {}
+    }
+    is Result.Error -> SnackBarEvent(
+        message = result.exception ?: "Error Deleting company"
+    )
+    else -> SnackBarEvent(message = "Error Deleting company")
 }
 
 @OptIn(ExperimentalPagerApi::class)
@@ -59,7 +81,8 @@ private fun CompanyDashboardScreenContent(
     onEditClick: () -> Unit,
     onClientClick: (String) -> Unit,
     onBranchClick: (String) -> Unit,
-    onDocumentClick: (String) -> Unit
+    onDocumentClick: (String) -> Unit,
+    onDatePicked: (Date) -> Unit
 ) {
     val pages = listOf("General", "Clients", "Branches", "Settings")
     val pagerState = rememberPagerState()
@@ -93,9 +116,9 @@ private fun CompanyDashboardScreenContent(
                 0 -> GeneralPage(
                     state = state,
                     onDeleteClick = onDeleteClick,
-                    isDeleteEnabledState = MutableStateFlow(false),
                     onEditClick = onEditClick,
-                    onDocumentClick = { onDocumentClick(it) }
+                    onDocumentClick = { onDocumentClick(it) },
+                    onDatePicked = onDatePicked
                 )
 
                 1 -> CompanyClientsPage(
@@ -108,6 +131,10 @@ private fun CompanyDashboardScreenContent(
                     branches = state.companyView.branches,
                     documents = state.documents,
                     onBranchClick = { onBranchClick(it.id) }
+                )
+
+                else -> CompanySettingsPage(
+                    settings = state.companyView.company.settings,
                 )
 
             }
@@ -129,11 +156,14 @@ fun CompanyDashboardScreenPreview() {
             ),
             invoices = emptyList(),
             documents = emptyList(),
+            isDeleteEnabled = false,
+            pickedDate = Date(),
         ),
         onEditClick = {},
         onClientClick = {},
         onBranchClick = {},
-        onDocumentClick = {}
+        onDocumentClick = {},
+        onDatePicked = {}
     )
 }
 

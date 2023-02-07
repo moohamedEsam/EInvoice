@@ -1,5 +1,6 @@
 package com.example.company.screen.all
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -7,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,8 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.common.models.Result
-import com.example.common.models.SnackBarEvent
 import com.example.einvoicecomponents.ListScreenContent
 import com.example.models.company.Company
 import com.example.models.company.CompanySettings
@@ -27,7 +25,6 @@ import org.koin.androidx.compose.viewModel
 
 @Composable
 fun CompaniesScreen(
-    onShowSnackBarEvent: (SnackBarEvent) -> Unit,
     onCompanyClick: (Company) -> Unit,
     onCreateNewCompanyClick: () -> Unit,
     onCompanyEditClick: (Company) -> Unit,
@@ -40,23 +37,7 @@ fun CompaniesScreen(
         queryState = viewModel.query,
         onQueryChange = viewModel::setQuery,
         onCreateNewCompanyClick = onCreateNewCompanyClick,
-        onCompanyEditClick = onCompanyEditClick,
-        onCompanyDeleteClick = {
-            viewModel.deleteCompany(it) { result ->
-                val event = if (result is Result.Success)
-                    SnackBarEvent("Company deleted successfully", actionLabel = "Undo") {
-                        viewModel.undoDeleteCompany(it)
-                    }
-                else
-                    SnackBarEvent(
-                        (result as? Result.Error)?.exception ?: "Error Deleting company",
-                        actionLabel = "Retry"
-                    ) {
-                        viewModel.deleteCompany(it)
-                    }
-                onShowSnackBarEvent(event)
-            }
-        }
+        onCompanyEditClick = onCompanyEditClick
     )
 
 }
@@ -70,7 +51,6 @@ private fun CompaniesScreenContent(
     onQueryChange: (String) -> Unit,
     onCompanyClick: (Company) -> Unit,
     onCompanyEditClick: (Company) -> Unit,
-    onCompanyDeleteClick: (Company) -> Unit,
     onCreateNewCompanyClick: () -> Unit = {}
 ) {
 
@@ -88,7 +68,6 @@ private fun CompaniesScreenContent(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { onCompanyClick(company) },
                 onEditClick = { onCompanyEditClick(company) },
-                onDeleteClick = { onCompanyDeleteClick(company) }
             )
         }
     }
@@ -102,7 +81,6 @@ private fun CompanyItem(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
     onEditClick: () -> Unit = {},
-    onDeleteClick: () -> Unit = {}
 ) {
     OutlinedCard(modifier = modifier, onClick = onClick) {
         Column(
@@ -124,8 +102,7 @@ private fun CompanyItem(
                     style = MaterialTheme.typography.bodyLarge,
                     maxLines = 1,
                     modifier = Modifier.clickable {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(company.website))
-                        context.startActivity(intent)
+                        openWebsiteInBrowser(context, company.website!!)
                     }
                 )
             }
@@ -138,13 +115,17 @@ private fun CompanyItem(
                 IconButton(onClick = onEditClick) {
                     Icon(Icons.Filled.Edit, contentDescription = "Edit company")
                 }
-                IconButton(onClick = onDeleteClick) {
-                    Icon(Icons.Filled.Delete, contentDescription = "Delete company")
-                }
-
             }
         }
     }
+}
+
+fun openWebsiteInBrowser(
+    context: Context,
+    url: String
+) {
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+    context.startActivity(intent)
 }
 
 @Preview(showBackground = true)
@@ -174,7 +155,6 @@ fun CompaniesScreenPreview() {
         onQueryChange = {},
         onCompanyClick = {},
         onCompanyEditClick = {},
-        onCompanyDeleteClick = {}
     ) {}
 
 }

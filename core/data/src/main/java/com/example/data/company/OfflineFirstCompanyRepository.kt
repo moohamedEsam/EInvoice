@@ -10,6 +10,7 @@ import com.example.models.company.Company
 import com.example.models.company.CompanyView
 import com.example.network.EInvoiceRemoteDataSource
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
@@ -23,6 +24,7 @@ class OfflineFirstCompanyRepository(
     }
 
     override fun getCompany(id: String): Flow<CompanyView> = localDataSource.getCompanyViewById(id)
+        .filterNotNull()
         .map(CompanyViewEntity::asCompanyView)
 
     override fun getCompaniesViews(): Flow<List<CompanyView>> = localDataSource.getCompaniesViews()

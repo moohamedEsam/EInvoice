@@ -26,6 +26,8 @@ val companyModule = module {
         CompanyDashboardViewModel(
             getCompanyUseCase = get(),
             getDocumentsUseCase = get(),
+            deleteCompanyUseCase = get(),
+            undoDeleteCompanyUseCase = get(),
             companyId = companyId
         )
     }

@@ -57,11 +57,9 @@ fun EInvoiceNavGraph(
         )
 
         companiesScreen(
-            onShowSnackBarEvent = onShowSnackbarEvent,
             onCompanyClick = {navController.navigateToCompanyDashboardScreen(it)},
-            onCreateNewCompany = navController::navigateToCompanyFormScreen,
-            onCompanyEditClick = { navController.navigateToCompanyFormScreen(it) }
-        )
+            onCreateNewCompany = navController::navigateToCompanyFormScreen
+        ) { navController.navigateToCompanyFormScreen(it) }
 
         companyFormScreen(onShowSnackbarEvent)
 
@@ -69,7 +67,8 @@ fun EInvoiceNavGraph(
             onClientClick = navController::navigateToClientFormScreen,
             onBranchClick = navController::navigateToBranchFormScreen,
             onDocumentClick = navController::navigateToDocumentFormScreen,
-            onEditClick = navController::navigateToCompanyFormScreen
+            onEditClick = navController::navigateToCompanyFormScreen,
+            onShowSnackbar = onShowSnackbarEvent
         )
 
         branchFormScreen(onShowSnackbarEvent) {

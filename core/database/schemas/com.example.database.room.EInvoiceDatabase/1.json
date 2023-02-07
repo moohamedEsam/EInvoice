@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "53d61bc31f677b249910659d63590a48",
+    "identityHash": "085f302a975331f15ddf88c8e4040d5a",
     "entities": [
       {
         "tableName": "Branch",
@@ -144,7 +144,7 @@
       },
       {
         "tableName": "Company",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `registrationNumber` TEXT NOT NULL, `ceo` TEXT NOT NULL, `phone` TEXT NOT NULL, `website` TEXT, `settings` TEXT NOT NULL, `isDeleted` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isCreated` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `registrationNumber` TEXT NOT NULL, `ceo` TEXT NOT NULL, `phone` TEXT NOT NULL, `website` TEXT, `isDeleted` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isCreated` INTEGER NOT NULL, `id` TEXT NOT NULL, `clientId` TEXT NOT NULL, `clientSecret` TEXT NOT NULL, `tokenPin` TEXT NOT NULL, `taxActivityCode` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "name",
@@ -177,12 +177,6 @@
             "notNull": false
           },
           {
-            "fieldPath": "settings",
-            "columnName": "settings",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
             "fieldPath": "isDeleted",
             "columnName": "isDeleted",
             "affinity": "INTEGER",
@@ -203,6 +197,30 @@
           {
             "fieldPath": "id",
             "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "settings.clientId",
+            "columnName": "clientId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "settings.clientSecret",
+            "columnName": "clientSecret",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "settings.tokenPin",
+            "columnName": "tokenPin",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "settings.taxActivityCode",
+            "columnName": "taxActivityCode",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -872,7 +890,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '53d61bc31f677b249910659d63590a48')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '085f302a975331f15ddf88c8e4040d5a')"
     ]
   }
 }

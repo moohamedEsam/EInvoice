@@ -56,8 +56,12 @@ class OfflineFirstDocumentRepository(
         localDataSource.getDocumentsView()
             .map { documents -> documents.map { it.asDocumentView() } }
 
-    override fun getDocumentsByCompany(companyId: String): Flow<List<DocumentView>> = localDataSource
-        .getDocumentsByCompany(companyId)
+    override fun getDocumentsByCompany(
+        companyId: String,
+        fromDateMillis: Long,
+        toDateMillis: Long
+    ): Flow<List<DocumentView>> = localDataSource
+        .getDocumentsByCompany(companyId, fromDateMillis, toDateMillis)
         .map { documents -> documents.map { it.asDocumentView() } }
 
     override suspend fun syncWith(synchronizer: Synchronizer): Boolean {

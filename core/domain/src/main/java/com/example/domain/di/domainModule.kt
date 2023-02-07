@@ -68,7 +68,7 @@ val domainModule = module {
 
     //document
     single { GetDocumentsUseCase(get<DocumentRepository>()::getDocuments) }
-    single { GetDocumentsByCompanyUseCase(get<DocumentRepository>()::getDocumentsByCompany) }
+    single { getDocumentsByCompanyUseCase(get()) }
     single { GetDocumentUseCase(get<DocumentRepository>()::getDocument) }
     single { CreateDocumentUseCase(get<DocumentRepository>()::createDocument) }
     single { UpdateDocumentUseCase(get<DocumentRepository>()::updateDocument) }

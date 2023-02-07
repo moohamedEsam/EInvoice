@@ -21,7 +21,7 @@ interface CompanyDao {
 
     @Transaction
     @Query("SELECT * FROM Company WHERE id = :id and isDeleted = 0")
-    fun getCompanyViewById(id: String): Flow<CompanyViewEntity>
+    fun getCompanyViewById(id: String): Flow<CompanyViewEntity?>
 
 
     @Insert

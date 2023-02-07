@@ -1,5 +1,7 @@
 package com.example.document.screens.form
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -20,8 +22,6 @@ import com.example.models.invoiceLine.*
 import com.example.models.item.Item
 import com.example.models.item.empty
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.viewModel
@@ -140,7 +140,7 @@ fun DocumentFormScreen(
 
 }
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalPagerApi::class, ExperimentalAnimationApi::class)
 @Composable
 private fun DocumentFormScreenContent(
     companies: StateFlow<List<Company>>,
@@ -173,13 +173,10 @@ private fun DocumentFormScreenContent(
     onFormSubmit: () -> Unit,
 ) {
     val pages = listOf("General", "Invoices", "Taxes")
-    val state = rememberPagerState()
-    var pageToScroll by remember {
-        mutableStateOf(state.currentPage)
+    var currentPage by remember {
+        mutableStateOf(0)
     }
-    LaunchedEffect(key1 = pageToScroll) {
-        state.animateScrollToPage(pageToScroll)
-    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -187,21 +184,19 @@ private fun DocumentFormScreenContent(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         ScrollableTabRow(
-            selectedTabIndex = state.currentPage
+            selectedTabIndex = currentPage
         ) {
             pages.forEachIndexed { index, page ->
                 Tab(
-                    selected = state.currentPage == index,
-                    onClick = { pageToScroll = index },
+                    selected = currentPage == index,
+                    onClick = { currentPage = index },
                     text = { Text(page) }
                 )
             }
         }
-        HorizontalPager(
-            count = pages.size,
-            state = state,
+        AnimatedContent(
+            targetState = currentPage,
             modifier = Modifier.weight(1f),
-            itemSpacing = 8.dp,
         ) { index ->
             when (index) {
                 0 -> GeneralPage(
@@ -228,7 +223,7 @@ private fun DocumentFormScreenContent(
                     onAddClick = onInvoiceAdd,
                     onAddTaxClick = onAddTaxClick,
                     onShowItemTaxes = {
-                        pageToScroll = 2
+                        currentPage = 2
                     }
                 )
 

@@ -45,6 +45,8 @@ dependencies {
     implementation(Dependencies.composeNavigation)
     implementation(Dependencies.composePager)
     implementation(Dependencies.composePagerIndicators)
+    implementation(Dependencies.materialDialogCore)
+    implementation(Dependencies.materialDialogsDateTime)
     implementation(project(":common"))
     implementation(project(":core:models"))
     implementation(project(":core:domain"))

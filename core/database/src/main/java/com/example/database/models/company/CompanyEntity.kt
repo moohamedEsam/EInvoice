@@ -1,5 +1,6 @@
 package com.example.database.models.company
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.models.company.Company
@@ -14,7 +15,7 @@ data class CompanyEntity(
     val ceo: String,
     val phone: String,
     val website: String?,
-    val settings: CompanySettings,
+    @Embedded val settings: CompanySettings,
     val isDeleted: Boolean = false,
     val isUpdated: Boolean = false,
     val isCreated: Boolean = false,

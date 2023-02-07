@@ -19,5 +19,9 @@ interface DocumentRepository : Syncable<Document> {
 
     fun getDocuments(): Flow<List<DocumentView>>
 
-    fun getDocumentsByCompany(companyId: String): Flow<List<DocumentView>>
+    fun getDocumentsByCompany(
+        companyId: String,
+        fromDateMillis: Long,
+        toDateMillis: Long
+    ): Flow<List<DocumentView>>
 }
