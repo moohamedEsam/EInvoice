@@ -14,12 +14,12 @@ import com.example.domain.client.CreateClientUseCase
 import com.example.domain.client.DeleteClientUseCase
 import com.example.domain.client.GetClientUseCase
 import com.example.domain.client.GetClientsUseCase
+import com.example.domain.client.UndoDeleteClientUseCase
 import com.example.domain.client.UpdateClientUseCase
 
 import com.example.domain.company.*
 import com.example.domain.document.*
 import com.example.domain.item.*
-import com.example.domain.sync.OneTimeSyncUseCase
 import com.example.domain.sync.oneTimeSyncUseCase
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
@@ -54,6 +54,7 @@ val domainModule = module {
     single { CreateClientUseCase(get<ClientRepository>()::createClient) }
     single { UpdateClientUseCase(get<ClientRepository>()::updateClient) }
     single { DeleteClientUseCase(get<ClientRepository>()::deleteClient) }
+    single { UndoDeleteClientUseCase(get<ClientRepository>()::undoDeleteClient) }
 
     //item
     single { GetItemsUseCase(get<ItemRepository>()::getItems) }
@@ -66,8 +67,7 @@ val domainModule = module {
 
     //document
     single { GetDocumentsUseCase(get<DocumentRepository>()::getDocuments) }
-    single { getDocumentsByCompanyUseCase(get()) }
-    single { getDocumentsByBranchUseCase(get()) }
+    single { getDocumentsByTypeUseCase(get()) }
     single { GetDocumentUseCase(get<DocumentRepository>()::getDocument) }
     single { CreateDocumentUseCase(get<DocumentRepository>()::createDocument) }
     single { UpdateDocumentUseCase(get<DocumentRepository>()::updateDocument) }

@@ -13,7 +13,9 @@ import com.example.branch.screens.dashboard.navigateToBranchDashboardScreen
 import com.example.branch.screens.form.branchFormScreen
 import com.example.branch.screens.form.navigateToBranchFormScreen
 import com.example.client.screens.all.clientsScreen
-import com.example.client.screens.form.clientsFormScreen
+import com.example.client.screens.dashboard.clientDashboardScreen
+import com.example.client.screens.dashboard.navigateToClientDashboardScreen
+import com.example.client.screens.form.clientFormScreen
 import com.example.client.screens.form.navigateToClientFormScreen
 import com.example.common.models.SnackBarEvent
 import com.example.company.screen.all.companiesScreen
@@ -66,7 +68,7 @@ fun EInvoiceNavGraph(
         companyFormScreen(onShowSnackbarEvent)
 
         companyDashboardScreen(
-            onClientClick = navController::navigateToClientFormScreen,
+            onClientClick = navController::navigateToClientDashboardScreen,
             onBranchClick = navController::navigateToBranchDashboardScreen,
             onDocumentClick = navController::navigateToDocumentFormScreen,
             onEditClick = navController::navigateToCompanyFormScreen,
@@ -96,14 +98,21 @@ fun EInvoiceNavGraph(
         )
 
         clientsScreen(
-            onClientClicked = { navController.navigateToClientFormScreen(it) },
-            onCreateClientClicked = navController::navigateToClientFormScreen
+            onClientClicked = navController::navigateToClientDashboardScreen,
+            onCreateClientClicked = navController::navigateToClientFormScreen,
+            onEditClick = navController::navigateToClientFormScreen
         )
 
-        clientsFormScreen(
+        clientFormScreen(
             onLocationRequested = navController::navigateToMapScreen,
             onShowSnackBarEvent = onShowSnackbarEvent,
-            onClientCreated = { }
+            onClientCreated = navController::navigateToClientDashboardScreen
+        )
+
+        clientDashboardScreen(
+            onDocumentClick = navController::navigateToDocumentFormScreen,
+            onClientEditClick = navController::navigateToClientFormScreen,
+            onShowSnackBarEvent = onShowSnackbarEvent
         )
 
         itemsScreen(onShowSnackBarEvent = onShowSnackbarEvent)

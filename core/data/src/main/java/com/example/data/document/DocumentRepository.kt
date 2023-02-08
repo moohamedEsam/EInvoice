@@ -30,4 +30,10 @@ interface DocumentRepository : Syncable<Document> {
         fromDateMillis: Long,
         toDateMillis: Long
     ): Flow<List<DocumentView>>
+
+    fun getDocumentsByClient(
+        clientId: String,
+        fromDateMillis: Long,
+        toDateMillis: Long
+    ): Flow<List<DocumentView>>
 }

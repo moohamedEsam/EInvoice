@@ -1,47 +1,46 @@
-package com.example.branch.screens.dashboard
+package com.example.client.screens.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.common.models.Result
-import com.example.domain.branch.DeleteBranchUseCase
-import com.example.domain.branch.GetBranchViewUseCase
-import com.example.domain.branch.UndoDeleteBranchUseCase
+import com.example.domain.client.DeleteClientUseCase
+import com.example.domain.client.GetClientUseCase
+import com.example.domain.client.UndoDeleteClientUseCase
 import com.example.domain.document.DaysRange
 import com.example.domain.document.GetDocumentsByTypeUseCase
-import com.example.models.branch.BranchView
+import com.example.models.Client
 import com.example.models.document.DocumentView
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
 
-class BranchDashboardViewModel(
-    private val branchId: String,
-    private val getBranchViewUseCase: GetBranchViewUseCase,
-    private val getDocumentsByBranchUseCase: GetDocumentsByTypeUseCase,
-    private val deleteBranchUseCase: DeleteBranchUseCase,
-    private val undoDeleteBranchUseCase: UndoDeleteBranchUseCase
+class ClientDashboardViewModel(
+    private val clientId: String,
+    private val getClientUseCase: GetClientUseCase,
+    private val getDocumentsByClientUseCase: GetDocumentsByTypeUseCase,
+    private val deleteClientUseCase: DeleteClientUseCase,
+    private val undoDeleteClientUseCase: UndoDeleteClientUseCase
 ) : ViewModel() {
-    private val _branchView: MutableStateFlow<BranchView?> = MutableStateFlow(null)
+    private val _client: MutableStateFlow<Client?> = MutableStateFlow(null)
     private val _lastDate = MutableStateFlow(Date())
     private val _documents = MutableStateFlow(emptyList<DocumentView>())
-    private val _isDeleteEnabled = combine(_documents, _branchView) { documents, branchView ->
-        branchView?.items?.isEmpty() == true && documents.isEmpty()
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
+    private val _isDeleteEnabled = _documents.map(List<DocumentView>::isEmpty)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
 
     val uiState = combine(
-        _branchView,
+        _client,
         _documents,
         _lastDate,
         _isDeleteEnabled
-    ) { branchView, documents, startDate, isDeleteEnabled ->
-        if (branchView == null) return@combine BranchDashboardState.random()
-        BranchDashboardState(
-            branchView = branchView,
+    ) { client, documents, startDate, isDeleteEnabled ->
+        if (client == null) return@combine ClientDashBoardState.random()
+        ClientDashBoardState(
+            client = client,
             documents = documents,
-            pickedDate = startDate,
+            endDate = startDate,
             isDeleteEnabled = isDeleteEnabled
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), BranchDashboardState.random())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ClientDashBoardState.random())
 
     fun onDatePicked(date: Date) {
         _lastDate.value = date
@@ -49,20 +48,20 @@ class BranchDashboardViewModel(
 
     fun onDeleteClick(onResult: (Result<Unit>) -> Unit) {
         viewModelScope.launch {
-            val result = deleteBranchUseCase(branchId)
+            val result = deleteClientUseCase(clientId)
             onResult(result)
         }
     }
 
     fun onUndoDeleteClick(onResult: (Result<Unit>) -> Unit) {
         viewModelScope.launch {
-            val result = undoDeleteBranchUseCase(branchId)
+            val result = undoDeleteClientUseCase(clientId)
             onResult(result)
         }
     }
 
     init {
-        observeBranch()
+        observeClient()
         observeDocuments()
     }
 
@@ -74,11 +73,11 @@ class BranchDashboardViewModel(
                     add(Calendar.MONTH, -1)
                 }.time
                 val params = GetDocumentsByTypeUseCase.Params(
-                    type = GetDocumentsByTypeUseCase.Types.Branch,
-                    id = branchId,
+                    type = GetDocumentsByTypeUseCase.Types.Client,
+                    id = clientId,
                     daysRange = DaysRange(startDate, endDate)
                 )
-                getDocumentsByBranchUseCase(params)
+                getDocumentsByClientUseCase(params)
                     .collect { documents ->
                         _documents.value = documents
                     }
@@ -86,11 +85,11 @@ class BranchDashboardViewModel(
         }
     }
 
-    private fun observeBranch() {
+    private fun observeClient() {
         viewModelScope.launch {
-            getBranchViewUseCase(branchId)
-                .collectLatest { branchView ->
-                    _branchView.value = branchView
+            getClientUseCase(clientId)
+                .collectLatest { client ->
+                    _client.value = client
                 }
         }
     }

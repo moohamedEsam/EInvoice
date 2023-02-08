@@ -16,5 +16,7 @@ interface ClientRepository : Syncable<Client> {
 
     suspend fun deleteClient(id: String): Result<Unit>
 
+    suspend fun undoDeleteClient(id: String): Result<Unit>
+
     fun getClientsByCompanyId(companyId: String): Flow<List<Client>>
 }

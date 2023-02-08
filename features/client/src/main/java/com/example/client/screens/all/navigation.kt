@@ -10,11 +10,13 @@ const val ClientsScreenRoute = "clients"
 fun NavGraphBuilder.clientsScreen(
     onClientClicked: (String) -> Unit,
     onCreateClientClicked: () -> Unit,
+    onEditClick: (String) -> Unit,
 ) {
     composable(ClientsScreenRoute) {
         ClientsScreen(
             onClientClicked = { onClientClicked(it.id) },
             onCreateClientClicked = onCreateClientClicked,
+            onEditClick = onEditClick
         )
     }
 }

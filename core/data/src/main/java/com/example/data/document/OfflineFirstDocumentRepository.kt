@@ -72,6 +72,14 @@ class OfflineFirstDocumentRepository(
         .getDocumentsByBranch(branchId, fromDateMillis, toDateMillis)
         .map { documents -> documents.map { it.asDocumentView() } }
 
+    override fun getDocumentsByClient(
+        clientId: String,
+        fromDateMillis: Long,
+        toDateMillis: Long
+    ): Flow<List<DocumentView>> = localDataSource
+        .getDocumentsByClient(clientId, fromDateMillis, toDateMillis)
+        .map { documents -> documents.map { it.asDocumentView() } }
+
     override suspend fun syncWith(synchronizer: Synchronizer): Boolean {
         val documents = localDataSource.getDocumentsView().first()
         val idMappings = HashMap<String, String>()

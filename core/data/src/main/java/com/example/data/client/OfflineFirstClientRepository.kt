@@ -10,9 +10,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import com.example.common.models.Result
 import com.example.data.sync.handleSync
+import com.example.database.models.ClientEntity
 import com.example.database.room.dao.ClientDao
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 
+private const val CLIENT_NOT_FOUND = "Client not found"
 class OfflineFirstClientRepository(
     private val localSource: ClientDao,
     private val remoteSource: EInvoiceRemoteDataSource
@@ -20,8 +23,13 @@ class OfflineFirstClientRepository(
     override fun getClients(): Flow<List<Client>> =
         localSource.getClients().map { clients -> clients.map { it.asClient() } }
 
+    override suspend fun undoDeleteClient(id: String): Result<Unit> = tryWrapper {
+        localSource.undoDeleteClient(id)
+        Result.Success(Unit)
+    }
+
     override fun getClient(id: String): Flow<Client> =
-        localSource.getClientById(id).map { it.asClient() }
+        localSource.getClientById(id).filterNotNull().map(ClientEntity::asClient)
 
     override suspend fun createClient(client: Client): Result<Client> = tryWrapper {
         localSource.insertClient(client.asClientEntity(isCreated = true))
@@ -29,7 +37,7 @@ class OfflineFirstClientRepository(
     }
 
     override suspend fun updateClient(client: Client): Result<Client> = tryWrapper {
-        val clientEntity = localSource.getClientById(client.id).first()
+        val clientEntity = localSource.getClientById(client.id).first() ?: return@tryWrapper Result.Error(CLIENT_NOT_FOUND)
         if (clientEntity.isCreated)
             localSource.updateClient(client.asClientEntity(isCreated = true))
         else
@@ -38,7 +46,7 @@ class OfflineFirstClientRepository(
     }
 
     override suspend fun deleteClient(id: String): Result<Unit> = tryWrapper {
-        val clientEntity = localSource.getClientById(id).first()
+        val clientEntity = localSource.getClientById(id).first() ?: return@tryWrapper Result.Error(CLIENT_NOT_FOUND)
         if (clientEntity.isCreated)
             localSource.deleteClient(id)
         else

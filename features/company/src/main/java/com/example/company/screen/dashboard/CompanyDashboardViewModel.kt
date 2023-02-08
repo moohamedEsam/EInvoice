@@ -6,7 +6,8 @@ import com.example.common.models.Result
 import com.example.domain.company.DeleteCompanyUseCase
 import com.example.domain.company.GetCompanyUseCase
 import com.example.domain.company.UndoDeleteCompanyUseCase
-import com.example.domain.document.GetDocumentsByCompanyUseCase
+import com.example.domain.document.DaysRange
+import com.example.domain.document.GetDocumentsByTypeUseCase
 import com.example.models.company.CompanyView
 import com.example.models.company.empty
 import com.example.models.document.DocumentView
@@ -17,7 +18,7 @@ import java.util.*
 class CompanyDashboardViewModel(
     private val companyId: String,
     private val getCompanyUseCase: GetCompanyUseCase,
-    private val getDocumentsUseCase: GetDocumentsByCompanyUseCase,
+    private val getDocumentsUseCase: GetDocumentsByTypeUseCase,
     private val deleteCompanyUseCase: DeleteCompanyUseCase,
     private val undoDeleteCompanyUseCase: UndoDeleteCompanyUseCase
 ) : ViewModel() {
@@ -78,9 +79,13 @@ class CompanyDashboardViewModel(
 
     private fun observeDocuments() {
         viewModelScope.launch {
-            _pickedDate.collectLatest {toDate->
-                val fromDate = getDateMinusOneMonth(toDate)
-                val params = GetDocumentsByCompanyUseCase.Params(companyId, fromDate, toDate)
+            _pickedDate.collectLatest {endDate->
+                val startDate = getDateMinusOneMonth(endDate)
+                val params = GetDocumentsByTypeUseCase.Params(
+                    type = GetDocumentsByTypeUseCase.Types.Company,
+                    id = companyId,
+                    daysRange = DaysRange(startDate, endDate)
+                )
                 getDocumentsUseCase(params).distinctUntilChanged().collectLatest {
                     _documents.value = it
                 }

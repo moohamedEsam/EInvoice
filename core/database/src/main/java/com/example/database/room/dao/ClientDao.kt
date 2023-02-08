@@ -16,13 +16,19 @@ interface ClientDao {
     fun getClientsByCompanyId(companyId: String): Flow<List<ClientEntity>>
 
     @Query("SELECT * FROM Client WHERE id = :id")
-    fun getClientById(id: String): Flow<ClientEntity>
+    fun getClientById(id: String): Flow<ClientEntity?>
 
     @Insert
     suspend fun insertClient(client: ClientEntity)
 
     @Query("DELETE FROM Client where id = :id")
     suspend fun deleteClient(id: String)
+
+    @Query("UPDATE Client SET isDeleted = 1 where id = :clientId")
+    suspend fun markClientAsDeleted(clientId: String)
+
+    @Query("UPDATE Client SET isDeleted = 0 where id = :clientId")
+    suspend fun undoDeleteClient(clientId: String)
 
     @Query("delete from client")
     suspend fun deleteAllClients()

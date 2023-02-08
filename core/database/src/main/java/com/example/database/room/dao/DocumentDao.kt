@@ -47,7 +47,9 @@ interface DocumentDao {
     @Query("SELECT * FROM Document WHERE branchId = :id and isDeleted = 0 and date between :fromDate and :toDate order by date desc")
     fun getDocumentsByBranch(id: String, fromDate:Long, toDate:Long): Flow<List<DocumentViewEntity>>
 
-
+    @Transaction
+    @Query("SELECT * FROM Document WHERE receiverId = :id and isDeleted = 0 and date between :fromDate and :toDate order by date desc")
+    fun getDocumentsByClient(id: String, fromDate:Long, toDate:Long): Flow<List<DocumentViewEntity>>
 
     @Transaction
     @Query("SELECT * FROM Document where isDeleted = 0 order by date desc")

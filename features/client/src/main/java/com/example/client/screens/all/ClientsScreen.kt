@@ -3,10 +3,13 @@ package com.example.client.screens.all
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -23,6 +26,7 @@ import org.koin.androidx.compose.viewModel
 fun ClientsScreen(
     onClientClicked: (Client) -> Unit,
     onCreateClientClicked: () -> Unit,
+    onEditClick: (String) -> Unit,
 ) {
     val viewModel: ClientsViewModel by viewModel()
     val clients by viewModel.clients.collectAsState()
@@ -33,6 +37,7 @@ fun ClientsScreen(
         onQueryChanged = viewModel::onQueryChanged,
         onClientClicked = onClientClicked,
         onCreateClientClicked = onCreateClientClicked,
+        onEditClick = onEditClick
     )
 }
 
@@ -44,6 +49,7 @@ private fun ClientsScreenContent(
     onQueryChanged: (String) -> Unit,
     onClientClicked: (Client) -> Unit,
     onCreateClientClicked: () -> Unit,
+    onEditClick: (String) -> Unit
 ) {
     ListScreenContent(
         queryState = queryState,
@@ -56,7 +62,8 @@ private fun ClientsScreenContent(
             ClientItem(
                 client = client,
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { onClientClicked(client) }
+                onClick = { onClientClicked(client) },
+                onEditClick = { onEditClick(client.id) }
             )
         }
     }
@@ -67,7 +74,8 @@ private fun ClientsScreenContent(
 private fun ClientItem(
     client: Client,
     modifier: Modifier = Modifier,
-    onClick: (Client) -> Unit
+    onClick: (Client) -> Unit,
+    onEditClick: () -> Unit
 ) {
     OutlinedCard(modifier = modifier, onClick = { onClick(client) }) {
         Column(
@@ -101,7 +109,12 @@ private fun ClientItem(
                     text = "City: ${client.address?.regionCity}",
                     style = MaterialTheme.typography.bodyMedium
                 )
-
+            }
+            IconButton(onClick = onEditClick, modifier = Modifier.align(Alignment.End)) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Edit"
+                )
             }
         }
     }
@@ -137,7 +150,8 @@ fun ClientsScreenPreview() {
         clients = List(20) { client },
         queryState = MutableStateFlow(""),
         onQueryChanged = {},
-        onClientClicked = {}
+        onClientClicked = {},
+        onCreateClientClicked = {},
     ) {
 
     }
