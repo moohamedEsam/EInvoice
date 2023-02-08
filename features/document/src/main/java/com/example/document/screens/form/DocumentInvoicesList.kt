@@ -82,43 +82,84 @@ fun DocumentInvoicesList(
             items(invoices, key = { it.id }) { invoice ->
                 InvoiceLineItem(
                     invoiceLineView = invoice,
-                    onInvoiceEdit = {
-                        onInvoiceEdit(invoice)
-                    },
-                    onInvoiceDelete = onInvoiceRemove,
-                    onAddTaxClick = onAddTaxClick,
-                    onShowItemTaxes = onShowItemTaxes,
                     modifier = Modifier
                         .heightIn(max = 280.dp)
-                        .animateItemPlacement()
+                        .animateItemPlacement(),
+                    actionRow = {
+                        InvoiceLineItemActions(
+                            onAddTaxClick = onAddTaxClick,
+                            invoice = invoice,
+                            onInvoiceEdit = onInvoiceEdit,
+                            onShowItemTaxes = onShowItemTaxes,
+                            onInvoiceRemove = onInvoiceRemove
+                        )
+                    }
                 )
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun InvoiceLineItem(
-    invoiceLineView: InvoiceLineView,
-    onInvoiceEdit: (InvoiceLineView) -> Unit,
-    onInvoiceDelete: (InvoiceLineView) -> Unit,
+@OptIn(ExperimentalMaterial3Api::class)
+private fun InvoiceLineItemActions(
     onAddTaxClick: (InvoiceLineView) -> Unit,
+    invoice: InvoiceLineView,
+    onInvoiceEdit: (InvoiceLineView) -> Unit,
     onShowItemTaxes: (InvoiceLineView) -> Unit,
-    modifier: Modifier = Modifier
+    onInvoiceRemove: (InvoiceLineView) -> Unit
 ) {
-    var totals by remember {
-        mutableStateOf(invoiceLineView.getTotals())
-    }
-    LaunchedEffect(key1 = invoiceLineView) {
-        totals = invoiceLineView.getTotals()
-    }
+    AssistChip(
+        onClick = { onAddTaxClick(invoice) },
+        label = { Text(text = "Add Tax") },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add Tax"
+            )
+        }
+    )
+
+    AssistChip(
+        onClick = { onInvoiceEdit(invoice) },
+        label = { Text("Edit") },
+        leadingIcon = { Icon(Icons.Default.Edit, contentDescription = "Edit") },
+    )
+
+    AssistChip(
+        onClick = { onShowItemTaxes(invoice) },
+        label = { Text(text = "Show Taxes") },
+    )
+
+    AssistChip(
+        onClick = { onInvoiceRemove(invoice) },
+        label = { Text("Delete") },
+        colors = AssistChipDefaults.assistChipColors(
+            containerColor = MaterialTheme.colorScheme.errorContainer,
+            labelColor = MaterialTheme.colorScheme.error
+        ),
+        leadingIcon = {
+            Icon(
+                Icons.Default.Delete,
+                contentDescription = "Delete",
+                tint = MaterialTheme.colorScheme.error
+            )
+        },
+    )
+}
+
+@Composable
+fun InvoiceLineItem(
+    invoiceLineView: InvoiceLineView,
+    modifier: Modifier = Modifier,
+    actionRow: @Composable RowScope.() -> Unit = {}
+) {
+    val totals = invoiceLineView.getTotals()
+
     OutlinedCard(modifier = modifier.fillMaxWidth()) {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier
-                .padding(8.dp)
-                .verticalScroll(rememberScrollState())
+            modifier = Modifier.padding(8.dp)
         ) {
             Text(text = invoiceLineView.item.name, style = MaterialTheme.typography.headlineSmall)
             Row(
@@ -150,44 +191,7 @@ private fun InvoiceLineItem(
                     .horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-
-                AssistChip(
-                    onClick = { onAddTaxClick(invoiceLineView) },
-                    label = { Text(text = "Add Tax") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Add Tax"
-                        )
-                    }
-                )
-
-                AssistChip(
-                    onClick = { onInvoiceEdit(invoiceLineView) },
-                    label = { Text("Edit") },
-                    leadingIcon = { Icon(Icons.Default.Edit, contentDescription = "Edit") },
-                )
-
-                AssistChip(
-                    onClick = { onShowItemTaxes(invoiceLineView) },
-                    label = { Text(text = "Show Taxes") },
-                )
-
-                AssistChip(
-                    onClick = { onInvoiceDelete(invoiceLineView) },
-                    label = { Text("Delete") },
-                    colors = AssistChipDefaults.assistChipColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        labelColor = MaterialTheme.colorScheme.error
-                    ),
-                    leadingIcon = {
-                        Icon(
-                            Icons.Default.Delete,
-                            contentDescription = "Delete",
-                            tint = MaterialTheme.colorScheme.error
-                        )
-                    },
-                )
+                actionRow()
             }
         }
     }

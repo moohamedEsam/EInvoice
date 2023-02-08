@@ -45,7 +45,11 @@ fun DocumentTransaction(
                 Text(text = document.branch.name, style = MaterialTheme.typography.bodySmall)
             }
 
-            Text(text = document.status.toString(), style = MaterialTheme.typography.bodyLarge)
+            Text(
+                text = document.status.toString(),
+                style = MaterialTheme.typography.bodyLarge,
+                color = document.status.getStatusColor(MaterialTheme.colorScheme.onSurface)
+            )
 
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(text = "%.2f $".format(total), style = MaterialTheme.typography.bodyLarge)

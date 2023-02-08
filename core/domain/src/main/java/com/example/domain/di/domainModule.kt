@@ -71,5 +71,7 @@ val domainModule = module {
     single { GetDocumentUseCase(get<DocumentRepository>()::getDocument) }
     single { CreateDocumentUseCase(get<DocumentRepository>()::createDocument) }
     single { UpdateDocumentUseCase(get<DocumentRepository>()::updateDocument) }
+    single { DeleteDocumentUseCase(get<DocumentRepository>()::deleteDocument) }
+    single { UndoDeleteDocumentUseCase(get<DocumentRepository>()::undoDeleteDocument) }
 
 }

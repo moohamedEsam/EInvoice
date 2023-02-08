@@ -25,6 +25,8 @@ import com.example.company.screen.dashboard.navigateToCompanyDashboardScreen
 import com.example.company.screen.form.companyFormScreen
 import com.example.company.screen.form.navigateToCompanyFormScreen
 import com.example.document.screens.all.documentsScreen
+import com.example.document.screens.details.documentDetailsScreen
+import com.example.document.screens.details.navigateToDocumentDetailsScreen
 import com.example.document.screens.form.documentFormScreen
 import com.example.document.screens.form.navigateToDocumentFormScreen
 import com.example.einvoice.R
@@ -61,7 +63,7 @@ fun EInvoiceNavGraph(
         )
 
         companiesScreen(
-            onCompanyClick = {navController.navigateToCompanyDashboardScreen(it)},
+            onCompanyClick = { navController.navigateToCompanyDashboardScreen(it) },
             onCreateNewCompany = navController::navigateToCompanyFormScreen
         ) { navController.navigateToCompanyFormScreen(it) }
 
@@ -70,7 +72,7 @@ fun EInvoiceNavGraph(
         companyDashboardScreen(
             onClientClick = navController::navigateToClientDashboardScreen,
             onBranchClick = navController::navigateToBranchDashboardScreen,
-            onDocumentClick = navController::navigateToDocumentFormScreen,
+            onDocumentClick = navController::navigateToDocumentDetailsScreen,
             onEditClick = navController::navigateToCompanyFormScreen,
             onShowSnackbar = onShowSnackbarEvent
         )
@@ -92,7 +94,7 @@ fun EInvoiceNavGraph(
         )
 
         branchDashboardScreen(
-            onDocumentClick = navController::navigateToDocumentFormScreen,
+            onDocumentClick = navController::navigateToDocumentDetailsScreen,
             onEditClick = navController::navigateToBranchFormScreen,
             onShowSnackBarEvent = onShowSnackbarEvent
         )
@@ -110,7 +112,7 @@ fun EInvoiceNavGraph(
         )
 
         clientDashboardScreen(
-            onDocumentClick = navController::navigateToDocumentFormScreen,
+            onDocumentClick = navController::navigateToDocumentDetailsScreen,
             onClientEditClick = navController::navigateToClientFormScreen,
             onShowSnackBarEvent = onShowSnackbarEvent
         )
@@ -118,12 +120,18 @@ fun EInvoiceNavGraph(
         itemsScreen(onShowSnackBarEvent = onShowSnackbarEvent)
 
         documentsScreen(
-            onDocumentClick = {
-                navController.navigateToDocumentFormScreen(it)
-            },
+            onDocumentClick = navController::navigateToDocumentDetailsScreen,
             onAddDocumentClick = navController::navigateToDocumentFormScreen
         )
 
         documentFormScreen(onShowSnackbarEvent)
+
+        documentDetailsScreen(
+            onCompanyClick = navController::navigateToCompanyDashboardScreen,
+            onBranchClick = navController::navigateToBranchDashboardScreen,
+            onClientClick = navController::navigateToClientDashboardScreen,
+            onEditClick = navController::navigateToDocumentFormScreen,
+            onShowSnackBarEvent = onShowSnackbarEvent
+        )
     }
 }

@@ -36,7 +36,7 @@ interface DocumentDao {
     suspend fun deleteAllInvoiceLines()
 
     //document
-    @Query("SELECT * FROM Document")
+    @Query("SELECT * FROM Document WHERE isDeleted = 0 order by date desc")
     fun getDocuments(): Flow<List<DocumentEntity>>
 
     @Transaction
