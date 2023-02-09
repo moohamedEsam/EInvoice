@@ -14,7 +14,7 @@ data class CreateDocumentDto(
     @SerialName("dateTimeIssued")
     @Serializable(with = DateSerializer::class)
     val date: Date,
-    val invoices: List<CreateInvoiceLineDto>
+    val invoiceLines: List<CreateInvoiceLineDto>
 )
 
 fun NetworkDocumentView.asCreateDocumentDto() = CreateDocumentDto(
@@ -23,5 +23,5 @@ fun NetworkDocumentView.asCreateDocumentDto() = CreateDocumentDto(
     receiverId = client.id,
     internalId = internalId,
     date = date,
-    invoices = invoices.map { it.asCreateInvoiceLineDto() }
+    invoiceLines = invoices.map { it.asCreateInvoiceLineDto() }
 )

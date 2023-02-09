@@ -127,6 +127,7 @@ private fun CompanyFormScreenContent(
             onValueChange = onRegistrationNumberChange
         )
 
+        Text(text = "Optional", style = MaterialTheme.typography.headlineSmall)
 
         ValidationOutlinedTextField(
             valueState = websiteState,
@@ -135,7 +136,6 @@ private fun CompanyFormScreenContent(
             onValueChange = onWebsiteChange
         )
 
-        Text(text = "Optional", style = MaterialTheme.typography.headlineSmall)
 
         EInvoiceOutlinedTextField(
             valueState = ceoState,

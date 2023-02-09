@@ -11,6 +11,9 @@ interface CompanyDao {
     @Query("SELECT * FROM Company where isDeleted = 0")
     fun getCompanies(): Flow<List<CompanyEntity>>
 
+    @Query("SELECT * FROM Company")
+    fun getAllCompanies(): Flow<List<CompanyEntity>>
+
     @Transaction
     @Query("SELECT * FROM Company where isDeleted = 0")
     fun getCompaniesViews(): Flow<List<CompanyViewEntity>>

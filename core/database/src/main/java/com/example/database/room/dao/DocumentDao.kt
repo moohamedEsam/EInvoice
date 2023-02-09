@@ -69,6 +69,10 @@ interface DocumentDao {
     fun getDocumentsView(): Flow<List<DocumentViewEntity>>
 
     @Transaction
+    @Query("SELECT * FROM Document order by date desc")
+    fun getAllDocuments() : Flow<List<DocumentViewEntity>>
+
+    @Transaction
     @Query("SELECT * FROM Document WHERE id = :id")
     fun getDocumentById(id: String): Flow<DocumentViewEntity>
 

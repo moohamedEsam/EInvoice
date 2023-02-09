@@ -1,5 +1,6 @@
 package com.example.network
 
+import android.util.Log
 import com.example.common.functions.tryWrapper
 import com.example.common.models.Result
 import com.example.models.branch.Branch
@@ -125,8 +126,8 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
             setBody(item.asNetworkItem())
             contentType(ContentType.Application.Json)
         }
-        val apiResponse = response.body<ApiResponse<Item>>()
-        apiResponse.asResult()
+        val apiResponse = response.body<ApiResponse<NetworkItem>>()
+        apiResponse.asResult().map { it.asItem() }
     }
 
     override suspend fun getItem(itemId: String): Result<Item> = tryWrapper {
@@ -146,8 +147,8 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
             setBody(item.asNetworkItem())
             contentType(ContentType.Application.Json)
         }
-        val apiResponse = response.body<ApiResponse<Item>>()
-        apiResponse.asResult()
+        val apiResponse = response.body<ApiResponse<NetworkItem>>()
+        apiResponse.asResult().map { it.asItem() }
     }
 
     override suspend fun getTaxTypes(): Result<List<TaxView>> = tryWrapper {

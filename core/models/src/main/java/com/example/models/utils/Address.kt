@@ -14,4 +14,19 @@ data class Address(
     val room: String,
     val landmark: String,
     val additionalInformation: String
+){
+    companion object
+}
+
+fun Address.Companion.empty() = Address(
+    street = " ",
+    country = " ",
+    governate = " ",
+    postalCode = " ",
+    regionCity = " ",
+    buildingNumber = " ",
+    floor = " ",
+    room = " ",
+    landmark = " ",
+    additionalInformation = " "
 )

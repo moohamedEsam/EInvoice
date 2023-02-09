@@ -36,7 +36,10 @@ class OfflineFirstDocumentRepository(
             ?: return@tryWrapper Result.Error("Document not found")
         val cancelResult = remoteDataSource.cancelDocument(document.documentEntity.id)
         cancelResult.ifSuccess {
-            localDataSource.updateDocumentStatus(document.documentEntity.id, DocumentStatus.Cancelled)
+            localDataSource.updateDocumentStatus(
+                document.documentEntity.id,
+                DocumentStatus.Cancelled
+            )
         }
         cancelResult
     }
@@ -108,7 +111,7 @@ class OfflineFirstDocumentRepository(
         .map { documents -> documents.map { it.asDocumentView() } }
 
     override suspend fun syncWith(synchronizer: Synchronizer): Boolean {
-        val documents = localDataSource.getDocumentsView().first()
+        val documents = localDataSource.getAllDocuments().first()
         val idMappings = HashMap<String, String>()
         return synchronizer.handleSync(
             remoteFetcher = fetcher@{
@@ -118,32 +121,27 @@ class OfflineFirstDocumentRepository(
                 if (ids !is Result.Success) return@fetcher Result.Error("Failed to fetch documents")
 
                 val remoteDocuments = ids.data.mapNotNull { id ->
-                    getDocumentEntityFromRemoteSource(id)
+                    getDocumentViewFromRemoteSource(id)?.asDocumentViewEntity()
                 }
 
                 Result.Success(remoteDocuments)
             },
             remoteDeleter = {
-                val deletedDocuments = documents.filter { it.documentEntity.isDeleted }
-                    .map { it.asDocumentView().asDocument() }
-                deletedDocuments.forEach { document ->
-                    val result = remoteDataSource.deleteDocument(document.id)
+                val deletedDocumentsIds = documents.filter { it.documentEntity.isDeleted }
+                    .map { it.documentEntity.id }
+                deletedDocumentsIds.forEach { id ->
+                    val result = remoteDataSource.deleteDocument(id)
                     if (result is Result.Success)
-                        localDataSource.deleteDocument(document.id)
+                        localDataSource.deleteDocument(id)
                 }
                 Result.Success(Unit)
             },
             remoteUpdater = {
                 val updatedDocuments = documents.filter { it.documentEntity.isUpdated }
                 updatedDocuments.forEach { document ->
-                    val result = remoteDataSource.updateDocument(
-                        document.asDocumentView().asNetworkDocumentView().asUpdateDocumentDto()
-                    )
-                    if (result is Result.Success) {
-                        localDataSource.updateDocument(
-                            document.asDocumentView().asDocument()
-                                .asDocumentEntity(isUpdated = false)
-                        )
+                    val result = remoteDataSource.updateDocument(document.convertToUpdateDocument())
+                    result.ifSuccess {
+                        localDataSource.updateDocument(document.asDocumentEntity().copy(isUpdated = false))
                     }
                 }
                 Result.Success(Unit)
@@ -151,9 +149,7 @@ class OfflineFirstDocumentRepository(
             remoteCreator = {
                 val createdDocuments = documents.filter { it.documentEntity.isCreated }
                 createdDocuments.forEach { document ->
-                    val result = remoteDataSource.createDocument(
-                        document.asDocumentView().asNetworkDocumentView().asCreateDocumentDto()
-                    )
+                    val result = remoteDataSource.createDocument(document.convertToCreateDocument())
                     if (result is Result.Success) {
                         idMappings[document.documentEntity.id] = result.data.id
                     }
@@ -170,17 +166,22 @@ class OfflineFirstDocumentRepository(
                     localDataSource.updateDocument(documentView.documentEntity)
             },
             afterLocalCreate = {
-                idMappings.forEach { (oldId, newId) ->
-                    localDataSource.updateInvoiceLinesDocumentId(oldId, newId)
+                idMappings.forEach { (oldId, _) ->
                     localDataSource.deleteDocument(oldId)
                 }
             },
         )
     }
 
-    private suspend fun getDocumentEntityFromRemoteSource(id: String): DocumentViewEntity? {
+    private fun DocumentViewEntity.convertToUpdateDocument() =
+        asDocumentView().asNetworkDocumentView().asUpdateDocumentDto()
+
+    private fun DocumentViewEntity.convertToCreateDocument() =
+        asDocumentView().asNetworkDocumentView().asCreateDocumentDto()
+
+    private suspend fun getDocumentViewFromRemoteSource(id: String): DocumentView? {
         val documentResult =
-            remoteDataSource.getDocument(id).map(DocumentView::asDocumentViewEntity)
+            remoteDataSource.getDocument(id)
 
         return if (documentResult is Result.Success)
             documentResult.data

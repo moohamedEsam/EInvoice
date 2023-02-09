@@ -28,7 +28,7 @@ class OfflineFirstBranchRepository(
         localSource.getBranchById(id).filterNotNull().map(BranchEntity::asBranch)
 
     override fun getBranchView(id: String): Flow<BranchView> =
-        localSource.getBranchViewById(id).filterNotNull().map(BranchViewEntity::asBranchView)
+        localSource.getBranchViewById(id).filterNotNull().map(BranchViewEntity::removeDeleted).map(BranchViewEntity::asBranchView)
 
     override suspend fun createBranch(branch: Branch): Result<Branch> = tryWrapper {
         localSource.insertBranch(branch.asBranchEntity(isCreated = true))

@@ -20,3 +20,7 @@ fun BranchViewEntity.asBranchView() = BranchView(
     branch = branch.asBranch(),
     items = items.map { it.asItem() }
 )
+
+fun BranchViewEntity.removeDeleted() = copy(
+    items = items.filter { !it.isDeleted }
+)

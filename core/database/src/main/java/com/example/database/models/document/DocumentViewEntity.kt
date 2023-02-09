@@ -81,3 +81,5 @@ fun DocumentView.asDocumentViewEntity() = DocumentViewEntity(
     companyEntity = company.asCompanyEntity(),
     invoices = invoices.map { it.asInvoiceLineViewEntity() }
 )
+
+fun DocumentViewEntity.asDocumentEntity() = documentEntity

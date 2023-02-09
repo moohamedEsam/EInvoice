@@ -28,7 +28,7 @@ class OfflineFirstCompanyRepository(
         .map(CompanyViewEntity::asCompanyView)
 
     override fun getCompaniesViews(): Flow<List<CompanyView>> = localDataSource.getCompaniesViews()
-        .map { companies -> companies.map(CompanyViewEntity::asCompanyView) }
+        .map { companies -> companies.map(CompanyViewEntity::removeDeleted).map(CompanyViewEntity::asCompanyView) }
 
     override fun getCompanies(): Flow<List<Company>> = localDataSource.getCompanies()
         .map { companies -> companies.map(CompanyEntity::asCompany) }
@@ -58,7 +58,7 @@ class OfflineFirstCompanyRepository(
     }
 
     override suspend fun syncWith(synchronizer: Synchronizer): Boolean {
-        val companies = localDataSource.getCompanies().first()
+        val companies = localDataSource.getAllCompanies().first()
         val idMappings = HashMap<String, String>()
         val isSuccessfulSync = synchronizer.handleSync(
             remoteFetcher = remoteDataSource::getCompanies,

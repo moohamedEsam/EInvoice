@@ -39,7 +39,6 @@ fun BranchFormScreen(
 ) {
     val viewModel: BranchFormViewModel by viewModel(parameters = { parametersOf(branchId) })
     if (latitude != null && longitude != null && latitude != 0.0 && longitude != 0.0) {
-        Log.i("BranchFormScreen", "BranchFormScreen: $latitude, $longitude")
         val address = Geocoder(LocalContext.current)
             .getFromLocation(latitude, longitude, 1)?.first()
 

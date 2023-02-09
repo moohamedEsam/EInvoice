@@ -4,6 +4,7 @@ import com.example.models.Client
 import com.example.models.utils.Address
 import com.example.models.utils.BusinessType
 import com.example.models.utils.TaxStatus
+import com.example.models.utils.empty
 
 @kotlinx.serialization.Serializable
 data class NetworkClient(
@@ -12,7 +13,7 @@ data class NetworkClient(
     val name: String,
     val email: String,
     val phone: String,
-    val address: Address?,
+    val address: Address,
     val businessType: Int,
     val status: Int,
     val companyId: String
@@ -36,7 +37,7 @@ fun Client.asNetworkClient() = NetworkClient(
     name = name,
     email = email,
     phone = phone,
-    address = address,
+    address = address ?: Address.empty(),
     businessType = businessType.ordinal,
     status = status.ordinal,
     companyId = companyId

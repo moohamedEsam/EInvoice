@@ -38,3 +38,9 @@ fun CompanyViewEntity.asCompanyView() = CompanyView(
     company = companyEntity.asCompany(),
     documents = documents.map { it.asDocument() },
 )
+
+fun CompanyViewEntity.removeDeleted() = copy(
+    branches = branches.filter { !it.isDeleted },
+    clients = clients.filter { !it.isDeleted },
+    documents = documents.filter { !it.isDeleted },
+)

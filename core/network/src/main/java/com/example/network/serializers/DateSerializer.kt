@@ -26,6 +26,10 @@ class DateSerializer : KSerializer<Date> {
 
 
     override fun serialize(encoder: Encoder, value: Date) {
-        encoder.encodeString(dateFormat.format(value))
+        var dateString = dateFormat.format(value)
+        dateString = dateString.replace(" ", "T")
+        dateString = dateString.removeSuffix("T")
+        dateString += "Z"
+        encoder.encodeString(dateString)
     }
 }
