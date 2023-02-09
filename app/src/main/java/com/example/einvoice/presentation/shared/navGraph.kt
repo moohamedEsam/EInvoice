@@ -50,13 +50,13 @@ fun EInvoiceNavGraph(
     ) {
         loginScreen(
             onShowSnackBarEvent = onShowSnackbarEvent,
-            logo = R.drawable.invoice,
+            logo = R.drawable.logo,
             onLoggedIn = navController::navigateToCompaniesScreen,
             onRegisterClick = navController::navigateToRegister
         )
 
         registerScreen(
-            logo = R.drawable.invoice,
+            logo = R.drawable.logo,
             onShowSnackBarEvent = onShowSnackbarEvent,
             onRegistered = { },
             onLoginClick = navController::popBackStack

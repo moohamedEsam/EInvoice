@@ -2,6 +2,7 @@ package com.example.auth.login
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -10,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
@@ -100,14 +102,15 @@ private fun LoginScreenContent(
                 validationState = emailValidation,
                 label = "Email",
                 modifier = Modifier.fillMaxWidth(),
-                onValueChange = onEmailValueChange
+                onValueChange = onEmailValueChange,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
 
             ValidationPasswordTextField(
                 valueState = password,
                 validationState = passwordValidation,
                 modifier = Modifier.fillMaxWidth(),
-                onValueChange = onPasswordValueChange
+                onValueChange = onPasswordValueChange,
             )
 
             OneTimeEventButton(

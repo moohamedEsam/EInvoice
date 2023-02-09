@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.common.models.Result
@@ -23,11 +24,13 @@ import com.example.models.invoiceLine.*
 import com.example.models.item.Item
 import com.example.models.item.empty
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
-import java.util.*
+import java.util.Date
 import kotlin.random.Random
 
 private const val UNKNOWN_ERROR = "Unknown error"
@@ -56,6 +59,8 @@ fun DocumentFormScreen(
         internalIdValidationResult = viewModel.internalIdValidationResult,
         invoicePageInvoices = viewModel.invoicesFilteredByInvoicePageQuery,
         invoicePageQuery = viewModel.invoicePageQuery,
+        createDate = viewModel.createdAt,
+        onCreateDateChanged = viewModel::setDate,
         onInvoicePageQueryChanged = viewModel::setInvoicePageQuery,
         taxPageInvoices = viewModel.invoicesFilteredByTaxPageQuery,
         taxPageQuery = viewModel.taxPageQuery,
@@ -82,7 +87,7 @@ fun DocumentFormScreen(
                         action = { viewModel.save {} }
                     )
                 else
-                    SnackBarEvent(message = "Saved successfully",)
+                    SnackBarEvent(message = "Saved successfully")
 
                 onShowSnackBarEvent(snackBarEvent)
             }
@@ -141,7 +146,7 @@ fun DocumentFormScreen(
 
 }
 
-@OptIn(ExperimentalPagerApi::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 private fun DocumentFormScreenContent(
     companies: StateFlow<List<Company>>,
@@ -169,15 +174,20 @@ private fun DocumentFormScreenContent(
     onAddTaxClick: (InvoiceLineView) -> Unit,
     onRemoveTax: (InvoiceLineView, InvoiceTax) -> Unit,
     onEditTax: (InvoiceLineView, InvoiceTax) -> Unit,
+    createDate: StateFlow<Date>,
+    onCreateDateChanged: (Date) -> Unit,
     isEnabled: StateFlow<Boolean>,
     isLoading: StateFlow<Boolean>,
     onFormSubmit: () -> Unit,
 ) {
     val pages = listOf("General", "Invoices", "Taxes")
-    var currentPage by remember {
+    val pagerState = rememberPagerState()
+    var pageToScroll by remember {
         mutableStateOf(0)
     }
-
+    LaunchedEffect(pageToScroll) {
+        pagerState.animateScrollToPage(pageToScroll)
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -185,19 +195,21 @@ private fun DocumentFormScreenContent(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         ScrollableTabRow(
-            selectedTabIndex = currentPage
+            selectedTabIndex = pagerState.currentPage
         ) {
             pages.forEachIndexed { index, page ->
                 Tab(
-                    selected = currentPage == index,
-                    onClick = { currentPage = index },
+                    selected = pagerState.currentPage == index,
+                    onClick = { pageToScroll = index },
                     text = { Text(page) }
                 )
             }
         }
-        AnimatedContent(
-            targetState = currentPage,
+        HorizontalPager(
+            count = pages.size,
             modifier = Modifier.weight(1f),
+            state = pagerState,
+            itemSpacing = 8.dp,
         ) { index ->
             when (index) {
                 0 -> GeneralPage(
@@ -212,7 +224,9 @@ private fun DocumentFormScreenContent(
                     onClientSelected = onClientSelected,
                     internalId = internalId,
                     onInternalIdChanged = onInternalIdChanged,
-                    internalIdValidationResult = internalIdValidationResult
+                    internalIdValidationResult = internalIdValidationResult,
+                    createDate = createDate,
+                    onCreateDateChanged = onCreateDateChanged,
                 )
 
                 1 -> DocumentInvoicesList(
@@ -224,7 +238,8 @@ private fun DocumentFormScreenContent(
                     onAddClick = onInvoiceAdd,
                     onAddTaxClick = onAddTaxClick,
                     onShowItemTaxes = {
-                        currentPage = 2
+                        pageToScroll = 2
+                        onTaxPageQueryChanged(it.item.name)
                     }
                 )
 
@@ -299,6 +314,8 @@ fun DocumentFormScreenPreview() {
         onTaxPageQueryChanged = {},
         invoicePageQuery = MutableStateFlow(""),
         onInvoicePageQueryChanged = {},
+        createDate = MutableStateFlow(Date()),
+        onCreateDateChanged = {},
     ) {}
 
 }

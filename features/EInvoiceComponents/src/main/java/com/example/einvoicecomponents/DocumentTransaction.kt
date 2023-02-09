@@ -1,6 +1,8 @@
 package com.example.einvoicecomponents
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -34,6 +36,7 @@ fun DocumentTransaction(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -44,13 +47,13 @@ fun DocumentTransaction(
                 Text(text = document.client.name, style = MaterialTheme.typography.bodyLarge)
                 Text(text = document.branch.name, style = MaterialTheme.typography.bodySmall)
             }
-
+            Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = document.status.toString(),
                 style = MaterialTheme.typography.bodyLarge,
                 color = document.status.getStatusColor(MaterialTheme.colorScheme.onSurface)
             )
-
+            Spacer(modifier = Modifier.width(8.dp))
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(text = "%.2f $".format(total), style = MaterialTheme.typography.bodyLarge)
                 Text(

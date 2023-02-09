@@ -1,16 +1,14 @@
 package com.example.document.screens.all
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -103,56 +101,61 @@ private fun DocumentsScreenContent(
     onFilterByBranchClick: () -> Unit,
     onFilterByStatusClick: () -> Unit,
 ) {
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        SearchField(state, onQueryChange)
-        ActionsRow(onSyncDocumentsClick, state)
-        FiltersRow(
-            state = state,
-            onFilterByCompanyClick = onFilterByCompanyClick,
-            onFilterByClientClick = onFilterByClientClick,
-            onFilterByBranchClick = onFilterByBranchClick,
-            onFilterByStatusClick = onFilterByStatusClick
-        )
-        DocumentsList(
-            modifier = Modifier.weight(1f),
+        item { SearchField(state, onQueryChange) }
+        item { ActionsRow(onSyncDocumentsClick, state) }
+        item {
+            FiltersRow(
+                state = state,
+                onFilterByCompanyClick = onFilterByCompanyClick,
+                onFilterByClientClick = onFilterByClientClick,
+                onFilterByBranchClick = onFilterByBranchClick,
+                onFilterByStatusClick = onFilterByStatusClick
+            )
+        }
+        documentsList(
             onDocumentClick = onDocumentClick,
             documents = state.documents,
-            onDocumentCancelClick = onDocumentCancelClick
-        )
-        CreateNewDocumentFloatingButton(
-            onClick = onAddDocumentClick
+            onDocumentCancelClick = onDocumentCancelClick,
+            onAddDocumentClick = onAddDocumentClick
         )
     }
 }
 
-@Composable
-@OptIn(ExperimentalFoundationApi::class)
-private fun DocumentsList(
-    modifier: Modifier = Modifier,
+private fun LazyListScope.documentsList(
     onDocumentClick: (String) -> Unit,
     onDocumentCancelClick: (String) -> Unit,
+    onAddDocumentClick: () -> Unit,
     documents: List<DocumentView>
 ) {
-    Text(text = "Documents", style = MaterialTheme.typography.headlineSmall)
-    LazyVerticalStaggeredGrid(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = modifier,
-        columns = StaggeredGridCells.Adaptive(200.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(documents) { document ->
-            DocumentItem(
-                document = document,
-                onClick = { onDocumentClick(document.id) },
-                onDocumentCancelClick = onDocumentCancelClick
-            )
+    item {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(text = "Documents", style = MaterialTheme.typography.headlineSmall)
+            IconButton(onClick = onAddDocumentClick) {
+                Icon(
+                    imageVector = Icons.Outlined.Add,
+                    contentDescription = "Add"
+                )
+            }
         }
     }
+
+    items(documents) { document ->
+        DocumentItem(
+            document = document,
+            onClick = { onDocumentClick(document.id) },
+            onDocumentCancelClick = onDocumentCancelClick
+        )
+    }
+
 }
 
 @Composable
@@ -223,19 +226,6 @@ private fun SearchField(
         label = { Text("Search") },
         leadingIcon = { Icon(imageVector = Icons.Outlined.Search, contentDescription = null) },
         modifier = Modifier.fillMaxWidth()
-    )
-}
-
-@Composable
-private fun ColumnScope.CreateNewDocumentFloatingButton(
-    onClick: () -> Unit,
-) {
-    FloatingActionButton(
-        onClick = onClick,
-        content = { Icon(imageVector = Icons.Filled.Add, contentDescription = null) },
-        modifier = Modifier
-            .align(Alignment.End)
-            .padding(8.dp),
     )
 }
 

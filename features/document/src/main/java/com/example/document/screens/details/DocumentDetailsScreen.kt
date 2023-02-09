@@ -58,7 +58,7 @@ fun DocumentDetailsScreen(
     DocumentScreenContent(
         documentView = document,
         isEditEnabled = isEditEnabled,
-        isDeleteEnabled = isEditEnabled,
+        isDeleteEnabled = document.status < DocumentStatus.Submitted,
         onCompanyClick = { onCompanyClick(document.company.id) },
         onBranchClick = { onBranchClick(document.branch.id) },
         onClientClick = { onClientClick(document.client.id) },
@@ -132,7 +132,9 @@ private fun DocumentScreenContent(
 
         DocumentSummery(
             invoicesState = MutableStateFlow(documentView.invoices),
-            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
         )
     }
 }
@@ -194,18 +196,25 @@ private fun DocumentInfo(
             Text(text = documentView.client.name)
         }
     }
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(text = "Status: ", style = MaterialTheme.typography.bodyLarge)
-        Text(
-            text = documentView.status.name,
-            color = documentView.status.getStatusColor(MaterialTheme.colorScheme.onSurface),
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.clickable {
-                val event = SnackBarEvent(documentView.error?:"")
-                onShowSnackBarEvent(event)
-            }
-        )
-        Spacer(modifier = Modifier.weight(1f))
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row{
+            Text(text = "Status: ", style = MaterialTheme.typography.bodyLarge)
+            Text(
+                text = documentView.status.name,
+                color = documentView.status.getStatusColor(MaterialTheme.colorScheme.onSurface),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.clickable {
+                    if (documentView.error == null) return@clickable
+                    val event = SnackBarEvent(documentView.error ?: "")
+                    onShowSnackBarEvent(event)
+                }
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = "Document Type:${documentView.documentType}",
             style = MaterialTheme.typography.bodyLarge

@@ -7,6 +7,7 @@ import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -20,12 +21,15 @@ import com.example.client.screens.all.navigateToClientsScreen
 import com.example.common.models.SnackBarEvent
 import com.example.company.screen.all.CompaniesScreenRoute
 import com.example.company.screen.all.navigateToCompaniesScreen
+import com.example.document.screens.all.DocumentsScreenRoute
 import com.example.document.screens.all.navigateToDocumentsScreen
 import com.example.domain.auth.LogoutUseCase
 import com.example.domain.sync.OneTimeSyncUseCase
+import com.example.einvoice.R
 import com.example.functions.handleSnackBarEvent
 import com.example.item.screens.all.ItemsScreenRoute
 import com.example.item.screens.all.navigateToItemsScreen
+import com.example.maplocation.MapScreenRoute
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.inject
 
@@ -80,7 +84,7 @@ private fun EInvoiceDrawer(
         drawerContent = { DrawerContent(navController = navController) },
         modifier = modifier.padding(paddingValues),
         drawerState = drawerState,
-        gesturesEnabled = true
+        gesturesEnabled = false
     ) {
         EInvoiceNavGraph(
             navController = navController,
@@ -103,38 +107,69 @@ private fun DrawerContent(navController: NavHostController) {
 
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        val iconSize = 24
         NavigationDrawerItem(
-            icon = { Icon(Icons.Outlined.Home, contentDescription = null) },
+            icon = {
+                Icon(
+                    painterResource(id = R.drawable.office_building),
+                    contentDescription = null,
+                    modifier = Modifier.size(iconSize.dp)
+                )
+            },
             label = { Text("Companies") },
             selected = currentRoute == CompaniesScreenRoute,
             onClick = navController::navigateToCompaniesScreen
         )
 
         NavigationDrawerItem(
-            icon = { Icon(Icons.Outlined.Home, contentDescription = null) },
+            icon = {
+                Icon(
+                    painterResource(id = R.drawable.branch),
+                    contentDescription = null,
+                    modifier = Modifier.size(iconSize.dp)
+                )
+            },
             label = { Text("Branches") },
             selected = currentRoute == BranchFormScreenRoute,
             onClick = navController::navigateToBranchesScreen
         )
 
         NavigationDrawerItem(
-            icon = { Icon(Icons.Outlined.Home, contentDescription = null) },
+            icon = {
+                Icon(
+                    painterResource(id = R.drawable.rating),
+                    contentDescription = null,
+                    modifier = Modifier.size(iconSize.dp)
+                )
+            },
             label = { Text("Clients") },
             selected = currentRoute == ClientsScreenRoute,
             onClick = navController::navigateToClientsScreen
         )
 
         NavigationDrawerItem(
-            icon = { Icon(Icons.Outlined.Home, contentDescription = null) },
+            icon = {
+                Icon(
+                    painterResource(id = R.drawable.list_tems),
+                    contentDescription = null,
+                    modifier = Modifier.size(iconSize.dp)
+                )
+            },
             label = { Text("Items") },
             selected = currentRoute == ItemsScreenRoute,
             onClick = navController::navigateToItemsScreen
         )
 
         NavigationDrawerItem(
-            icon = { Icon(Icons.Outlined.Home, contentDescription = null) },
+            icon = {
+                Icon(
+                    painterResource(id = R.drawable.invoice),
+                    contentDescription = null,
+                    modifier = Modifier.size(iconSize.dp)
+                )
+            },
             label = { Text("Documents") },
-            selected = false,
+            selected = currentRoute == DocumentsScreenRoute,
             onClick = navController::navigateToDocumentsScreen
         )
     }

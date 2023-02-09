@@ -10,7 +10,7 @@ import androidx.core.content.getSystemService
 import androidx.work.ForegroundInfo
 
 const val SyncNotificationId = 0
-const val SyncNotificationChannelID = "SyncNotificationChannel"
+const val SyncNotificationChannelID = "Sync Notification Channel"
 
 fun Context.syncForegroundInfo() = ForegroundInfo(
     SyncNotificationId,
@@ -31,5 +31,6 @@ fun Context.syncWorkerNotification(): Notification {
 
     return NotificationCompat.Builder(this, SyncNotificationChannelID)
         .setContentTitle("Syncing data")
+        .setSmallIcon(R.drawable.sync_foreground)
         .build()
 }

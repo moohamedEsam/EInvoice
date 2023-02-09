@@ -17,6 +17,7 @@ import com.example.models.branch.Branch
 import com.example.models.Client
 import com.example.models.company.Company
 import com.example.models.company.CompanyView
+import com.example.models.document.DocumentStatus
 import com.example.models.document.DocumentView
 import com.example.models.invoiceLine.*
 import com.example.models.item.Item
@@ -97,10 +98,14 @@ class DocumentFormViewModel(
     private val _internalId = MutableStateFlow("")
     val internalId = _internalId.asStateFlow()
     val internalIdValidationResult = combine(_internalId, _documents) { internalId, documents ->
-        val internalIdAlreadyExists = documents.any { it.id != newDocumentId && it.internalId == internalId }
+        val internalIdAlreadyExists =
+            documents.any { it.id != newDocumentId && it.internalId == internalId }
         if (internalIdAlreadyExists) ValidationResult.Invalid("Internal ID already exists")
         else notBlankValidator(internalId)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
+
+    private val _createdAt = MutableStateFlow(Date())
+    val createdAt = _createdAt.asStateFlow()
 
     private val _invoicePageQuery = MutableStateFlow("")
     val invoicePageQuery = _invoicePageQuery.asStateFlow()
@@ -122,7 +127,7 @@ class DocumentFormViewModel(
                 invoice.taxes.any { tax ->
                     tax.taxSubTypeCode.contains(query, true)
                             || tax.taxTypeCode.contains(query, true)
-                }
+                } || invoice.item.name.contains(query, true)
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
@@ -142,6 +147,7 @@ class DocumentFormViewModel(
     val isTaxDialogVisible = _isTaxDialogVisible.asStateFlow()
     private var isUpdatingTax = false
     private var invoiceLineId: String? = null
+    private var oldStatus = DocumentStatus.Initial
 
     fun setInternalId(value: String) = viewModelScope.launch {
         _internalId.update { value }
@@ -233,6 +239,10 @@ class DocumentFormViewModel(
 
     fun setDiscount(value: String) = viewModelScope.launch {
         _discount.update { value }
+    }
+
+    fun setDate(date: Date) = viewModelScope.launch {
+        _createdAt.update { date }
     }
 
     fun saveTax(onResult: (Result<Unit>) -> Unit) = viewModelScope.launch {
@@ -335,6 +345,7 @@ class DocumentFormViewModel(
                 if (isUpdatingDocument) {
                     val document = it.firstOrNull { document -> document.id == documentId }
                         ?: return@collectLatest
+                    oldStatus = document.status
                     setForm(document)
                 }
             }
@@ -408,8 +419,16 @@ class DocumentFormViewModel(
             client = _selectedClient.value ?: return null,
             internalId = _internalId.value,
             invoices = _invoices.value,
-            date = Date(),
+            date = _createdAt.value,
             documentType = "I",
+            status = if (isUpdatingDocument && oldStatus in listOf(
+                    DocumentStatus.SignError,
+                    DocumentStatus.Invalid
+                )
+            )
+                DocumentStatus.Updated
+            else
+                oldStatus
         )
     }
 

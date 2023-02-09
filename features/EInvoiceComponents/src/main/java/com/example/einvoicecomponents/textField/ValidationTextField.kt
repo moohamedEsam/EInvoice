@@ -1,6 +1,7 @@
 package com.example.einvoicecomponents
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -22,6 +23,7 @@ fun ValidationTextField(
     modifier: Modifier = Modifier,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     onValueChange: (String) -> Unit
 ) {
     val value by valueState.collectAsState()
@@ -34,7 +36,10 @@ fun ValidationTextField(
             isError = validation is ValidationResult.Invalid,
             modifier = Modifier.fillMaxWidth(),
             trailingIcon = trailingIcon,
-            leadingIcon = leadingIcon
+            leadingIcon = leadingIcon,
+            keyboardOptions = keyboardOptions,
+            singleLine = true,
+            maxLines = 1
         )
     }
 }
