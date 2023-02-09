@@ -4,6 +4,7 @@ import androidx.room.*
 import com.example.database.models.document.DocumentEntity
 import com.example.database.models.document.DocumentViewEntity
 import com.example.database.models.invoiceLine.InvoiceLineEntity
+import com.example.models.document.DocumentStatus
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -41,15 +42,27 @@ interface DocumentDao {
 
     @Transaction
     @Query("SELECT * FROM Document WHERE issuerId = :id and isDeleted = 0 and date between :fromDate and :toDate order by date desc")
-    fun getDocumentsByCompany(id: String, fromDate:Long, toDate:Long): Flow<List<DocumentViewEntity>>
+    fun getDocumentsByCompany(
+        id: String,
+        fromDate: Long,
+        toDate: Long
+    ): Flow<List<DocumentViewEntity>>
 
     @Transaction
     @Query("SELECT * FROM Document WHERE branchId = :id and isDeleted = 0 and date between :fromDate and :toDate order by date desc")
-    fun getDocumentsByBranch(id: String, fromDate:Long, toDate:Long): Flow<List<DocumentViewEntity>>
+    fun getDocumentsByBranch(
+        id: String,
+        fromDate: Long,
+        toDate: Long
+    ): Flow<List<DocumentViewEntity>>
 
     @Transaction
     @Query("SELECT * FROM Document WHERE receiverId = :id and isDeleted = 0 and date between :fromDate and :toDate order by date desc")
-    fun getDocumentsByClient(id: String, fromDate:Long, toDate:Long): Flow<List<DocumentViewEntity>>
+    fun getDocumentsByClient(
+        id: String,
+        fromDate: Long,
+        toDate: Long
+    ): Flow<List<DocumentViewEntity>>
 
     @Transaction
     @Query("SELECT * FROM Document where isDeleted = 0 order by date desc")
@@ -89,6 +102,9 @@ interface DocumentDao {
 
     @Query("update Document set isDeleted = 0 where id = :id")
     suspend fun undoDeleteDocument(id: String)
+
+    @Query("update Document set status = :status where id = :id")
+    suspend fun updateDocumentStatus(id: String, status: DocumentStatus)
 
     @Query("DELETE FROM InvoiceLine where documentId = :id")
     suspend fun deleteInvoicesByDocumentId(id: String)

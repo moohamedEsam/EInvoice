@@ -2,10 +2,13 @@ package com.example.document.screens.form
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.example.models.invoiceLine.InvoiceLineView
 import com.example.models.invoiceLine.getTotals
 import kotlinx.coroutines.flow.StateFlow
@@ -37,6 +40,5 @@ fun DocumentSummery(
         Text("Net: %.3f".format(invoicesTotals.sumOf { it.net }))
         Text("Discount Totals: %.3f".format(invoicesTotals.sumOf { it.discount }))
     }
-
 
 }

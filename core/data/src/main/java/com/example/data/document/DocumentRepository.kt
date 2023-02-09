@@ -36,4 +36,8 @@ interface DocumentRepository : Syncable<Document> {
         fromDateMillis: Long,
         toDateMillis: Long
     ): Flow<List<DocumentView>>
+
+    suspend fun syncDocumentsStatus(): Result<Unit>
+
+    suspend fun cancelDocument(id: String): Result<Unit>
 }

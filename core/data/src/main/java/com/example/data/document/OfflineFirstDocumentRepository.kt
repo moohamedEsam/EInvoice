@@ -10,6 +10,7 @@ import com.example.database.models.document.asDocumentView
 import com.example.database.models.document.asDocumentViewEntity
 import com.example.database.models.invoiceLine.asInvoiceLineEntity
 import com.example.database.room.dao.DocumentDao
+import com.example.models.document.DocumentStatus
 import com.example.models.document.DocumentView
 import com.example.models.document.asDocument
 import com.example.models.invoiceLine.asInvoiceLine
@@ -17,9 +18,7 @@ import com.example.network.EInvoiceRemoteDataSource
 import com.example.network.models.document.asCreateDocumentDto
 import com.example.network.models.document.asNetworkDocumentView
 import com.example.network.models.document.asUpdateDocumentDto
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 
 class OfflineFirstDocumentRepository(
     private val localDataSource: DocumentDao,
@@ -32,8 +31,18 @@ class OfflineFirstDocumentRepository(
         Result.Success(document)
     }
 
+    override suspend fun cancelDocument(id: String): Result<Unit> = tryWrapper {
+        val document = localDataSource.getDocumentById(id).firstOrNull()
+            ?: return@tryWrapper Result.Error("Document not found")
+        val cancelResult = remoteDataSource.cancelDocument(document.documentEntity.id)
+        cancelResult.ifSuccess {
+            localDataSource.updateDocumentStatus(document.documentEntity.id, DocumentStatus.Cancelled)
+        }
+        cancelResult
+    }
+
     override fun getDocument(id: String): Flow<DocumentView> =
-        localDataSource.getDocumentById(id).map { it.asDocumentView() }
+        localDataSource.getDocumentById(id).distinctUntilChanged().map { it.asDocumentView() }
 
     override suspend fun updateDocument(document: DocumentView): Result<DocumentView> = tryWrapper {
         val documentEntity = document.asDocument().asDocumentEntity(isUpdated = true)
@@ -47,13 +56,28 @@ class OfflineFirstDocumentRepository(
         Result.Success(Unit)
     }
 
+    override suspend fun syncDocumentsStatus(): Result<Unit> = tryWrapper {
+        val syncResult = remoteDataSource.syncDocumentsStatus()
+        if (syncResult is Result.Success) {
+            val documentsResult = remoteDataSource.getDocuments()
+            documentsResult.ifSuccess { networkDocuments ->
+                networkDocuments.forEach { document ->
+                    val status = DocumentStatus.values().first { it.ordinal == document.status }
+                    localDataSource.updateDocumentStatus(document.id, status)
+                }
+            }
+            return@tryWrapper documentsResult.map { }
+        }
+        syncResult
+    }
+
     override suspend fun undoDeleteDocument(id: String): Result<Unit> = tryWrapper {
         localDataSource.undoDeleteDocument(id)
         Result.Success(Unit)
     }
 
     override fun getDocuments(): Flow<List<DocumentView>> =
-        localDataSource.getDocumentsView()
+        localDataSource.getDocumentsView().distinctUntilChanged()
             .map { documents -> documents.map { it.asDocumentView() } }
 
     override fun getDocumentsByCompany(
@@ -62,6 +86,7 @@ class OfflineFirstDocumentRepository(
         toDateMillis: Long
     ): Flow<List<DocumentView>> = localDataSource
         .getDocumentsByCompany(companyId, fromDateMillis, toDateMillis)
+        .distinctUntilChanged()
         .map { documents -> documents.map { it.asDocumentView() } }
 
     override fun getDocumentsByBranch(
@@ -70,6 +95,7 @@ class OfflineFirstDocumentRepository(
         toDateMillis: Long
     ): Flow<List<DocumentView>> = localDataSource
         .getDocumentsByBranch(branchId, fromDateMillis, toDateMillis)
+        .distinctUntilChanged()
         .map { documents -> documents.map { it.asDocumentView() } }
 
     override fun getDocumentsByClient(
@@ -78,6 +104,7 @@ class OfflineFirstDocumentRepository(
         toDateMillis: Long
     ): Flow<List<DocumentView>> = localDataSource
         .getDocumentsByClient(clientId, fromDateMillis, toDateMillis)
+        .distinctUntilChanged()
         .map { documents -> documents.map { it.asDocumentView() } }
 
     override suspend fun syncWith(synchronizer: Synchronizer): Boolean {

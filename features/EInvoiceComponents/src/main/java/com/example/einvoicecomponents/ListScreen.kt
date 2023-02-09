@@ -66,14 +66,14 @@ fun ListScreenContent(
         ) {
             listContent()
         }
-        CreateNewCompanyFloatingButton(onFloatingButtonClick, floatingButtonText) {
+        CreateNewItemFloatingButton(onFloatingButtonClick, floatingButtonText) {
             expanded
         }
     }
 }
 
 @Composable
-private fun ColumnScope.CreateNewCompanyFloatingButton(
+private fun ColumnScope.CreateNewItemFloatingButton(
     onCreateNewCompanyClick: () -> Unit,
     label: String,
     isExpanded: () -> Boolean

@@ -169,13 +169,13 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
         apiResponse.asResult().map { unitTypes -> unitTypes.map { it.asUnitType() } }
     }
 
-    override suspend fun createDocument(document: CreateDocumentDto): Result<DocumentDto> =
+    override suspend fun createDocument(document: CreateDocumentDto): Result<NetworkDocument> =
         tryWrapper {
             val response = client.post(Urls.DOCUMENT) {
                 setBody(document)
                 contentType(ContentType.Application.Json)
             }
-            val apiResponse = response.body<ApiResponse<DocumentDto>>()
+            val apiResponse = response.body<ApiResponse<NetworkDocument>>()
             apiResponse.asResult()
         }
 
@@ -185,24 +185,30 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
         apiResponse.asResult().map { it.asDocumentView() }
     }
 
-    override suspend fun getDocuments(): Result<List<DocumentDto>> = tryWrapper {
+    override suspend fun getDocuments(): Result<List<NetworkDocument>> = tryWrapper {
         val response = client.get(Urls.DOCUMENT)
-        val apiResponse = response.body<ApiResponse<PagedResponse<DocumentDto>>>()
+        val apiResponse = response.body<ApiResponse<PagedResponse<NetworkDocument>>>()
         apiResponse.asResult().map { it.data }
     }
 
-    override suspend fun updateDocument(document: UpdateDocumentDto): Result<DocumentDto> =
+    override suspend fun updateDocument(document: UpdateDocumentDto): Result<NetworkDocument> =
         tryWrapper {
             val response = client.put(Urls.getDocument(document.id)) {
                 setBody(document)
                 contentType(ContentType.Application.Json)
             }
-            val apiResponse = response.body<ApiResponse<DocumentDto>>()
+            val apiResponse = response.body<ApiResponse<NetworkDocument>>()
             apiResponse.asResult()
         }
 
     override suspend fun deleteDocument(documentId: String): Result<Unit> = tryWrapper {
         val response = client.delete(Urls.getDocument(documentId))
+        val apiResponse = response.body<ApiResponse<Unit>>()
+        apiResponse.asResult()
+    }
+
+    override suspend fun syncDocumentsStatus(): Result<Unit> = tryWrapper {
+        val response = client.post(Urls.SYNC_DOCUMENTS_STATUS)
         val apiResponse = response.body<ApiResponse<Unit>>()
         apiResponse.asResult()
     }
@@ -213,6 +219,12 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
             contentType(ContentType.Application.Json)
         }
         val apiResponse = response.body<ApiResponse<Branch>>()
+        apiResponse.asResult()
+    }
+
+    override suspend fun cancelDocument(documentId: String): Result<Unit> = tryWrapper {
+        val response = client.post(Urls.cancelDocument(documentId))
+        val apiResponse = response.body<ApiResponse<Unit>>()
         apiResponse.asResult()
     }
 

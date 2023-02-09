@@ -13,6 +13,7 @@ object Urls {
     const val UNIT_TYPES = "$CONSTANTS/unit_types"
     const val TAX_TYPES = "$CONSTANTS/tax_types"
     const val DOCUMENT = "$BASE_URL/Document"
+    const val SYNC_DOCUMENTS_STATUS = "$DOCUMENT/sync"
     fun getCompany(companyId: String) = "$COMPANY/$companyId"
     fun getClient(clientId: String) = "$CLIENT/$clientId"
     fun getBranch(branchId: String) = "$BRANCH/$branchId"
@@ -20,6 +21,8 @@ object Urls {
     fun getItem(itemId: String) = "$ITEM/$itemId"
 
     fun getDocument(documentId: String) = "$DOCUMENT/$documentId"
+
+    fun cancelDocument(documentId: String) = "$DOCUMENT/cancel/$documentId"
 
 
 }

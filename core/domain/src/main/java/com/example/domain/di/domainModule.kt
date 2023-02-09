@@ -20,12 +20,14 @@ import com.example.domain.client.UpdateClientUseCase
 import com.example.domain.company.*
 import com.example.domain.document.*
 import com.example.domain.item.*
+import com.example.domain.networkStatus.getAndroidNetworkObserver
 import com.example.domain.sync.oneTimeSyncUseCase
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val domainModule = module {
     single { oneTimeSyncUseCase(androidContext()) }
+    single { getAndroidNetworkObserver(androidContext()) }
 
     single { loginUseCase(get(), androidContext(), get()) }
     single { logoutUseCase(get(), androidContext()) }
@@ -73,5 +75,7 @@ val domainModule = module {
     single { UpdateDocumentUseCase(get<DocumentRepository>()::updateDocument) }
     single { DeleteDocumentUseCase(get<DocumentRepository>()::deleteDocument) }
     single { UndoDeleteDocumentUseCase(get<DocumentRepository>()::undoDeleteDocument) }
+    single { SyncDocumentsStatusUseCase(get<DocumentRepository>()::syncDocumentsStatus) }
+    single{CancelDocumentUseCase(get<DocumentRepository>()::cancelDocument)}
 
 }

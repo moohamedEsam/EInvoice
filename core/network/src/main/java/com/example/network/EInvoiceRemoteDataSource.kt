@@ -14,6 +14,7 @@ import com.example.models.item.UnitType
 import com.example.network.models.document.*
 
 interface EInvoiceRemoteDataSource {
+
     //auth
     suspend fun login(credentials: Credentials): Result<Token>
     suspend fun register(register: Register): Result<Token>
@@ -54,15 +55,20 @@ interface EInvoiceRemoteDataSource {
 
     suspend fun getTaxTypes(): Result<List<TaxView>>
 
+    // document related
 
-    suspend fun createDocument(document:CreateDocumentDto): Result<DocumentDto>
+    suspend fun createDocument(document: CreateDocumentDto): Result<NetworkDocument>
 
     suspend fun getDocument(documentId: String): Result<DocumentView>
 
-    suspend fun getDocuments(): Result<List<DocumentDto>>
+    suspend fun getDocuments(): Result<List<NetworkDocument>>
 
-    suspend fun updateDocument(document: UpdateDocumentDto): Result<DocumentDto>
+    suspend fun updateDocument(document: UpdateDocumentDto): Result<NetworkDocument>
 
     suspend fun deleteDocument(documentId: String): Result<Unit>
+
+    suspend fun syncDocumentsStatus(): Result<Unit>
+
+    suspend fun cancelDocument(documentId: String): Result<Unit>
 
 }
