@@ -62,22 +62,23 @@ class ItemsViewModel(
     val itemCodeValidationResult = itemCode.map(::notBlankValidator)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Valid)
 
+    private val _selectedBranch = MutableStateFlow<Branch?>(null)
+    val selectedBranch = _selectedBranch.asStateFlow()
     private val _internalCode = MutableStateFlow("")
     val internalCode = _internalCode.asStateFlow()
-    val internalCodeValidationResult = combine(_items, internalCode) { items, internalCode ->
-        when {
-            items.any { it.internalCode == internalCode && it.id != itemId } ->
-                ValidationResult.Invalid("Internal code already exists")
-            else -> notBlankValidator(internalCode)
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Valid)
 
 
+    val internalCodeValidationResult =
+        combine(_items, internalCode, _selectedBranch) { items, internalCode, selectedBranch ->
+            when {
+                items.filter { it.branchId == selectedBranch?.id }
+                    .any { it.internalCode == internalCode && it.id != itemId } ->
+                    ValidationResult.Invalid("Internal code already exists")
+                else -> notBlankValidator(internalCode)
+            }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Valid)
     private val _branches = MutableStateFlow(emptyList<Branch>())
     val branches = _branches.asStateFlow()
-    private val _selectedBranch = MutableStateFlow<Branch?>(null)
-
-    val selectedBranch = _selectedBranch.asStateFlow()
     private val _unitTypes = MutableStateFlow(emptyList<UnitType>())
 
     val unitTypes = _unitTypes.asStateFlow()

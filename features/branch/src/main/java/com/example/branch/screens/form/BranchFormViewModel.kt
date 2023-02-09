@@ -4,20 +4,23 @@ import android.location.Address
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.common.models.ValidationResult
+import com.example.common.validators.notBlankValidator
 import com.example.common.validators.validateUsername
 import com.example.domain.branch.CreateBranchUseCase
+import com.example.domain.branch.GetBranchesByCompanyUseCase
 import com.example.domain.branch.GetBranchesUseCase
 import com.example.domain.branch.UpdateBranchUseCase
 import com.example.domain.company.GetCompaniesUseCase
 import com.example.models.branch.Branch
 import com.example.models.OptionalAddress
 import com.example.models.company.Company
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
 
 class BranchFormViewModel(
-    private val getBranchesUseCase: GetBranchesUseCase,
+    private val getBranchesUseCase: GetBranchesByCompanyUseCase,
     private val getCompaniesUseCase: GetCompaniesUseCase,
     private val createBranchUseCase: CreateBranchUseCase,
     private val updateBranchUseCase: UpdateBranchUseCase,
@@ -31,10 +34,16 @@ class BranchFormViewModel(
         name.map(::validateUsername)
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
 
+    private val _selectedCompany = MutableStateFlow<Company?>(null)
+    val selectedCompany = _selectedCompany.asStateFlow()
+
     private val _internalId = MutableStateFlow("")
     val internalId = _internalId.asStateFlow()
     val internalIdValidationResult =
-        combine(internalId, _otherBranchesInternalIds) { internalId, branchesInternalIds ->
+        combine(
+            internalId,
+            _otherBranchesInternalIds
+        ) { internalId, branchesInternalIds ->
             when {
                 internalId.isEmpty() -> ValidationResult.Empty
                 internalId.any { char -> !char.isDigit() } -> ValidationResult.Invalid("Must be a number")
@@ -42,37 +51,27 @@ class BranchFormViewModel(
                 else -> ValidationResult.Valid
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
-
-
     private val _street = MutableStateFlow("")
-    private val streetValidationResult = _street.map {
-        if (it.isBlank()) ValidationResult.Invalid("Street is required")
-        else ValidationResult.Valid
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
 
+
+    private val streetValidationResult = _street.map(::notBlankValidator)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
 
     private val _country = MutableStateFlow("")
-
     private val _governate = MutableStateFlow("")
-    private val governateValidationResult = _governate.map {
-        if (it.isBlank()) ValidationResult.Invalid("Governate is required")
-        else ValidationResult.Valid
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
+
+    private val governateValidationResult = _governate.map(::notBlankValidator)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
+
 
     private val _postalCode = MutableStateFlow("")
-
-
     private val _regionCity = MutableStateFlow("")
-    private val regionCityValidationResult = _regionCity.map {
-        if (it.isBlank()) ValidationResult.Invalid("Region/City is required")
-        else ValidationResult.Valid
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
 
+    private val regionCityValidationResult = _regionCity.map(::notBlankValidator)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
     private val _companies = MutableStateFlow(emptyList<Company>())
-    val companies = _companies.asStateFlow()
 
-    private val _selectedCompany = MutableStateFlow<Company?>(null)
-    val selectedCompany = _selectedCompany.asStateFlow()
+    val companies = _companies.asStateFlow()
 
 
     private val _optionalAddress = MutableStateFlow(OptionalAddress("", "", "", "", ""))
@@ -118,10 +117,14 @@ class BranchFormViewModel(
         observeBranches()
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeBranches() {
         viewModelScope.launch {
-            getBranchesUseCase().collectLatest { branches ->
-                _otherBranchesInternalIds.update { branches.filter { it.id != branchId }.map { it.internalId } }
+            _selectedCompany.filterNotNull().flatMapLatest {company-> getBranchesUseCase(company.id) }
+                .collectLatest { branches ->
+                _otherBranchesInternalIds.update {
+                    branches.filter { it.id != branchId }.map { it.internalId }
+                }
                 if (isUpdating) {
                     val branch = branches.find { it.id == branchId } ?: return@collectLatest
                     fillForm(branch)

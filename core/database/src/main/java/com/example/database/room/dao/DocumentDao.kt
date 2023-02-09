@@ -48,6 +48,9 @@ interface DocumentDao {
         toDate: Long
     ): Flow<List<DocumentViewEntity>>
 
+    @Query("SELECT internalId FROM Document WHERE issuerId = :id and isDeleted = 0")
+    fun getDocumentsInternalIdsByCompanyId(id: String): Flow<List<String>>
+
     @Transaction
     @Query("SELECT * FROM Document WHERE branchId = :id and isDeleted = 0 and date between :fromDate and :toDate order by date desc")
     fun getDocumentsByBranch(

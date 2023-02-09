@@ -17,13 +17,14 @@ val documentsModule = module {
     }
     viewModel { params ->
         DocumentFormViewModel(
-            getDocumentsUseCase = get(),
             createDocumentUseCase = get(),
             updateDocumentUseCase = get(),
             getCompaniesViewsUseCase = get(),
-            getItemsUseCase = get(),
+            getItemsByBranchUseCase = get(),
             getTaxTypesUseCase = get(),
-            documentId = params[0]
+            documentId = params[0],
+            getDocumentUseCase = get(),
+            getDocumentsInternalIdsByCompanyIdUseCase = get()
         )
     }
 

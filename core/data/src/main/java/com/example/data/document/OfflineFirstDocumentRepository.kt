@@ -31,6 +31,9 @@ class OfflineFirstDocumentRepository(
         Result.Success(document)
     }
 
+    override fun getDocumentsInternalIdsByCompanyId(id: String): Flow<List<String>> =
+        localDataSource.getDocumentsInternalIdsByCompanyId(id)
+
     override suspend fun cancelDocument(id: String): Result<Unit> = tryWrapper {
         val document = localDataSource.getDocumentById(id).firstOrNull()
             ?: return@tryWrapper Result.Error("Document not found")
@@ -141,7 +144,9 @@ class OfflineFirstDocumentRepository(
                 updatedDocuments.forEach { document ->
                     val result = remoteDataSource.updateDocument(document.convertToUpdateDocument())
                     result.ifSuccess {
-                        localDataSource.updateDocument(document.asDocumentEntity().copy(isUpdated = false))
+                        localDataSource.updateDocument(
+                            document.asDocumentEntity().copy(isUpdated = false)
+                        )
                     }
                 }
                 Result.Success(Unit)

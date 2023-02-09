@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.Flow
 interface DocumentRepository : Syncable<Document> {
     suspend fun createDocument(document: DocumentView): Result<DocumentView>
 
+    fun getDocumentsInternalIdsByCompanyId(id: String): Flow<List<String>>
+
     fun getDocument(id: String): Flow<DocumentView>
 
     suspend fun updateDocument(document: DocumentView): Result<DocumentView>

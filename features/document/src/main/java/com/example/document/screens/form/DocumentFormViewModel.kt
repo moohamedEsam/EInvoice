@@ -9,8 +9,10 @@ import com.example.common.validators.numberValidator
 import com.example.common.validators.percentValidator
 import com.example.domain.company.GetCompaniesViewsUseCase
 import com.example.domain.document.CreateDocumentUseCase
-import com.example.domain.document.GetDocumentsUseCase
+import com.example.domain.document.GetDocumentUseCase
+import com.example.domain.document.GetDocumentsInternalIdsByCompanyIdUseCase
 import com.example.domain.document.UpdateDocumentUseCase
+import com.example.domain.item.GetItemsByBranchUseCase
 import com.example.domain.item.GetItemsUseCase
 import com.example.domain.item.GetTaxTypesUseCase
 import com.example.models.branch.Branch
@@ -21,22 +23,24 @@ import com.example.models.document.DocumentStatus
 import com.example.models.document.DocumentView
 import com.example.models.invoiceLine.*
 import com.example.models.item.Item
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
 
 class DocumentFormViewModel(
-    private val getDocumentsUseCase: GetDocumentsUseCase,
+    private val getDocumentUseCase: GetDocumentUseCase,
+    private val getDocumentsInternalIdsByCompanyIdUseCase: GetDocumentsInternalIdsByCompanyIdUseCase,
     private val createDocumentUseCase: CreateDocumentUseCase,
     private val updateDocumentUseCase: UpdateDocumentUseCase,
     private val getCompaniesViewsUseCase: GetCompaniesViewsUseCase,
-    private val getItemsUseCase: GetItemsUseCase,
+    private val getItemsByBranchUseCase: GetItemsByBranchUseCase,
     private val getTaxTypesUseCase: GetTaxTypesUseCase,
-    private val documentId: String,
+    documentId: String,
 ) : ViewModel() {
     private val isUpdatingDocument = documentId.isNotBlank()
     private val newDocumentId = if (isUpdatingDocument) documentId else UUID.randomUUID().toString()
-    private val _documents = MutableStateFlow(emptyList<DocumentView>())
+    private val _alreadyUsedInternalIds = MutableStateFlow(emptyList<String>())
     private val _companiesViews = MutableStateFlow(emptyList<CompanyView>())
     val companies = _companiesViews.map { companies ->
         companies.map { it.company }
@@ -97,9 +101,8 @@ class DocumentFormViewModel(
 
     private val _internalId = MutableStateFlow("")
     val internalId = _internalId.asStateFlow()
-    val internalIdValidationResult = combine(_internalId, _documents) { internalId, documents ->
-        val internalIdAlreadyExists =
-            documents.any { it.id != newDocumentId && it.internalId == internalId }
+    val internalIdValidationResult = combine(_internalId, _alreadyUsedInternalIds) { internalId, otherIds ->
+        val internalIdAlreadyExists = otherIds.contains(internalId)
         if (internalIdAlreadyExists) ValidationResult.Invalid("Internal ID already exists")
         else notBlankValidator(internalId)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
@@ -332,23 +335,27 @@ class DocumentFormViewModel(
     }
 
     init {
+        if (isUpdatingDocument)
+            observeDocument()
         observeCompanies()
-        observeDocuments()
+        observeInternalIds()
         observeItems()
         observeTaxes()
     }
 
-    private fun observeDocuments() {
+    private fun observeInternalIds() {
         viewModelScope.launch {
-            getDocumentsUseCase().collectLatest {
-                _documents.update { _ -> it }
-                if (isUpdatingDocument) {
-                    val document = it.firstOrNull { document -> document.id == documentId }
-                        ?: return@collectLatest
-                    oldStatus = document.status
-                    setForm(document)
-                }
+            _selectedCompany.filterNotNull().flatMapLatest {
+                getDocumentsInternalIdsByCompanyIdUseCase(it.id)
+            }.collectLatest {
+                _alreadyUsedInternalIds.update { _ -> it }
             }
+        }
+    }
+
+    private fun observeDocument() {
+        viewModelScope.launch {
+            getDocumentUseCase(newDocumentId).distinctUntilChanged().collectLatest (::setForm)
         }
     }
 
@@ -360,9 +367,12 @@ class DocumentFormViewModel(
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeItems() {
         viewModelScope.launch {
-            getItemsUseCase().collectLatest {
+            _selectedBranch.filterNotNull().flatMapLatest {
+                getItemsByBranchUseCase(it.id)
+            }.collectLatest {
                 _items.update { _ -> it }
             }
         }

@@ -14,7 +14,7 @@ interface BranchDao {
     @Query("SELECT * FROM Branch")
     fun getBranches(): Flow<List<BranchEntity>>
 
-    @Query("SELECT * FROM Branch WHERE companyId = :companyId")
+    @Query("SELECT * FROM Branch WHERE companyId = :companyId and isDeleted = 0")
     fun getBranchesByCompanyId(companyId: String): Flow<List<BranchEntity>>
 
     @Query("SELECT * FROM Branch WHERE id = :id")

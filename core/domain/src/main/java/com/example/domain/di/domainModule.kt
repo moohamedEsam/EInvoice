@@ -43,6 +43,7 @@ val domainModule = module {
 
     //branch
     single { GetBranchesUseCase(get<BranchRepository>()::getBranches) }
+    single { GetBranchesByCompanyUseCase(get<BranchRepository>()::getBranchesByCompanyId) }
     single { GetBranchUseCase(get<BranchRepository>()::getBranch) }
     single { GetBranchViewUseCase(get<BranchRepository>()::getBranchView) }
     single { CreateBranchUseCase(get<BranchRepository>()::createBranch) }
@@ -60,6 +61,7 @@ val domainModule = module {
 
     //item
     single { GetItemsUseCase(get<ItemRepository>()::getItems) }
+    single { GetItemsByBranchUseCase(get<ItemRepository>()::getItemsByBranchId) }
     single { GetItemUseCase(get<ItemRepository>()::getItem) }
     single { CreateItemUseCase(get<ItemRepository>()::createItem) }
     single { UpdateItemUseCase(get<ItemRepository>()::updateItem) }
@@ -69,6 +71,7 @@ val domainModule = module {
 
     //document
     single { GetDocumentsUseCase(get<DocumentRepository>()::getDocuments) }
+    single { GetDocumentsInternalIdsByCompanyIdUseCase(get<DocumentRepository>()::getDocumentsInternalIdsByCompanyId) }
     single { getDocumentsByTypeUseCase(get()) }
     single { GetDocumentUseCase(get<DocumentRepository>()::getDocument) }
     single { CreateDocumentUseCase(get<DocumentRepository>()::createDocument) }

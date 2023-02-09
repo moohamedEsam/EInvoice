@@ -19,14 +19,14 @@ suspend fun <T> Synchronizer.handleSync(
     localCreator: suspend (T) -> Unit,
     afterLocalCreate: suspend () -> Unit,
 ): Boolean {
-    val remoteCreateResult = remoteCreator()
-    if (remoteCreateResult !is Result.Success) return false
-
     val remoteDeleteResult = remoteDeleter()
     if (remoteDeleteResult !is Result.Success) return false
 
     val remoteUpdateResult = remoteUpdater()
     if (remoteUpdateResult !is Result.Success) return false
+
+    val remoteCreateResult = remoteCreator()
+    if (remoteCreateResult !is Result.Success) return false
 
     val result = remoteFetcher()
     if (result !is Result.Success) return false
