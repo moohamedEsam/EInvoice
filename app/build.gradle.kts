@@ -28,6 +28,11 @@ android {
                 "proguard-rules.pro"
             )
         }
+        create("benchmark") {
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
+            isDebuggable = false
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -70,6 +75,7 @@ dependencies {
     implementation(Dependencies.coroutinesCore)
     implementation(Dependencies.viewModelCompose)
     implementation(Dependencies.splashScreen)
+    implementation(Dependencies.baselineProfile)
     implementation(project(":common"))
     implementation(project(":core:network"))
     implementation(project(":core:data"))

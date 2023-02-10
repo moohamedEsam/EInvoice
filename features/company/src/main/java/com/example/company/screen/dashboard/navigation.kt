@@ -13,7 +13,8 @@ fun NavGraphBuilder.companyDashboardScreen(
     onBranchClick: (String) -> Unit,
     onDocumentClick: (String) -> Unit,
     onEditClick: (String) -> Unit,
-    onShowSnackbar: (SnackBarEvent) -> Unit
+    onShowSnackbar: (SnackBarEvent) -> Unit,
+    onCreateDocumentClick: () -> Unit
 ) {
     composable("$CompanyDashboardScreenRoute/{companyId}") { backStackEntry ->
         val companyId = backStackEntry.arguments?.getString("companyId") ?: ""
@@ -23,7 +24,8 @@ fun NavGraphBuilder.companyDashboardScreen(
             onBranchClick = onBranchClick,
             onDocumentClick = onDocumentClick,
             onEditClick = onEditClick,
-            onShowSnackBarEvent = onShowSnackbar
+            onShowSnackBarEvent = onShowSnackbar,
+            onCreateDocumentClick = onCreateDocumentClick
         )
     }
 }

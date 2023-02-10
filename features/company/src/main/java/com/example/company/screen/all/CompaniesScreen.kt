@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.einvoicecomponents.ListScreenContent
@@ -60,7 +61,7 @@ private fun CompaniesScreenContent(
         floatingButtonText = "Create New Company",
         adaptiveItemSize = 250.dp,
         onFloatingButtonClick = onCreateNewCompanyClick,
-        modifier = modifier
+        modifier = modifier.testTag("CompaniesScreenList")
     ){
         items(companies) { company ->
             CompanyItem(
@@ -82,7 +83,7 @@ private fun CompanyItem(
     onClick: () -> Unit = {},
     onEditClick: () -> Unit = {},
 ) {
-    OutlinedCard(modifier = modifier, onClick = onClick) {
+    OutlinedCard(modifier = modifier.testTag("CompaniesScreenCompanyItem"), onClick = onClick) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -101,9 +102,9 @@ private fun CompanyItem(
                     text = "Website: ${company.website}",
                     style = MaterialTheme.typography.bodyLarge,
                     maxLines = 1,
-                    modifier = Modifier.clickable {
-                        openWebsiteInBrowser(context, company.website!!)
-                    }
+//                    modifier = Modifier.clickable {
+//                        openWebsiteInBrowser(context, company.website!!)
+//                    }
                 )
             }
             Text(

@@ -1,14 +1,14 @@
 package com.example.company.screen.dashboard
 
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.ScrollableTabRow
-import androidx.compose.material3.Tab
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.common.models.Result
@@ -36,7 +36,8 @@ fun CompanyDashboardScreen(
     onBranchClick: (String) -> Unit,
     onDocumentClick: (String) -> Unit,
     onEditClick: (String) -> Unit,
-    onShowSnackBarEvent: (SnackBarEvent) -> Unit
+    onShowSnackBarEvent: (SnackBarEvent) -> Unit,
+    onCreateDocumentClick: () -> Unit
 ) {
     val viewModel: CompanyDashboardViewModel by viewModel { parametersOf(companyId) }
     val state by viewModel.uiState.collectAsState()
@@ -54,7 +55,8 @@ fun CompanyDashboardScreen(
             }
         },
         onDocumentClick = onDocumentClick,
-        onDatePicked = { viewModel.setPickedDate(it) }
+        onDatePicked = { viewModel.setPickedDate(it) },
+        onCreateDocumentClick = onCreateDocumentClick
     )
 }
 
@@ -83,7 +85,8 @@ private fun CompanyDashboardScreenContent(
     onClientClick: (String) -> Unit,
     onBranchClick: (String) -> Unit,
     onDocumentClick: (String) -> Unit,
-    onDatePicked: (Date) -> Unit
+    onDatePicked: (Date) -> Unit,
+    onCreateDocumentClick: () -> Unit
 ) {
     val pages = listOf("General", "Clients", "Branches", "Settings")
     val pagerState = rememberPagerState()
@@ -93,52 +96,70 @@ private fun CompanyDashboardScreenContent(
     LaunchedEffect(key1 = pageToScroll) {
         pagerState.animateScrollToPage(pageToScroll)
     }
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        ScrollableTabRow(selectedTabIndex = pagerState.currentPage) {
-            pages.forEachIndexed { index, page ->
-                Tab(
-                    text = { Text(page) },
-                    selected = pagerState.currentPage == index,
-                    onClick = { pageToScroll = index }
-                )
+    Box {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .testTag("CompanyDashboardScreen"),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            ScrollableTabRow(selectedTabIndex = pagerState.currentPage) {
+                pages.forEachIndexed { index, page ->
+                    Tab(
+                        text = { Text(page) },
+                        selected = pagerState.currentPage == index,
+                        onClick = { pageToScroll = index },
+                        modifier = Modifier.testTag("CompanyDashboardTab")
+                    )
+                }
+            }
+
+            HorizontalPager(
+                count = pages.size,
+                state = pagerState,
+                modifier = Modifier.weight(1f),
+                itemSpacing = 8.dp
+            ) { pageIndex ->
+                when (pageIndex) {
+                    0 -> GeneralPage(
+                        state = state,
+                        onDeleteClick = onDeleteClick,
+                        onEditClick = onEditClick,
+                        onDocumentClick = { onDocumentClick(it) },
+                        onDatePicked = onDatePicked
+                    )
+
+                    1 -> CompanyClientsPage(
+                        clients = state.companyView.clients,
+                        documents = state.documents,
+                        onClientClick = { onClientClick(it.id) }
+                    )
+
+                    2 -> CompanyBranchesPage(
+                        branches = state.companyView.branches,
+                        documents = state.documents,
+                        onBranchClick = { onBranchClick(it.id) }
+                    )
+
+                    else -> CompanySettingsPage(
+                        settings = state.companyView.company.settings,
+                    )
+
+                }
             }
         }
 
-        HorizontalPager(
-            count = pages.size,
-            state = pagerState,
-            modifier = Modifier.weight(1f),
-            itemSpacing = 8.dp
-        ) { pageIndex ->
-            when (pageIndex) {
-                0 -> GeneralPage(
-                    state = state,
-                    onDeleteClick = onDeleteClick,
-                    onEditClick = onEditClick,
-                    onDocumentClick = { onDocumentClick(it) },
-                    onDatePicked = onDatePicked
-                )
-
-                1 -> CompanyClientsPage(
-                    clients = state.companyView.clients,
-                    documents = state.documents,
-                    onClientClick = { onClientClick(it.id) }
-                )
-
-                2 -> CompanyBranchesPage(
-                    branches = state.companyView.branches,
-                    documents = state.documents,
-                    onBranchClick = { onBranchClick(it.id) }
-                )
-
-                else -> CompanySettingsPage(
-                    settings = state.companyView.company.settings,
-                )
-
-            }
+        FloatingActionButton(
+            onClick = onCreateDocumentClick,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(8.dp)
+                .testTag("CompanyDashboardCreateDocumentButton")
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add"
+            )
         }
     }
 }
@@ -164,7 +185,8 @@ fun CompanyDashboardScreenPreview() {
         onClientClick = {},
         onBranchClick = {},
         onDocumentClick = {},
-        onDatePicked = {}
+        onDatePicked = {},
+        onCreateDocumentClick = {}
     )
 }
 

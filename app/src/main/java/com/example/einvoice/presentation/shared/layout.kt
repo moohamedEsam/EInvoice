@@ -3,6 +3,7 @@ package com.example.einvoice.presentation.shared
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -111,7 +112,8 @@ private fun DrawerContent(navController: NavHostController) {
         NavigationDrawerItem(
             icon = {
                 Icon(
-                    painterResource(id = R.drawable.office_building),
+//                    painterResource(id = R.drawable.office_building),
+                    imageVector = Icons.Default.Home,
                     contentDescription = null,
                     modifier = Modifier.size(iconSize.dp)
                 )
@@ -124,7 +126,8 @@ private fun DrawerContent(navController: NavHostController) {
         NavigationDrawerItem(
             icon = {
                 Icon(
-                    painterResource(id = R.drawable.branch),
+//                    painterResource(id = R.drawable.branch),
+                    imageVector = Icons.Default.Home,
                     contentDescription = null,
                     modifier = Modifier.size(iconSize.dp)
                 )
@@ -137,7 +140,8 @@ private fun DrawerContent(navController: NavHostController) {
         NavigationDrawerItem(
             icon = {
                 Icon(
-                    painterResource(id = R.drawable.rating),
+//                    painterResource(id = R.drawable.rating),
+                    imageVector = Icons.Default.Home,
                     contentDescription = null,
                     modifier = Modifier.size(iconSize.dp)
                 )
@@ -150,7 +154,8 @@ private fun DrawerContent(navController: NavHostController) {
         NavigationDrawerItem(
             icon = {
                 Icon(
-                    painterResource(id = R.drawable.list_tems),
+//                    painterResource(id = R.drawable.list_tems),
+                    imageVector = Icons.Default.Home,
                     contentDescription = null,
                     modifier = Modifier.size(iconSize.dp)
                 )
@@ -163,7 +168,8 @@ private fun DrawerContent(navController: NavHostController) {
         NavigationDrawerItem(
             icon = {
                 Icon(
-                    painterResource(id = R.drawable.invoice),
+//                    painterResource(id = R.drawable.invoice),
+                    imageVector = Icons.Default.Home,
                     contentDescription = null,
                     modifier = Modifier.size(iconSize.dp)
                 )
