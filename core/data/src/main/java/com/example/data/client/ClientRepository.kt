@@ -3,12 +3,15 @@ package com.example.data.client
 import com.example.common.models.Result
 import com.example.data.sync.Syncable
 import com.example.models.Client
+import com.example.models.ClientView
 import kotlinx.coroutines.flow.Flow
 
 interface ClientRepository : Syncable<Client> {
     fun getClients(): Flow<List<Client>>
 
     fun getClient(id: String): Flow<Client>
+
+    fun getClientView(id: String): Flow<ClientView>
 
     suspend fun createClient(client: Client): Result<Client>
 

@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.common.models.ValidationResult
 import com.example.einvoicecomponents.BaseExposedDropDownMenu
+import com.example.einvoicecomponents.DropDownMenuTextFieldType
 import com.example.einvoicecomponents.ValidationTextFieldContainer
 import com.example.models.invoiceLine.SubTax
 import com.example.models.invoiceLine.TaxView
@@ -88,6 +89,11 @@ private fun InvoiceTaxDialogContent(
             },
             textFieldLabel = "Tax Code",
             optionsLabel = { "${it.name} - ${it.code}" },
+            filterCriteria = { option, filter ->
+                option.name.contains(filter, true) || option.code.contains(filter, true)
+            },
+            textFieldType = DropDownMenuTextFieldType.Outlined,
+            textStyle = MaterialTheme.typography.bodyMedium
         )
         BaseExposedDropDownMenu(
             optionsState = MutableStateFlow(newTax?.subTaxes ?: emptyList()),
@@ -99,6 +105,11 @@ private fun InvoiceTaxDialogContent(
             },
             textFieldLabel = "Tax Sub Code",
             optionsLabel = { "${it.name} - ${it.code}" },
+            filterCriteria = { option, filter ->
+                option.name.contains(filter, true) || option.code.contains(filter, true)
+            },
+            textFieldType = DropDownMenuTextFieldType.Outlined,
+            textStyle = MaterialTheme.typography.bodyMedium
         )
         ValidationTextFieldContainer(
             validation = taxRateValidationResult

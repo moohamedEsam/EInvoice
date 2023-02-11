@@ -7,10 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.common.models.ValidationResult
-import com.example.einvoicecomponents.CompanyDropDownMenuBox
-import com.example.einvoicecomponents.ValidationTextField
-import com.example.einvoicecomponents.toDate
-import com.example.einvoicecomponents.toLocalDate
+import com.example.einvoicecomponents.*
 import com.example.models.branch.Branch
 import com.example.models.Client
 import com.example.models.company.Company
@@ -49,7 +46,8 @@ fun GeneralPage(
         CompanyDropDownMenuBox(
             value = selectedCompany,
             companies = companies,
-            onCompanyPicked = onCompanySelected
+            onCompanyPicked = onCompanySelected,
+            filterCriteria = { company, query -> company.name.contains(query, true) },
         )
 
         Row(
@@ -126,7 +124,6 @@ private fun DocumentCreateDate(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BranchDropDownMenuBox(
     branchesState: StateFlow<List<Branch>>,
@@ -134,49 +131,18 @@ private fun BranchDropDownMenuBox(
     modifier: Modifier = Modifier,
     onBranchSelected: (Branch) -> Unit
 ) {
-    var isExpanded by remember {
-        mutableStateOf(false)
-    }
-    val selectedBranch by selectedBranchState.collectAsState()
-    val branches by branchesState.collectAsState()
-    ExposedDropdownMenuBox(
-        expanded = isExpanded,
-        onExpandedChange = { isExpanded = it },
-        modifier = modifier
-    ) {
-        TextField(
-            value = selectedBranch?.name ?: "",
-            onValueChange = {},
-            label = { Text("Branch") },
-            modifier = Modifier
-                .menuAnchor()
-                .fillMaxWidth(),
-            readOnly = true,
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
-            },
-            colors = ExposedDropdownMenuDefaults.textFieldColors()
-        )
-
-        DropdownMenu(
-            expanded = isExpanded,
-            onDismissRequest = { isExpanded = false },
-        ) {
-            branches.forEach { branch ->
-                DropdownMenuItem(
-                    onClick = {
-                        isExpanded = false
-                        onBranchSelected(branch)
-                    },
-                    text = { Text(branch.name) },
-                    modifier = Modifier.padding(ExposedDropdownMenuDefaults.ItemContentPadding)
-                )
-            }
-        }
-    }
+    BaseExposedDropDownMenu(
+        optionsState = branchesState,
+        selectedOptionState = selectedBranchState,
+        onOptionSelect = onBranchSelected,
+        textFieldValue = { it?.name ?: "" },
+        textFieldLabel = "Branch",
+        optionsLabel = { it.name },
+        modifier = modifier,
+        filterCriteria = { branch, query -> branch.name.contains(query, true) }
+    )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ClientsDropDownMenuBox(
     clientsState: StateFlow<List<Client>>,
@@ -184,43 +150,14 @@ private fun ClientsDropDownMenuBox(
     modifier: Modifier = Modifier,
     onClientSelected: (Client) -> Unit
 ) {
-    var isExpanded by remember {
-        mutableStateOf(false)
-    }
-    val selectedClient by selectedClientState.collectAsState()
-    val clients by clientsState.collectAsState()
-    ExposedDropdownMenuBox(
-        expanded = isExpanded,
-        onExpandedChange = { isExpanded = it },
-        modifier = modifier
-    ) {
-        TextField(
-            value = selectedClient?.name ?: "",
-            onValueChange = {},
-            label = { Text("Client") },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
-            },
-            readOnly = true,
-            modifier = Modifier
-                .menuAnchor()
-                .fillMaxWidth(),
-            colors = ExposedDropdownMenuDefaults.textFieldColors()
-        )
-
-        DropdownMenu(
-            expanded = isExpanded,
-            onDismissRequest = { isExpanded = false },
-        ) {
-            clients.forEach { client ->
-                DropdownMenuItem(
-                    onClick = {
-                        isExpanded = false
-                        onClientSelected(client)
-                    },
-                    text = { Text(client.name) },
-                )
-            }
-        }
-    }
+    BaseExposedDropDownMenu(
+        optionsState = clientsState,
+        selectedOptionState = selectedClientState,
+        onOptionSelect = onClientSelected,
+        textFieldValue = { it?.name ?: "" },
+        textFieldLabel = "Client",
+        optionsLabel = { it.name },
+        modifier = modifier,
+        filterCriteria = { client, query -> client.name.contains(query, true) }
+    )
 }

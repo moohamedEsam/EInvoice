@@ -49,6 +49,9 @@ fun BranchFormScreen(
         companies = viewModel.companies,
         selectedCompany = viewModel.selectedCompany,
         onCompanySelected = viewModel::setSelectedCompany,
+        companyFilterCriteria = { company, query ->
+            company.name.contains(query, true)
+        },
         name = viewModel.name,
         nameValidationResult = viewModel.nameValidationResult,
         onNameValueChange = viewModel::setName,
@@ -90,6 +93,7 @@ private fun BranchFormScreenContent(
     companies: StateFlow<List<Company>>,
     selectedCompany: StateFlow<Company?>,
     onCompanySelected: (Company) -> Unit,
+    companyFilterCriteria: (Company, String) -> Boolean,
     name: StateFlow<String>,
     nameValidationResult: StateFlow<ValidationResult>,
     onNameValueChange: (String) -> Unit,
@@ -119,7 +123,8 @@ private fun BranchFormScreenContent(
         CompanyDropDownMenuBox(
             value = selectedCompany,
             companies = companies,
-            onCompanyPicked = onCompanySelected
+            onCompanyPicked = onCompanySelected,
+            filterCriteria = companyFilterCriteria,
         )
 
         ValidationTextField(
@@ -224,6 +229,7 @@ fun BranchFormScreenPreview() {
         onPostalCodeChange = {},
         isLoading = MutableStateFlow(false),
         onSaveClick = {},
-        isSaveButtonEnabled = MutableStateFlow(true)
+        isSaveButtonEnabled = MutableStateFlow(true),
+        companyFilterCriteria = { company, query -> company.name.contains(query, true) }
     )
 }

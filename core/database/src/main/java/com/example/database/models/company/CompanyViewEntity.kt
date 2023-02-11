@@ -2,8 +2,8 @@ package com.example.database.models.company
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.example.database.models.ClientEntity
-import com.example.database.models.asClient
+import com.example.database.models.client.ClientEntity
+import com.example.database.models.client.asClient
 import com.example.database.models.branch.BranchEntity
 import com.example.database.models.branch.asBranch
 import com.example.database.models.document.DocumentEntity

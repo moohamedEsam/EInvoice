@@ -10,12 +10,7 @@ import com.example.domain.auth.loginUseCase
 import com.example.domain.auth.logoutUseCase
 import com.example.domain.auth.registerUseCase
 import com.example.domain.branch.*
-import com.example.domain.client.CreateClientUseCase
-import com.example.domain.client.DeleteClientUseCase
-import com.example.domain.client.GetClientUseCase
-import com.example.domain.client.GetClientsUseCase
-import com.example.domain.client.UndoDeleteClientUseCase
-import com.example.domain.client.UpdateClientUseCase
+import com.example.domain.client.*
 
 import com.example.domain.company.*
 import com.example.domain.document.*
@@ -54,6 +49,7 @@ val domainModule = module {
     //client
     single { GetClientsUseCase(get<ClientRepository>()::getClients) }
     single { GetClientUseCase(get<ClientRepository>()::getClient) }
+    single { GetClientViewUseCase(get<ClientRepository>()::getClientView) }
     single { CreateClientUseCase(get<ClientRepository>()::createClient) }
     single { UpdateClientUseCase(get<ClientRepository>()::updateClient) }
     single { DeleteClientUseCase(get<ClientRepository>()::deleteClient) }

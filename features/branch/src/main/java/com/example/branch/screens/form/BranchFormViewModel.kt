@@ -6,13 +6,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.common.models.ValidationResult
 import com.example.common.validators.notBlankValidator
 import com.example.common.validators.validateUsername
-import com.example.domain.branch.CreateBranchUseCase
-import com.example.domain.branch.GetBranchesByCompanyUseCase
-import com.example.domain.branch.GetBranchesUseCase
-import com.example.domain.branch.UpdateBranchUseCase
+import com.example.domain.branch.*
 import com.example.domain.company.GetCompaniesUseCase
 import com.example.models.branch.Branch
 import com.example.models.OptionalAddress
+import com.example.models.branch.BranchView
 import com.example.models.company.Company
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -24,6 +22,7 @@ class BranchFormViewModel(
     private val getCompaniesUseCase: GetCompaniesUseCase,
     private val createBranchUseCase: CreateBranchUseCase,
     private val updateBranchUseCase: UpdateBranchUseCase,
+    private val getBranchViewUseCase: GetBranchViewUseCase,
     private val branchId: String,
 ) : ViewModel() {
     private val _otherBranchesInternalIds = MutableStateFlow(emptyList<String>())
@@ -115,45 +114,51 @@ class BranchFormViewModel(
     init {
         observerCompanies()
         observeBranches()
+        if (isUpdating) {
+            observeBranch()
+        }
+    }
+
+    private fun observeBranch() {
+        viewModelScope.launch {
+            getBranchViewUseCase(branchId).collectLatest { branch ->
+                fillForm(branch)
+            }
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeBranches() {
         viewModelScope.launch {
-            _selectedCompany.filterNotNull().flatMapLatest {company-> getBranchesUseCase(company.id) }
+            _selectedCompany.filterNotNull()
+                .flatMapLatest { company -> getBranchesUseCase(company.id) }
                 .collectLatest { branches ->
-                _otherBranchesInternalIds.update {
-                    branches.filter { it.id != branchId }.map { it.internalId }
+                    _otherBranchesInternalIds.update {
+                        branches.filter { it.id != branchId }.map { it.internalId }
+                    }
                 }
-                if (isUpdating) {
-                    val branch = branches.find { it.id == branchId } ?: return@collectLatest
-                    fillForm(branch)
-                }
-            }
         }
     }
 
 
-    private fun fillForm(branch: Branch) {
-        _name.update { branch.name }
-        _internalId.update { branch.internalId }
-        _street.update { branch.street }
-        _country.update { branch.country }
-        _governate.update { branch.governate }
-        _postalCode.update { branch.postalCode }
-        _regionCity.update { branch.regionCity }
+    private fun fillForm(branchView: BranchView) {
+        _name.update { branchView.branch.name }
+        _internalId.update { branchView.branch.internalId }
+        _street.update { branchView.branch.street }
+        _country.update { branchView.branch.country }
+        _governate.update { branchView.branch.governate }
+        _postalCode.update { branchView.branch.postalCode }
+        _regionCity.update { branchView.branch.regionCity }
         _optionalAddress.update {
             OptionalAddress(
-                branch.buildingNumber,
-                branch.floor,
-                branch.floor,
-                branch.landmark,
-                branch.additionalInformation
+                branchView.branch.buildingNumber,
+                branchView.branch.floor,
+                branchView.branch.floor,
+                branchView.branch.landmark,
+                branchView.branch.additionalInformation
             )
         }
-        val selectedCompany =
-            _companies.value.find { it.id == branch.companyId } ?: return
-        _selectedCompany.update { selectedCompany }
+        _selectedCompany.update { branchView.company }
     }
 
     private fun observerCompanies() {

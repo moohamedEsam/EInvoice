@@ -13,6 +13,7 @@ val branchModule = module {
             getCompaniesUseCase = get(),
             createBranchUseCase = get(),
             updateBranchUseCase = get(),
+            getBranchViewUseCase = get(),
             branchId = params[0]
         )
     }

@@ -4,6 +4,8 @@ import com.example.models.Client
 import com.example.models.branch.Branch
 import com.example.models.branch.BranchView
 import com.example.models.branch.empty
+import com.example.models.company.Company
+import com.example.models.company.empty
 import com.example.models.document.DocumentView
 import com.example.models.document.empty
 import com.example.models.empty
@@ -28,6 +30,7 @@ fun BranchDashboardState.Companion.random() = BranchDashboardState(
     branchView = BranchView(
         branch = Branch.empty().copy(name = "Branch name"),
         items = List(Random.nextInt(0, 100)) { Item.empty() },
+        company = Company.empty(),
     ),
     documents = List(Random.nextInt(0, 100)) {
         DocumentView.empty().copy(

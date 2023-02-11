@@ -54,4 +54,18 @@ interface CompanyDao {
     @Query("update Company set isDeleted = 0 where id = :id")
     suspend fun undoDeleteCompany(id: String)
 
+    @Query("delete from UnitType")
+    suspend fun deleteAllUnitTypes()
+
+    @Query("delete from Tax")
+    suspend fun deleteAllTaxes()
+
+
+    @Transaction
+    suspend fun clearData() {
+        deleteAllCompanies()
+        deleteAllTaxes()
+        deleteAllUnitTypes()
+    }
+
 }

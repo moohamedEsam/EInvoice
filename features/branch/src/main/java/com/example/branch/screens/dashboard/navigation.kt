@@ -9,7 +9,7 @@ const val BranchDashboardScreenRoute= "Branch Dashboard"
 
 fun NavGraphBuilder.branchDashboardScreen(
     onDocumentClick: (String) -> Unit,
-    onEditClick: () -> Unit,
+    onEditClick: (String) -> Unit,
     onShowSnackBarEvent: (SnackBarEvent) -> Unit,
 ){
     composable("$BranchDashboardScreenRoute/{branchId}"){
@@ -17,7 +17,7 @@ fun NavGraphBuilder.branchDashboardScreen(
         BranchDashboardScreen(
             branchId = branchId,
             onDocumentClick = onDocumentClick,
-            onEditClick = onEditClick,
+            onEditClick = { onEditClick(branchId) },
             onShowSnackBarEvent = onShowSnackBarEvent
         )
     }

@@ -10,11 +10,11 @@ val clientModule = module {
     viewModel { ClientsViewModel(get()) }
     viewModel { params ->
         ClientFormViewModel(
-            getClientUseCase = get(),
             createClientUseCase = get(),
             updateClientUseCase = get(),
             getCompaniesUseCase = get(),
-            clientId = params.get()
+            clientId = params.get(),
+            getClientViewUseCase = get()
         )
     }
     viewModel { params ->

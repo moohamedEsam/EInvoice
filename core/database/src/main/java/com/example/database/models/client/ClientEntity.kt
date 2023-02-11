@@ -1,4 +1,4 @@
-package com.example.database.models
+package com.example.database.models.client
 
 import androidx.room.Embedded
 import androidx.room.Entity

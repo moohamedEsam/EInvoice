@@ -2,16 +2,15 @@ package com.example.data.client
 
 import com.example.common.functions.tryWrapper
 import com.example.data.sync.Synchronizer
-import com.example.database.models.asClient
-import com.example.database.models.asClientEntity
 import com.example.models.Client
 import com.example.network.EInvoiceRemoteDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import com.example.common.models.Result
 import com.example.data.sync.handleSync
-import com.example.database.models.ClientEntity
+import com.example.database.models.client.*
 import com.example.database.room.dao.ClientDao
+import com.example.models.ClientView
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 
@@ -22,6 +21,9 @@ class OfflineFirstClientRepository(
 ) : ClientRepository {
     override fun getClients(): Flow<List<Client>> =
         localSource.getClients().map { clients -> clients.map { it.asClient() } }
+
+    override fun getClientView(id: String): Flow<ClientView> =
+        localSource.getClientViewById(id).filterNotNull().map(ClientViewEntity::asClientView)
 
     override suspend fun undoDeleteClient(id: String): Result<Unit> = tryWrapper {
         localSource.undoDeleteClient(id)

@@ -75,6 +75,7 @@ fun ClientFormScreen(
         companiesState = viewModel.companies,
         selectedCompanyState = viewModel.selectedCompany,
         onCompanySelected = viewModel::setSelectedCompany,
+        companyFilterCriteria = { company, query -> company.name.contains(query, true) },
         onLocationRequested = onLocationRequested,
         isLoadingState = viewModel.isLoading,
         isEnabledState = viewModel.isFormValid,
@@ -126,6 +127,7 @@ private fun ClientFormScreenContent(
     companiesState: StateFlow<List<Company>>,
     selectedCompanyState: StateFlow<Company?>,
     onCompanySelected: (Company) -> Unit,
+    companyFilterCriteria: (Company, String) -> Boolean,
     onLocationRequested: () -> Unit,
     isLoadingState: StateFlow<Boolean>,
     isEnabledState: StateFlow<Boolean>,
@@ -143,7 +145,8 @@ private fun ClientFormScreenContent(
         CompanyDropDownMenuBox(
             value = selectedCompanyState,
             companies = companiesState,
-            onCompanyPicked = onCompanySelected
+            onCompanyPicked = onCompanySelected,
+            filterCriteria = companyFilterCriteria
         )
 
         ValidationTextField(
@@ -370,7 +373,8 @@ fun ClientFormScreenPreview() {
         onGovernorateChange = {},
         onCityChange = {},
         onStreetChange = {},
-        onPostalCodeChange = {}
+        onPostalCodeChange = {},
+        companyFilterCriteria = { _, _ -> true }
     )
 
 }

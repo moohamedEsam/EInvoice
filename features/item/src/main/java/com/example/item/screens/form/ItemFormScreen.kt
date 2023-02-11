@@ -9,9 +9,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.common.models.ValidationResult
-import com.example.einvoicecomponents.EInvoiceOutlinedTextField
-import com.example.einvoicecomponents.OneTimeEventButton
-import com.example.einvoicecomponents.ValidationOutlinedTextField
+import com.example.einvoicecomponents.*
 import com.example.models.branch.Branch
 import com.example.models.item.UnitType
 import com.example.models.utils.TaxStatus
@@ -113,100 +111,44 @@ fun ItemFormScreenContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BranchesExposedDropDownMenu(
     branchesState: StateFlow<List<Branch>>,
     selectedBranchState: StateFlow<Branch?>,
     onBranchChange: (Branch) -> Unit
 ) {
-    var expanded by remember {
-        mutableStateOf(false)
-    }
-    val branches by branchesState.collectAsState()
-    val selectedBranch by selectedBranchState.collectAsState()
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        OutlinedTextField(
-            value = selectedBranch?.name ?: "",
-            onValueChange = {},
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor(),
-            readOnly = true,
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-            },
-            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-            label = { Text(text = "Branch") }
-        )
-
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            branches.forEach { branch ->
-                DropdownMenuItem(
-                    onClick = {
-                        onBranchChange(branch)
-                        expanded = false
-                    },
-                    text = { Text(text = branch.name) }
-                )
-            }
-        }
-    }
+    BaseExposedDropDownMenu(
+        optionsState = branchesState,
+        selectedOptionState = selectedBranchState,
+        onOptionSelect = onBranchChange,
+        textFieldValue = { it?.name ?: "" },
+        textFieldLabel = "Branch",
+        optionsLabel = { it.name },
+        filterCriteria = { option, filter ->
+            option.name.contains(filter, true)
+        },
+        textFieldType = DropDownMenuTextFieldType.Outlined
+    )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun UnitTypeExposedDropDownMenu(
     unitTypesState: StateFlow<List<UnitType>>,
     selectedUnitTypeState: StateFlow<UnitType?>,
     onUnitTypeChange: (UnitType) -> Unit
 ) {
-    var expanded by remember {
-        mutableStateOf(false)
-    }
-    val unitTypes by unitTypesState.collectAsState()
-    val selectedUnitType by selectedUnitTypeState.collectAsState()
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        OutlinedTextField(
-            value = selectedUnitType?.name ?: "",
-            onValueChange = {},
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor(),
-            readOnly = true,
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-            },
-            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-            label = { Text(text = "Unit Type") }
-        )
-
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            unitTypes.forEach { unitType ->
-                DropdownMenuItem(
-                    onClick = {
-                        onUnitTypeChange(unitType)
-                        expanded = false
-                    },
-                    text = { Text(text = unitType.name) }
-                )
-            }
-        }
-    }
+    BaseExposedDropDownMenu(
+        optionsState = unitTypesState,
+        selectedOptionState = selectedUnitTypeState,
+        onOptionSelect = onUnitTypeChange,
+        textFieldValue = { it?.name ?: "" },
+        textFieldLabel = "Unit Type",
+        optionsLabel = { it.name },
+        filterCriteria = { option, filter ->
+            option.name.contains(filter, true)
+        },
+        textFieldType = DropDownMenuTextFieldType.Outlined
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

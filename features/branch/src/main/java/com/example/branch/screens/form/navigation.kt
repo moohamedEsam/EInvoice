@@ -31,8 +31,5 @@ fun NavGraphBuilder.branchFormScreen(
 fun NavHostController.navigateToBranchFormScreen(
     id: String = " "
 ) {
-    navigate("$BranchFormScreenRoute/$id") {
-        restoreState = true
-        launchSingleTop = true
-    }
+    navigate("$BranchFormScreenRoute/$id")
 }
