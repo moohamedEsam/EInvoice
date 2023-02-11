@@ -1,22 +1,19 @@
 package com.example.document.screens.form
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.common.models.Result
 import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
 import com.example.einvoicecomponents.OneTimeEventButton
-import com.example.models.branch.Branch
 import com.example.models.Client
+import com.example.models.branch.Branch
 import com.example.models.branch.empty
 import com.example.models.company.Company
 import com.example.models.company.empty
@@ -31,7 +28,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
-import java.util.Date
+import java.util.*
 import kotlin.random.Random
 
 private const val UNKNOWN_ERROR = "Unknown error"

@@ -26,23 +26,36 @@ class ExampleStartupBenchmark {
     @get:Rule
     val benchmarkRule = MacrobenchmarkRule()
 
+
     @Test
-    fun startup() = benchmarkRule.measureRepeated(
+    fun startupCold() = startup(CompilationMode.None())
+
+    @Test
+    fun startupWarm() = startup(CompilationMode.Partial())
+
+    @Test
+    fun openCompanyDashboardCold() = openCompanyDashboard(CompilationMode.None())
+
+    @Test
+    fun openCompanyDashboardWarm() = openCompanyDashboard(CompilationMode.Partial())
+
+    fun startup(mode: CompilationMode) = benchmarkRule.measureRepeated(
         packageName = "com.example.einvoice",
         metrics = listOf(StartupTimingMetric()),
         iterations = 5,
-        startupMode = StartupMode.COLD
+        startupMode = StartupMode.COLD,
+        compilationMode = mode
     ) {
         pressHome()
         startActivityAndWait()
     }
 
-    @Test
-    fun openCompanyDashboard() = benchmarkRule.measureRepeated(
+    fun openCompanyDashboard(mode: CompilationMode) = benchmarkRule.measureRepeated(
         packageName = "com.example.einvoice",
         metrics = listOf(FrameTimingMetric()),
         iterations = 5,
-        startupMode = StartupMode.COLD
+        startupMode = StartupMode.COLD,
+        compilationMode = mode
     ) {
         pressHome()
         startActivityAndWait()
@@ -53,15 +66,41 @@ class ExampleStartupBenchmark {
 }
 
 fun MacrobenchmarkScope.clickOnCompanyDashboardAndClickCreateButton() {
-    val companyCard = device.findObject(By.res("CompaniesScreenCompanyItem"))
-    companyCard.click()
-    device.wait(Until.hasObject(By.res("CompanyDashboardScreen")), 5000)
+    login()
+    device.wait(Until.hasObject(By.res("CompaniesScreenCompanyItem")), 5000)
+    clickOnCompany()
+    device.wait(Until.hasObject(By.res("CompanyDashboardTab")), 5000)
+    clickTabs()
+    device.wait(Until.hasObject(By.res("CompanyDashboardCreateDocumentButton")), 5000)
+    navigateToDocumentForm()
+    device.wait(Until.hasObject(By.res("DocumentFormScreen")), 5000)
+    logOut()
+}
+
+private fun MacrobenchmarkScope.logOut() {
+    val logout = device.findObject(By.res("Logout"))
+    logout.click()
+}
+
+private fun MacrobenchmarkScope.navigateToDocumentForm() {
+    val createButton = device.findObject(By.res("CompanyDashboardCreateDocumentButton"))
+    createButton.click()
+}
+
+private fun MacrobenchmarkScope.clickTabs() {
     val tabs = device.findObjects(By.res("CompanyDashboardTab"))
     tabs.forEach {
         it.click()
         device.waitForIdle()
     }
-    val createButton = device.findObject(By.res("CompanyDashboardCreateDocumentButton"))
-    createButton.click()
-    device.wait(Until.hasObject(By.res("DocumentFormScreen")), 5000)
+}
+
+private fun MacrobenchmarkScope.clickOnCompany() {
+    val companyCard = device.findObject(By.res("CompaniesScreenCompanyItem"))
+    companyCard.click()
+}
+
+private fun MacrobenchmarkScope.login() {
+    val loginButton = device.findObject(By.res("login"))
+    loginButton.click()
 }

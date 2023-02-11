@@ -39,7 +39,6 @@ import com.example.maplocation.lngKey
 import com.example.maplocation.mapScreen
 import com.example.maplocation.navigateToMapScreen
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun EInvoiceNavGraph(
     navController: NavHostController,
@@ -50,7 +49,7 @@ fun EInvoiceNavGraph(
     NavHost(
         navController = navController,
         startDestination = startScreen,
-        modifier = modifier.semantics { testTagsAsResourceId = true }
+        modifier = modifier
     ) {
         loginScreen(
             onShowSnackBarEvent = onShowSnackbarEvent,
@@ -62,7 +61,7 @@ fun EInvoiceNavGraph(
         registerScreen(
             logo = R.drawable.logo,
             onShowSnackBarEvent = onShowSnackbarEvent,
-            onRegistered = { },
+            onRegistered = navController::popBackStack,
             onLoginClick = navController::popBackStack
         )
 

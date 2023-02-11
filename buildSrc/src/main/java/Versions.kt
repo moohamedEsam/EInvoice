@@ -35,5 +35,5 @@ object Versions {
     const val compileSdk = 33
     const val minSdk = 21
 
-    const val baselineProfile = "1.3.0-alpha01"
+    const val baselineProfile = "1.2.2"
 }

@@ -6,12 +6,13 @@ import com.example.common.models.Result
 import com.example.common.models.ValidationResult
 import com.example.common.validators.validateEmail
 import com.example.common.validators.validatePassword
+import com.example.domain.auth.LoginUseCase
 import com.example.models.auth.Token
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class LoginViewModel(private val loginUseCase: com.example.domain.auth.LoginUseCase) : ViewModel() {
+class LoginViewModel(private val loginUseCase: LoginUseCase) : ViewModel() {
     private val _email = MutableStateFlow("")
     val email = _email.asStateFlow()
     val emailValidationResult = email.map(::validateEmail)

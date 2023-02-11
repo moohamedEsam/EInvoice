@@ -32,55 +32,61 @@ fun ListScreenContent(
     onFloatingButtonClick: () -> Unit,
     listContent: LazyStaggeredGridScope.() -> Unit,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        var expanded by remember {
-            mutableStateOf(false)
-        }
-        val nestedScrollConnection = object : NestedScrollConnection {
-            override fun onPostScroll(
-                consumed: Offset,
-                available: Offset,
-                source: NestedScrollSource
-            ): Offset {
-                expanded = consumed.y < 0f || available.y < 0f
-                return super.onPostScroll(consumed, available, source)
+    var expanded by remember {
+        mutableStateOf(false)
+    }
+    Box {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            val nestedScrollConnection = object : NestedScrollConnection {
+                override fun onPostScroll(
+                    consumed: Offset,
+                    available: Offset,
+                    source: NestedScrollSource
+                ): Offset {
+                    expanded = consumed.y < 0f || available.y < 0f
+                    return super.onPostScroll(consumed, available, source)
+                }
+            }
+            OutlinedSearchTextField(
+                queryState = queryState,
+                onQueryChange = onQueryChange,
+                modifier = Modifier.fillMaxWidth()
+            )
+            LazyVerticalStaggeredGrid(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .nestedScroll(nestedScrollConnection),
+                columns = StaggeredGridCells.Adaptive(adaptiveItemSize),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                listContent()
             }
         }
-        OutlinedSearchTextField(
-            queryState = queryState,
-            onQueryChange = onQueryChange,
-            modifier = Modifier.fillMaxWidth()
+        CreateNewItemFloatingButton(
+            onCreateNewCompanyClick = onFloatingButtonClick,
+            label = floatingButtonText,
+            modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp),
+            isExpanded = { expanded }
         )
-        LazyVerticalStaggeredGrid(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier
-                .weight(1f)
-                .nestedScroll(nestedScrollConnection),
-            columns = StaggeredGridCells.Adaptive(adaptiveItemSize),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            listContent()
-        }
-        CreateNewItemFloatingButton(onFloatingButtonClick, floatingButtonText) {
-            expanded
-        }
     }
 }
 
 @Composable
-private fun ColumnScope.CreateNewItemFloatingButton(
+private fun CreateNewItemFloatingButton(
     onCreateNewCompanyClick: () -> Unit,
     label: String,
+    modifier: Modifier = Modifier,
     isExpanded: () -> Boolean
 ) {
     ExtendedFloatingActionButton(
         onClick = onCreateNewCompanyClick,
-        modifier = Modifier.align(Alignment.End),
+        modifier = modifier,
         text = { Text(label) },
         icon = { Icon(Icons.Filled.Add, contentDescription = label) },
         expanded = isExpanded()

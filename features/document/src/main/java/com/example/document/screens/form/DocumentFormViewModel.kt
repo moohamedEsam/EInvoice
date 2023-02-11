@@ -13,10 +13,9 @@ import com.example.domain.document.GetDocumentUseCase
 import com.example.domain.document.GetDocumentsInternalIdsByCompanyIdUseCase
 import com.example.domain.document.UpdateDocumentUseCase
 import com.example.domain.item.GetItemsByBranchUseCase
-import com.example.domain.item.GetItemsUseCase
 import com.example.domain.item.GetTaxTypesUseCase
-import com.example.models.branch.Branch
 import com.example.models.Client
+import com.example.models.branch.Branch
 import com.example.models.company.Company
 import com.example.models.company.CompanyView
 import com.example.models.document.DocumentStatus
@@ -101,11 +100,12 @@ class DocumentFormViewModel(
 
     private val _internalId = MutableStateFlow("")
     val internalId = _internalId.asStateFlow()
-    val internalIdValidationResult = combine(_internalId, _alreadyUsedInternalIds) { internalId, otherIds ->
-        val internalIdAlreadyExists = otherIds.contains(internalId)
-        if (internalIdAlreadyExists) ValidationResult.Invalid("Internal ID already exists")
-        else notBlankValidator(internalId)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
+    val internalIdValidationResult =
+        combine(_internalId, _alreadyUsedInternalIds) { internalId, otherIds ->
+            val internalIdAlreadyExists = otherIds.contains(internalId)
+            if (internalIdAlreadyExists) ValidationResult.Invalid("Internal ID already exists")
+            else notBlankValidator(internalId)
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Empty)
 
     private val _createdAt = MutableStateFlow(Date())
     val createdAt = _createdAt.asStateFlow()
@@ -355,7 +355,7 @@ class DocumentFormViewModel(
 
     private fun observeDocument() {
         viewModelScope.launch {
-            getDocumentUseCase(newDocumentId).distinctUntilChanged().collectLatest (::setForm)
+            getDocumentUseCase(newDocumentId).distinctUntilChanged().collectLatest(::setForm)
         }
     }
 

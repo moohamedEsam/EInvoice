@@ -25,7 +25,7 @@ fun NavGraphBuilder.companyDashboardScreen(
             onDocumentClick = onDocumentClick,
             onEditClick = onEditClick,
             onShowSnackBarEvent = onShowSnackbar,
-            onCreateDocumentClick = onCreateDocumentClick
+            onCreateDocumentClick =  onCreateDocumentClick
         )
     }
 }

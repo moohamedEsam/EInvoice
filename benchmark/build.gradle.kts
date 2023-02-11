@@ -23,6 +23,7 @@ android {
         targetSdk = 33
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] = "EMULATOR"
     }
 
     testOptions {
@@ -55,8 +56,8 @@ android {
 dependencies {
     implementation("androidx.test.ext:junit:1.1.5")
     implementation("androidx.test.espresso:espresso-core:3.5.1")
-    implementation("androidx.test.uiautomator:uiautomator:2.2.0")
-    implementation("androidx.benchmark:benchmark-macro-junit4:1.1.0-beta05")
+    implementation("androidx.test.uiautomator:uiautomator:2.3.0-alpha02")
+    implementation("androidx.benchmark:benchmark-macro-junit4:1.1.1")
 }
 
 androidComponents {

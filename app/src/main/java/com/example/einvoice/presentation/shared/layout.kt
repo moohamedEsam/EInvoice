@@ -7,14 +7,19 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.auth.login.LoginScreenRoute
 import com.example.auth.login.navigateToLoginScreen
+import com.example.branch.screens.all.BranchesScreenRoute
 import com.example.branch.screens.all.navigateToBranchesScreen
 import com.example.branch.screens.form.BranchFormScreenRoute
 import com.example.client.screens.all.ClientsScreenRoute
@@ -34,7 +39,7 @@ import com.example.maplocation.MapScreenRoute
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.inject
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun EInvoiceLayout(startScreen: String) {
     val snackbarHostState by remember {
@@ -49,7 +54,7 @@ fun EInvoiceLayout(startScreen: String) {
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().semantics { testTagsAsResourceId = true },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
@@ -133,7 +138,7 @@ private fun DrawerContent(navController: NavHostController) {
                 )
             },
             label = { Text("Branches") },
-            selected = currentRoute == BranchFormScreenRoute,
+            selected = currentRoute == BranchesScreenRoute,
             onClick = navController::navigateToBranchesScreen
         )
 
@@ -244,7 +249,8 @@ fun EInvoiceTopBar(navController: NavHostController, drawerState: DrawerState) {
                             navController.navigateToLoginScreen()
                         }
                     }
-                }
+                },
+                modifier = Modifier.testTag("Logout")
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Logout,
