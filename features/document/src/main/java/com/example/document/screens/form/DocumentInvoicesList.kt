@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -19,13 +18,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.common.models.ValidationResult
-import com.example.einvoicecomponents.BaseExposedDropDownMenu
-import com.example.einvoicecomponents.OutlinedSearchTextField
-import com.example.einvoicecomponents.ValidationOutlinedTextField
+import com.example.einvoicecomponents.textField.OutlinedSearchTextField
 import com.example.models.invoiceLine.*
 import com.example.models.item.Item
 import com.example.models.item.empty
+import com.google.accompanist.flowlayout.FlowRow
+import com.google.accompanist.flowlayout.MainAxisAlignment
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.random.Random
@@ -152,7 +150,7 @@ private fun InvoiceLineItemActions(
 fun InvoiceLineItem(
     invoiceLineView: InvoiceLineView,
     modifier: Modifier = Modifier,
-    actionRow: @Composable RowScope.() -> Unit = {}
+    actionRow: @Composable () -> Unit = {}
 ) {
     val totals = invoiceLineView.getTotals()
 
@@ -162,34 +160,43 @@ fun InvoiceLineItem(
             modifier = Modifier.padding(8.dp)
         ) {
             Text(text = invoiceLineView.item.name, style = MaterialTheme.typography.headlineSmall)
-            Row(
+            FlowRow(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                mainAxisAlignment = MainAxisAlignment.SpaceBetween,
+                mainAxisSpacing = 8.dp,
+                crossAxisSpacing = 8.dp
             ) {
                 Text("Quantity: ${invoiceLineView.quantity}")
                 Text("Price: %.2f".format(invoiceLineView.unitValue.currencyEgp))
             }
-            Row(
+            Divider()
+            FlowRow(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                mainAxisAlignment = MainAxisAlignment.SpaceBetween,
+                mainAxisSpacing = 8.dp,
+                crossAxisSpacing = 8.dp
             ) {
                 Text("Discount: ${invoiceLineView.discountRate}%")
                 Text("Total: %.2f".format(totals.discount))
             }
-
+            Divider()
             Text(text = "Totals", style = MaterialTheme.typography.bodyLarge)
-            Row(
+            FlowRow(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                mainAxisAlignment = MainAxisAlignment.SpaceBetween,
+                mainAxisSpacing = 8.dp,
+                crossAxisSpacing = 8.dp
             ) {
                 Text("Tax Total: %.2f".format(totals.taxes))
                 Text("Total: %.2f".format(totals.total))
             }
+            Divider()
+
             Row(
                 modifier = Modifier
                     .align(Alignment.End)
                     .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 actionRow()
             }

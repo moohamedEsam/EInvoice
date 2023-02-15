@@ -112,15 +112,12 @@ private fun BranchItem(
                 text = "Street: ${branch.street}",
                 style = MaterialTheme.typography.bodySmall
             )
-            IconButton(
+            AssistChip(
                 onClick = onBranchEditClick,
+                leadingIcon = { Icon(Icons.Filled.Edit, null) },
+                label = { Text("Edit") },
                 modifier = Modifier.align(Alignment.End)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = "Edit Branch"
-                )
-            }
+            )
         }
     }
 }

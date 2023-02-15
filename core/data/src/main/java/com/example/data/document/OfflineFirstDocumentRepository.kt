@@ -4,10 +4,7 @@ import com.example.common.functions.tryWrapper
 import com.example.common.models.Result
 import com.example.data.sync.Synchronizer
 import com.example.data.sync.handleSync
-import com.example.database.models.document.DocumentViewEntity
-import com.example.database.models.document.asDocumentEntity
-import com.example.database.models.document.asDocumentView
-import com.example.database.models.document.asDocumentViewEntity
+import com.example.database.models.document.*
 import com.example.database.models.invoiceLine.asInvoiceLineEntity
 import com.example.database.room.dao.DocumentDao
 import com.example.models.document.DocumentStatus
@@ -31,8 +28,8 @@ class OfflineFirstDocumentRepository(
         Result.Success(document)
     }
 
-    override fun getDocumentsInternalIdsByCompanyId(id: String): Flow<List<String>> =
-        localDataSource.getDocumentsInternalIdsByCompanyId(id)
+    override fun getDocumentsInternalIdsByCompanyId(id: String, excludedDocumentId:String): Flow<List<String>> =
+        localDataSource.getDocumentsInternalIdsByCompanyId(id, excludedDocumentId)
 
     override suspend fun cancelDocument(id: String): Result<Unit> = tryWrapper {
         val document = localDataSource.getDocumentById(id).firstOrNull()
@@ -86,12 +83,12 @@ class OfflineFirstDocumentRepository(
         localDataSource.getDocumentsView().distinctUntilChanged()
             .map { documents -> documents.map { it.asDocumentView() } }
 
-    override fun getDocumentsByCompany(
+    override fun getDocumentsViewByCompanyInDuration(
         companyId: String,
         fromDateMillis: Long,
         toDateMillis: Long
     ): Flow<List<DocumentView>> = localDataSource
-        .getDocumentsByCompany(companyId, fromDateMillis, toDateMillis)
+        .getDocumentsByCompanyInDuration(companyId, fromDateMillis, toDateMillis)
         .distinctUntilChanged()
         .map { documents -> documents.map { it.asDocumentView() } }
 

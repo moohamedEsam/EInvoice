@@ -30,6 +30,7 @@ dependencies {
     implementation(Dependencies.composeMaterial3)
     debugImplementation(Dependencies.composeUiTooling)
     implementation(Dependencies.composeUiToolingPreview)
+    implementation(Dependencies.composeFlowLayout)
     implementation(Dependencies.extendedIcons)
     implementation(Dependencies.coil)
     implementation(Dependencies.coilCompose)

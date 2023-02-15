@@ -1,15 +1,19 @@
 package com.example.item.screens.form
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.common.models.ValidationResult
 import com.example.einvoicecomponents.*
+import com.example.einvoicecomponents.textField.EInvoiceOutlinedTextField
+import com.example.einvoicecomponents.textField.ValidationOutlinedTextField
 import com.example.models.branch.Branch
 import com.example.models.item.UnitType
 import com.example.models.utils.TaxStatus
@@ -65,9 +69,10 @@ fun ItemFormScreenContent(
 
         ValidationOutlinedTextField(
             valueState = internalCode,
+            validationState = internalCodeValidationResult,
             label = "Internal Code",
             onValueChange = onInternalCodeChange,
-            validationState = internalCodeValidationResult
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
 
         EInvoiceOutlinedTextField(
@@ -81,7 +86,8 @@ fun ItemFormScreenContent(
             valueState = price,
             validationState = priceValidationResult,
             label = "Price",
-            onValueChange = onPriceChange
+            onValueChange = onPriceChange,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
 
 
@@ -123,11 +129,7 @@ private fun BranchesExposedDropDownMenu(
         onOptionSelect = onBranchChange,
         textFieldValue = { it?.name ?: "" },
         textFieldLabel = "Branch",
-        optionsLabel = { it.name },
-        filterCriteria = { option, filter ->
-            option.name.contains(filter, true)
-        },
-        textFieldType = DropDownMenuTextFieldType.Outlined
+        optionsLabel = { it.name }
     )
 }
 
@@ -142,12 +144,8 @@ private fun UnitTypeExposedDropDownMenu(
         selectedOptionState = selectedUnitTypeState,
         onOptionSelect = onUnitTypeChange,
         textFieldValue = { it?.name ?: "" },
-        textFieldLabel = "Unit Type",
-        optionsLabel = { it.name },
-        filterCriteria = { option, filter ->
-            option.name.contains(filter, true)
-        },
-        textFieldType = DropDownMenuTextFieldType.Outlined
+        textFieldLabel = "Unit Type*",
+        optionsLabel = { it.name }
     )
 }
 

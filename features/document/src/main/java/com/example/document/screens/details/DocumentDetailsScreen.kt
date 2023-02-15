@@ -3,9 +3,9 @@ package com.example.document.screens.details
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
@@ -34,6 +34,9 @@ import com.example.models.invoiceLine.empty
 import com.example.models.invoiceLine.getTotals
 import com.example.models.item.Item
 import com.example.models.item.empty
+import com.google.accompanist.flowlayout.FlowCrossAxisAlignment
+import com.google.accompanist.flowlayout.FlowRow
+import com.google.accompanist.flowlayout.MainAxisAlignment
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
@@ -103,33 +106,38 @@ private fun DocumentScreenContent(
     val simpleFormatter by remember {
         mutableStateOf(SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()))
     }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        DocumentHeader(
-            isEditEnabled = isEditEnabled,
-            isDeleteEnabled = isDeleteEnabled,
-            onEditClick = onEditClick,
-            onDeleteClick = onDeleteClick
-        )
-        DocumentInfo(
-            onCompanyClick = onCompanyClick,
-            documentView = documentView,
-            onBranchClick = onBranchClick,
-            onClientClick = onClientClick,
-            simpleFormatter = simpleFormatter,
-            onShowSnackBarEvent = onShowSnackBarEvent
-        )
+    Column {
+        LazyColumn(
+            modifier = Modifier
+                .weight(1f)
+                .padding(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            item {
+                DocumentHeader(
+                    isEditEnabled = isEditEnabled,
+                    isDeleteEnabled = isDeleteEnabled,
+                    onEditClick = onEditClick,
+                    onDeleteClick = onDeleteClick
+                )
+            }
+            item {
+                DocumentInfo(
+                    onCompanyClick = onCompanyClick,
+                    documentView = documentView,
+                    onBranchClick = onBranchClick,
+                    onClientClick = onClientClick,
+                    simpleFormatter = simpleFormatter,
+                    onShowSnackBarEvent = onShowSnackBarEvent
+                )
+            }
 
-        DocumentInvoices(
-            documentView = documentView,
-            onShowTaxesClick = onShowTaxesClick,
-            modifier = Modifier.weight(1f)
-        )
+            documentInvoices(
+                documentView = documentView,
+                onShowTaxesClick = onShowTaxesClick
+            )
 
+        }
         DocumentSummery(
             invoicesState = MutableStateFlow(documentView.invoices),
             modifier = Modifier
@@ -139,32 +147,25 @@ private fun DocumentScreenContent(
     }
 }
 
-@Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun DocumentInvoices(
+private fun LazyListScope.documentInvoices(
     documentView: DocumentView,
-    onShowTaxesClick: (InvoiceLineView) -> Unit,
-    modifier: Modifier = Modifier
+    onShowTaxesClick: (InvoiceLineView) -> Unit
 ) {
-    Text(text = "Invoices", style = MaterialTheme.typography.headlineMedium)
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(250.dp),
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(documentView.invoices) {
-            InvoiceLineItem(
-                invoiceLineView = it,
-                modifier = Modifier.fillMaxWidth(),
-                actionRow = {
-                    AssistChip(
-                        onClick = { onShowTaxesClick(it) },
-                        label = { Text(text = "Show Taxes") }
-                    )
-                }
-            )
-        }
+    item {
+        Text(text = "Invoices", style = MaterialTheme.typography.headlineMedium)
+    }
+    items(documentView.invoices) {
+        InvoiceLineItem(
+            invoiceLineView = it,
+            modifier = Modifier.fillMaxWidth(),
+            actionRow = {
+                AssistChip(
+                    onClick = { onShowTaxesClick(it) },
+                    label = { Text(text = "Show Taxes") }
+                )
+            }
+        )
     }
 }
 
@@ -183,25 +184,33 @@ private fun DocumentInfo(
             Text(text = documentView.company.name)
         }
     }
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(text = "Branch: ")
-        TextButton(onClick = onBranchClick) {
-            Text(text = documentView.branch.name)
-        }
-    }
-
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(text = "Client: ")
-        TextButton(onClick = onClientClick) {
-            Text(text = documentView.client.name)
-        }
-    }
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth()
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        mainAxisSpacing = 8.dp,
+        mainAxisAlignment = MainAxisAlignment.SpaceBetween,
     ) {
-        Row{
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(text = "Branch: ")
+            TextButton(onClick = onBranchClick) {
+                Text(text = documentView.branch.name)
+            }
+        }
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(text = "Client: ")
+            TextButton(onClick = onClientClick) {
+                Text(text = documentView.client.name)
+            }
+        }
+    }
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        mainAxisSpacing = 8.dp,
+        crossAxisSpacing = 8.dp,
+        mainAxisAlignment = MainAxisAlignment.SpaceBetween,
+        crossAxisAlignment = FlowCrossAxisAlignment.Center
+    ) {
+        Row {
             Text(text = "Status: ", style = MaterialTheme.typography.bodyLarge)
             Text(
                 text = documentView.status.name,
@@ -214,15 +223,20 @@ private fun DocumentInfo(
                 }
             )
         }
-        Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = "Document Type:${documentView.documentType}",
             style = MaterialTheme.typography.bodyLarge
         )
     }
-    Row {
+    Spacer(modifier = Modifier.height(8.dp))
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        mainAxisSpacing = 8.dp,
+        crossAxisSpacing = 8.dp,
+        mainAxisAlignment = MainAxisAlignment.SpaceBetween,
+        crossAxisAlignment = FlowCrossAxisAlignment.Center
+    ) {
         Text(text = "Internal Id: ${documentView.internalId}")
-        Spacer(modifier = Modifier.weight(1f))
         Text(text = "Date: ${simpleFormatter.format(documentView.date)}")
     }
 }

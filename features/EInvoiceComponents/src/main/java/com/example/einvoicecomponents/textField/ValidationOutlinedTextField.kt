@@ -1,4 +1,4 @@
-package com.example.einvoicecomponents
+package com.example.einvoicecomponents.textField
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.common.models.ValidationResult
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +20,6 @@ fun ValidationOutlinedTextField(
     label: String,
     modifier: Modifier = Modifier,
     leadingIcon: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = null,
     onValueChange: (String) -> Unit,
     colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors(),
     keyboardOptions: KeyboardOptions = KeyboardOptions(),
@@ -32,10 +30,12 @@ fun ValidationOutlinedTextField(
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
-            label = { Text(label) },
+            label = { Text("$label*") },
             isError = validation is ValidationResult.Invalid,
             modifier = Modifier.fillMaxWidth(),
-            trailingIcon = trailingIcon,
+            trailingIcon = {
+                ValidationTrailingIcon(validation)
+            },
             leadingIcon = leadingIcon,
             colors = colors,
             keyboardOptions = keyboardOptions,
@@ -48,7 +48,7 @@ fun ValidationOutlinedTextField(
 fun ValidationOutlinedTextFieldPreview() {
     ValidationOutlinedTextField(
         valueState = MutableStateFlow(""),
-        validationState = MutableStateFlow(ValidationResult.Empty),
+        validationState = MutableStateFlow(ValidationResult.Valid),
         label = "Email",
         onValueChange = {}
     )

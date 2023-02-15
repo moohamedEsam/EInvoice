@@ -18,9 +18,9 @@ fun CompanyDropDownMenuBox(
         selectedOptionState = value,
         onOptionSelect = onCompanyPicked,
         textFieldValue = { it?.name ?: "" },
-        textFieldLabel = "Company",
+        textFieldLabel = "Company*",
         optionsLabel = { it.name },
         modifier = modifier,
-        filterCriteria = filterCriteria
+        filterCriteria = filterCriteria,
     )
 }

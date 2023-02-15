@@ -16,6 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.models.document.DocumentView
 import com.example.models.invoiceLine.getTotals
+import com.google.accompanist.flowlayout.FlowCrossAxisAlignment
+import com.google.accompanist.flowlayout.FlowMainAxisAlignment
+import com.google.accompanist.flowlayout.FlowRow
 import java.text.SimpleDateFormat
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,13 +36,12 @@ fun DocumentTransaction(
         modifier = modifier.fillMaxWidth(),
         onClick = onClick
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+        FlowRow(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            mainAxisSpacing = 8.dp,
+            crossAxisSpacing = 8.dp,
+            mainAxisAlignment = FlowMainAxisAlignment.SpaceBetween,
+            crossAxisAlignment = FlowCrossAxisAlignment.Center
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -47,13 +49,11 @@ fun DocumentTransaction(
                 Text(text = document.client.name, style = MaterialTheme.typography.bodyLarge)
                 Text(text = document.branch.name, style = MaterialTheme.typography.bodySmall)
             }
-            Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = document.status.toString(),
                 style = MaterialTheme.typography.bodyLarge,
                 color = document.status.getStatusColor(MaterialTheme.colorScheme.onSurface)
             )
-            Spacer(modifier = Modifier.width(8.dp))
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(text = "%.2f $".format(total), style = MaterialTheme.typography.bodyLarge)
                 Text(

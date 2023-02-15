@@ -1,9 +1,6 @@
 package com.example.database.room.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import com.example.database.models.client.ClientEntity
 import com.example.database.models.client.ClientViewEntity
 import kotlinx.coroutines.flow.Flow
@@ -19,6 +16,7 @@ interface ClientDao {
     @Query("SELECT * FROM Client WHERE id = :id")
     fun getClientById(id: String): Flow<ClientEntity?>
 
+    @Transaction
     @Query("SELECT * FROM Client WHERE isDeleted = 0 and id = :id")
     fun getClientViewById(id: String): Flow<ClientViewEntity?>
 

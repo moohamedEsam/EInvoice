@@ -4,25 +4,35 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.einvoicecomponents.ListScreenContent
+import com.example.models.Client
+import com.example.models.branch.Branch
+import com.example.models.branch.empty
 import com.example.models.company.Company
-import com.example.models.company.CompanySettings
+import com.example.models.company.CompanyView
+import com.example.models.company.empty
+import com.example.models.document.Document
+import com.example.models.document.empty
+import com.example.models.empty
+import com.google.accompanist.flowlayout.FlowRow
+import com.google.accompanist.flowlayout.MainAxisAlignment
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.viewModel
+import kotlin.random.Random
 
 @Composable
 fun CompaniesScreen(
@@ -47,7 +57,7 @@ fun CompaniesScreen(
 @Composable
 private fun CompaniesScreenContent(
     modifier: Modifier = Modifier,
-    companies: List<Company>,
+    companies: List<CompanyView>,
     queryState: StateFlow<String>,
     onQueryChange: (String) -> Unit,
     onCompanyClick: (Company) -> Unit,
@@ -62,13 +72,13 @@ private fun CompaniesScreenContent(
         adaptiveItemSize = 250.dp,
         onFloatingButtonClick = onCreateNewCompanyClick,
         modifier = modifier.testTag("CompaniesScreenList")
-    ){
-        items(companies) { company ->
+    ) {
+        items(companies) { companyView ->
             CompanyItem(
-                company = company,
+                companyView = companyView,
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { onCompanyClick(company) },
-                onEditClick = { onCompanyEditClick(company) },
+                onClick = { onCompanyClick(companyView.company) },
+                onEditClick = { onCompanyEditClick(companyView.company) },
             )
         }
     }
@@ -78,7 +88,7 @@ private fun CompaniesScreenContent(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CompanyItem(
-    company: Company,
+    companyView: CompanyView,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
     onEditClick: () -> Unit = {},
@@ -90,62 +100,55 @@ private fun CompanyItem(
                 .padding(8.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Text(text = company.name, style = MaterialTheme.typography.headlineSmall, maxLines = 1)
             Text(
-                text = "Registration number: ${company.registrationNumber}",
-                style = MaterialTheme.typography.bodyLarge,
+                text = companyView.company.name,
+                style = MaterialTheme.typography.headlineSmall,
                 maxLines = 1
             )
-            if (company.website != null) {
-                val context = LocalContext.current
+            Divider()
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                mainAxisAlignment = MainAxisAlignment.SpaceBetween,
+                mainAxisSpacing = 8.dp,
+                crossAxisSpacing = 8.dp,
+            ) {
                 Text(
-                    text = "Website: ${company.website}",
+                    text = "${companyView.branches.size} branches",
                     style = MaterialTheme.typography.bodyLarge,
-                    maxLines = 1,
-//                    modifier = Modifier.clickable {
-//                        openWebsiteInBrowser(context, company.website!!)
-//                    }
+                    maxLines = 1
+                )
+                Text(
+                    text = "${companyView.clients.size} clients",
+                    style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 1
                 )
             }
+            Divider()
             Text(
-                text = "Phone: ${company.phone}",
+                text = "${companyView.documents.size} invoices",
                 style = MaterialTheme.typography.bodyLarge,
                 maxLines = 1
             )
-            Row(modifier = Modifier.align(Alignment.End)) {
-                IconButton(onClick = onEditClick) {
-                    Icon(Icons.Filled.Edit, contentDescription = "Edit company")
-                }
-            }
+
+            AssistChip(
+                onClick = onEditClick,
+                label = { Text(text = ("Edit")) },
+                leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = "Edit") },
+                modifier = Modifier.align(Alignment.End)
+            )
         }
     }
-}
-
-fun openWebsiteInBrowser(
-    context: Context,
-    url: String
-) {
-    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-    context.startActivity(intent)
 }
 
 @Preview(showBackground = true)
 @Composable
 fun CompaniesScreenPreview() {
     val companies = List(10) {
-        Company(
-            id = it.toString(),
-            name = "Company 1",
-            registrationNumber = "123456789",
-            website = "https://www.google.com",
-            phone = "123456789",
-            ceo = "John Doe",
-            settings = CompanySettings(
-                clientId = "123456789",
-                clientSecret = "123",
-                tokenPin = "123456",
-                taxActivityCode = "123456789"
-            )
+        CompanyView.empty().copy(
+            company = Company.empty().copy(name = "Company $it"),
+            branches = List(Random.nextInt(0, 100)) { Branch.empty() },
+            clients = List(Random.nextInt(0, 100)) { Client.empty() },
+            documents = List(Random.nextInt(0, 100)) { Document.empty() },
         )
     }
 

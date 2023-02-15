@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface DocumentRepository : Syncable<Document> {
     suspend fun createDocument(document: DocumentView): Result<DocumentView>
 
-    fun getDocumentsInternalIdsByCompanyId(id: String): Flow<List<String>>
+    fun getDocumentsInternalIdsByCompanyId(id: String, excludedDocumentId:String): Flow<List<String>>
 
     fun getDocument(id: String): Flow<DocumentView>
 
@@ -21,11 +21,12 @@ interface DocumentRepository : Syncable<Document> {
 
     fun getDocuments(): Flow<List<DocumentView>>
 
-    fun getDocumentsByCompany(
+    fun getDocumentsViewByCompanyInDuration(
         companyId: String,
         fromDateMillis: Long,
         toDateMillis: Long
     ): Flow<List<DocumentView>>
+
 
     fun getDocumentsByBranch(
         branchId: String,

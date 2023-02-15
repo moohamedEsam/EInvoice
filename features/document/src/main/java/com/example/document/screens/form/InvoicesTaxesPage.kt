@@ -13,14 +13,17 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.einvoicecomponents.OutlinedSearchTextField
+import com.example.einvoicecomponents.textField.OutlinedSearchTextField
 import com.example.models.invoiceLine.InvoiceLineView
 import com.example.models.invoiceLine.InvoiceTax
 import com.example.models.invoiceLine.empty
 import com.example.models.item.Item
 import com.example.models.item.empty
+import com.google.accompanist.flowlayout.FlowRow
+import com.google.accompanist.flowlayout.MainAxisAlignment
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.random.Random
@@ -56,14 +59,15 @@ fun InvoicesTaxesPage(
             invoices.forEach { invoice ->
                 stickyHeader {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.primaryContainer),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             text = invoice.item.name,
                             style = MaterialTheme.typography.headlineMedium,
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Center
                         )
 
                         IconButton(onClick = { onAddTax(invoice) }) {
@@ -112,9 +116,10 @@ private fun InvoiceTaxItem(
 
     Column(modifier = Modifier.padding(horizontal = 8.dp)) {
         Text(text = taxSubTypeName, style = MaterialTheme.typography.headlineSmall)
-        Row(
+        FlowRow(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            mainAxisAlignment = MainAxisAlignment.SpaceBetween,
+            mainAxisSpacing = 8.dp,
         ) {
             Text(text = taxTypeName, style = MaterialTheme.typography.bodyLarge)
             Text(

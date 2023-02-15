@@ -16,8 +16,9 @@ import androidx.compose.ui.unit.dp
 import com.example.common.models.Result
 import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
-import com.example.einvoicecomponents.EInvoiceOutlinedTextField
-import com.example.einvoicecomponents.ValidationOutlinedTextField
+import com.example.einvoicecomponents.OneTimeEventFloatingButton
+import com.example.einvoicecomponents.textField.EInvoiceOutlinedTextField
+import com.example.einvoicecomponents.textField.ValidationOutlinedTextField
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.viewModel
@@ -106,103 +107,93 @@ private fun CompanyFormScreenContent(
     onCreateClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .verticalScroll(rememberScrollState())
-            .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        Text(text = "Main Information", style = MaterialTheme.typography.headlineSmall)
-        ValidationOutlinedTextField(
-            valueState = nameState,
-            validationState = nameValidation,
-            label = "Name",
-            onValueChange = onNameChange
+        Column(
+            modifier = modifier
+                .verticalScroll(rememberScrollState())
+                .padding(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(text = "Main Information", style = MaterialTheme.typography.headlineSmall)
+            ValidationOutlinedTextField(
+                valueState = nameState,
+                validationState = nameValidation,
+                label = "Name",
+                onValueChange = onNameChange
+            )
+
+            ValidationOutlinedTextField(
+                valueState = registrationNumberState,
+                validationState = registrationNumberValidation,
+                label = "Registration number",
+                onValueChange = onRegistrationNumberChange
+            )
+
+
+            Text(text = "Settings", style = MaterialTheme.typography.headlineSmall)
+
+            ValidationOutlinedTextField(
+                valueState = clientIdState,
+                validationState = clientIdValidationResult,
+                label = "Client ID",
+                onValueChange = onClientIdChange
+            )
+
+            ValidationOutlinedTextField(
+                valueState = clientSecretState,
+                validationState = clientSecretValidationResult,
+                label = "Client secret",
+                onValueChange = onClientSecretChange
+            )
+
+            ValidationOutlinedTextField(
+                valueState = tokenPinState,
+                validationState = tokenPinValidationResult,
+                label = "Token pin",
+                onValueChange = onTokenPinChange
+            )
+
+            ValidationOutlinedTextField(
+                valueState = taxActivityCodeState,
+                validationState = taxActivityCodeValidationResult,
+                label = "Tax activity code",
+                onValueChange = onTaxPayerActivityCodeChange
+            )
+            Text(text = "Optional", style = MaterialTheme.typography.headlineSmall)
+
+            ValidationOutlinedTextField(
+                valueState = websiteState,
+                validationState = websiteValidation,
+                label = "Website",
+                onValueChange = onWebsiteChange
+            )
+
+
+            EInvoiceOutlinedTextField(
+                valueState = ceoState,
+                label = "CEO",
+                onValueChange = onCeoChange,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            EInvoiceOutlinedTextField(
+                valueState = phoneNumberState,
+                label = "Phone number",
+                onValueChange = onPhoneNumberChange,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        OneTimeEventFloatingButton(
+            enabled = isFormValid,
+            loading = MutableStateFlow(false),
+            label = "Save",
+            onClick = onCreateClick,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(8.dp)
         )
-
-        ValidationOutlinedTextField(
-            valueState = registrationNumberState,
-            validationState = registrationNumberValidation,
-            label = "Registration number",
-            onValueChange = onRegistrationNumberChange
-        )
-
-        Text(text = "Optional", style = MaterialTheme.typography.headlineSmall)
-
-        ValidationOutlinedTextField(
-            valueState = websiteState,
-            validationState = websiteValidation,
-            label = "Website",
-            onValueChange = onWebsiteChange
-        )
-
-
-        EInvoiceOutlinedTextField(
-            valueState = ceoState,
-            label = "CEO",
-            onValueChange = onCeoChange,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        EInvoiceOutlinedTextField(
-            valueState = phoneNumberState,
-            label = "Phone number",
-            onValueChange = onPhoneNumberChange,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Text(text = "Settings", style = MaterialTheme.typography.headlineSmall)
-
-        ValidationOutlinedTextField(
-            valueState = clientIdState,
-            validationState = clientIdValidationResult,
-            label = "Client ID",
-            onValueChange = onClientIdChange
-        )
-
-        ValidationOutlinedTextField(
-            valueState = clientSecretState,
-            validationState = clientSecretValidationResult,
-            label = "Client secret",
-            onValueChange = onClientSecretChange
-        )
-
-        ValidationOutlinedTextField(
-            valueState = tokenPinState,
-            validationState = tokenPinValidationResult,
-            label = "Token pin",
-            onValueChange = onTokenPinChange
-        )
-
-        ValidationOutlinedTextField(
-            valueState = taxActivityCodeState,
-            validationState = taxActivityCodeValidationResult,
-            label = "Tax activity code",
-            onValueChange = onTaxPayerActivityCodeChange
-        )
-
-
-        CreateCompanyButton(
-            isFormValid = isFormValid,
-            onCreateClick = onCreateClick,
-            modifier = Modifier.align(Alignment.End)
-        )
-    }
-}
-
-@Composable
-private fun CreateCompanyButton(
-    isFormValid: StateFlow<Boolean>,
-    modifier: Modifier = Modifier,
-    onCreateClick: () -> Unit
-) {
-    val isEnabled by isFormValid.collectAsState()
-    Button(
-        onClick = onCreateClick,
-        modifier = modifier,
-        enabled = isEnabled
-    ) {
-        Text(text = "Save")
     }
 }
 
@@ -216,15 +207,15 @@ fun CreateCompanyScreenPreview() {
         CompanyFormScreenContent(
             nameState = MutableStateFlow(""),
             onNameChange = {},
-            nameValidation = MutableStateFlow(ValidationResult.Empty),
+            nameValidation = MutableStateFlow(ValidationResult.Valid),
             registrationNumberState = MutableStateFlow(""),
             onRegistrationNumberChange = {},
-            registrationNumberValidation = MutableStateFlow(ValidationResult.Empty),
+            registrationNumberValidation = MutableStateFlow(ValidationResult.Valid),
             ceoState = MutableStateFlow(""),
             onCeoChange = {},
             websiteState = MutableStateFlow(""),
             onWebsiteChange = {},
-            websiteValidation = MutableStateFlow(ValidationResult.Empty),
+            websiteValidation = MutableStateFlow(ValidationResult.Valid),
             phoneNumberState = MutableStateFlow(""),
             onPhoneNumberChange = {},
             isFormValid = MutableStateFlow(true),
@@ -237,10 +228,10 @@ fun CreateCompanyScreenPreview() {
             onTokenPinChange = {},
             taxActivityCodeState = MutableStateFlow(""),
             onTaxPayerActivityCodeChange = {},
-            clientIdValidationResult = MutableStateFlow(ValidationResult.Empty),
-            clientSecretValidationResult = MutableStateFlow(ValidationResult.Empty),
-            tokenPinValidationResult = MutableStateFlow(ValidationResult.Empty),
-            taxActivityCodeValidationResult = MutableStateFlow(ValidationResult.Empty),
+            clientIdValidationResult = MutableStateFlow(ValidationResult.Valid),
+            clientSecretValidationResult = MutableStateFlow(ValidationResult.Valid),
+            tokenPinValidationResult = MutableStateFlow(ValidationResult.Valid),
+            taxActivityCodeValidationResult = MutableStateFlow(ValidationResult.Valid),
         )
 
     }

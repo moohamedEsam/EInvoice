@@ -68,6 +68,8 @@ object Dependencies {
         "com.google.accompanist:accompanist-pager:${Versions.accompanistVersion}"
     const val composePagerIndicators =
         "com.google.accompanist:accompanist-pager-indicators:${Versions.accompanistVersion}"
+    const val composeFlowLayout =
+        "com.google.accompanist:accompanist-flowlayout:${Versions.accompanistVersion}"
 
     const val materialDialogCore = "io.github.vanpra.compose-material-dialogs:core:${Versions.materialDialogsVersion}"
     const val materialDialogsDateTime = "io.github.vanpra.compose-material-dialogs:datetime:${Versions.materialDialogsVersion}"

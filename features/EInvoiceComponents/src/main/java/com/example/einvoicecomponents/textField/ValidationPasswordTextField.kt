@@ -1,4 +1,4 @@
-package com.example.einvoicecomponents
+package com.example.einvoicecomponents.textField
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
@@ -35,7 +35,7 @@ fun ValidationPasswordTextField(
         TextField(
             value = value,
             onValueChange = onValueChange,
-            label = { Text(text = label) },
+            label = { Text(text = "$label*") },
             leadingIcon = leadingIcon,
             trailingIcon = {
                 IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {

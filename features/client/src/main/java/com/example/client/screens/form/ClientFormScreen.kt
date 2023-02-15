@@ -6,6 +6,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MyLocation
@@ -14,12 +15,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.common.models.Result
 import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
 import com.example.einvoicecomponents.*
+import com.example.einvoicecomponents.textField.ValidationOutlinedTextField
 import com.example.models.company.Company
 import com.example.models.OptionalAddress
 import com.example.models.utils.BusinessType
@@ -133,80 +136,83 @@ private fun ClientFormScreenContent(
     isEnabledState: StateFlow<Boolean>,
     onFormSubmitted: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(text = "Main Information", style = MaterialTheme.typography.headlineSmall)
+    Box {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(text = "Main Information", style = MaterialTheme.typography.headlineSmall)
 
-        CompanyDropDownMenuBox(
-            value = selectedCompanyState,
-            companies = companiesState,
-            onCompanyPicked = onCompanySelected,
-            filterCriteria = companyFilterCriteria
-        )
+            CompanyDropDownMenuBox(
+                value = selectedCompanyState,
+                companies = companiesState,
+                onCompanyPicked = onCompanySelected,
+                filterCriteria = companyFilterCriteria
+            )
 
-        ValidationTextField(
-            valueState = nameState,
-            validationState = nameValidationResultState,
-            label = "Name",
-            onValueChange = onNameChange
-        )
+            ValidationOutlinedTextField(
+                valueState = nameState,
+                validationState = nameValidationResultState,
+                label = "Name",
+                onValueChange = onNameChange
+            )
 
-        ValidationTextField(
-            valueState = phoneState,
-            validationState = phoneValidationResultState,
-            label = "Phone",
-            onValueChange = onPhoneChange
-        )
+            ValidationOutlinedTextField(
+                valueState = phoneState,
+                validationState = phoneValidationResultState,
+                label = "Phone",
+                onValueChange = onPhoneChange
+            )
 
-        ValidationTextField(
-            valueState = registrationNumberState,
-            validationState = registrationNumberValidationResultState,
-            label = "Registration Number",
-            onValueChange = onRegistrationNumberChange
-        )
+            ValidationOutlinedTextField(
+                valueState = registrationNumberState,
+                validationState = registrationNumberValidationResultState,
+                label = "Registration Number",
+                onValueChange = onRegistrationNumberChange
+            )
 
-        ValidationTextField(
-            valueState = emailState,
-            validationState = emailValidationResultState,
-            label = "Email",
-            onValueChange = onEmailChange
-        )
+            ValidationOutlinedTextField(
+                valueState = emailState,
+                validationState = emailValidationResultState,
+                label = "Email",
+                onValueChange = onEmailChange,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+            )
 
-        ClientTaxStatusRow(
-            taxStatusState = taxStatusState,
-            onTaxStatusChange = onTaxStatusChange
-        )
+            ClientTaxStatusRow(
+                taxStatusState = taxStatusState,
+                onTaxStatusChange = onTaxStatusChange
+            )
 
-        ClientBusinessTypeRow(
-            businessTypeState = businessTypeState,
-            onBusinessTypeChange = onBusinessTypeChange
-        )
-        ClientAddress(
-            businessTypeState = businessTypeState,
-            onLocationRequested = onLocationRequested,
-            addressState = addressState,
-            onCountryChange = onCountryChange,
-            onGovernorateChange = onGovernorateChange,
-            onCityChange = onCityChange,
-            onStreetChange = onStreetChange,
-            onPostalCodeChange = onPostalCodeChange,
-            optionalAddressState = optionalAddressState,
-            onOptionalAddressChange = onOptionalAddressChange
-        )
-
-        OneTimeEventButton(
+            ClientBusinessTypeRow(
+                businessTypeState = businessTypeState,
+                onBusinessTypeChange = onBusinessTypeChange
+            )
+            ClientAddress(
+                businessTypeState = businessTypeState,
+                onLocationRequested = onLocationRequested,
+                addressState = addressState,
+                onCountryChange = onCountryChange,
+                onGovernorateChange = onGovernorateChange,
+                onCityChange = onCityChange,
+                onStreetChange = onStreetChange,
+                onPostalCodeChange = onPostalCodeChange,
+                optionalAddressState = optionalAddressState,
+                onOptionalAddressChange = onOptionalAddressChange
+            )
+        }
+        OneTimeEventFloatingButton(
             enabled = isEnabledState,
             loading = isLoadingState,
             label = "Save",
             onClick = onFormSubmitted,
-            modifier = Modifier.align(Alignment.End)
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(8.dp)
         )
-
     }
 
 }

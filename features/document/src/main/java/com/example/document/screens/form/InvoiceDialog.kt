@@ -16,8 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.common.models.ValidationResult
 import com.example.einvoicecomponents.BaseExposedDropDownMenu
-import com.example.einvoicecomponents.DropDownMenuTextFieldType
-import com.example.einvoicecomponents.ValidationOutlinedTextField
+import com.example.einvoicecomponents.textField.ValidationOutlinedTextField
 import com.example.models.item.Item
 import com.example.models.item.empty
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,7 +39,7 @@ fun InvoiceDialog(
     onAddClick: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    Dialog(onDismissRequest = onDismiss){
+    Dialog(onDismissRequest = onDismiss) {
         Card {
             InvoiceDialogContent(
                 itemsState = itemsState,
@@ -87,11 +86,7 @@ private fun InvoiceDialogContent(
             onOptionSelect = onItemSelect,
             textFieldValue = { it?.name ?: "" },
             textFieldLabel = "Item",
-            optionsLabel = { it.name },
-            filterCriteria = { option, query ->
-                option.name.contains(query, true)
-            },
-            textFieldType = DropDownMenuTextFieldType.Outlined
+            optionsLabel = { it.name }
         )
 
         ValidationOutlinedTextField(

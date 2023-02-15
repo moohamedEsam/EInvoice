@@ -5,6 +5,7 @@ import com.example.models.branch.Branch
 import com.example.models.company.Company
 import com.example.models.document.DocumentStatus
 import com.example.models.document.DocumentView
+import java.util.*
 
 data class DocumentsScreenState(
     val documents: List<DocumentView>,
@@ -15,6 +16,7 @@ data class DocumentsScreenState(
     val clientFilter: Client?,
     val branchFilter: Branch?,
     val statusFilter: DocumentStatus?,
+    val dateFilter: Date? = null,
 ){
     companion object
 }

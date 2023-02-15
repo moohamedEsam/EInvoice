@@ -1,4 +1,4 @@
-package com.example.einvoicecomponents
+package com.example.einvoicecomponents.textField
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column

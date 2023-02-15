@@ -30,9 +30,8 @@ fun <T> BaseExposedDropDownMenu(
     textFieldLabel: String,
     optionsLabel: (T) -> String,
     modifier: Modifier = Modifier,
-    textStyle: TextStyle = MaterialTheme.typography.headlineSmall,
+    textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     filterCriteria: (T, String) -> Boolean = { _, _ -> true },
-    textFieldType: DropDownMenuTextFieldType = DropDownMenuTextFieldType.Normal,
 ) {
 
     val options by optionsState.collectAsState()
@@ -51,25 +50,33 @@ fun <T> BaseExposedDropDownMenu(
             options.filter { filterCriteria(it, query) }
         }
     }
+    var shouldShowFilteredItems by remember {
+        mutableStateOf(false)
+    }
     Column(
         modifier = modifier
     ) {
-        BoxTextField(
-            textFieldType = textFieldType,
+        BoxOutlinedTextField(
             query = query,
             isExpanded = isExpanded,
-            onValueChange = { query = it },
-            onCheckedChange = { isExpanded = it },
+            onValueChange = {
+                query = it
+                shouldShowFilteredItems = true
+            },
+            onCheckedChange = {
+                isExpanded = it
+                shouldShowFilteredItems = false
+            },
             textFieldLabel = textFieldLabel
         )
 
         LazyColumn(
             modifier = Modifier
-                .heightIn(max = (LocalConfiguration.current.screenHeightDp / 5).dp)
+                .heightIn(max = (LocalConfiguration.current.screenHeightDp / 4).dp)
                 .animateContentSize()
         ) {
             if (isExpanded)
-                items(filteredItems) {
+                items(if (shouldShowFilteredItems) filteredItems else options) {
                     Text(
                         text = optionsLabel(it),
                         style = textStyle,
@@ -86,33 +93,6 @@ fun <T> BaseExposedDropDownMenu(
         }
     }
 
-}
-
-@Composable
-private fun BoxTextField(
-    textFieldType: DropDownMenuTextFieldType,
-    query: String,
-    isExpanded: Boolean,
-    onValueChange: (String) -> Unit,
-    onCheckedChange: (Boolean) -> Unit,
-    textFieldLabel: String
-) {
-    when (textFieldType) {
-        DropDownMenuTextFieldType.Outlined -> BoxOutlinedTextField(
-            query = query,
-            onValueChange = onValueChange,
-            textFieldLabel = textFieldLabel,
-            isExpanded = isExpanded,
-            onCheckedChange = onCheckedChange
-        )
-        else -> BoxNormalTextField(
-            query = query,
-            onValueChange = onValueChange,
-            textFieldLabel = textFieldLabel,
-            isExpanded = isExpanded,
-            onCheckedChange = onCheckedChange
-        )
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -144,49 +124,15 @@ private fun BoxOutlinedTextField(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun BoxNormalTextField(
-    query: String,
-    onValueChange: (String) -> Unit,
-    textFieldLabel: String,
-    isExpanded: Boolean,
-    onCheckedChange: (Boolean) -> Unit
-) {
-    TextField(
-        value = query,
-        onValueChange = onValueChange,
-        label = { Text(text = textFieldLabel) },
-        modifier = Modifier.fillMaxWidth(),
-        trailingIcon = {
-            IconToggleButton(
-                checked = isExpanded,
-                onCheckedChange = onCheckedChange
-            ) {
-                Icon(
-                    imageVector = if (isExpanded) Icons.Filled.ArrowDropUp
-                    else Icons.Filled.ArrowDropDown,
-                    contentDescription = "Expand"
-                )
-            }
-        }
-    )
-}
-
 @Preview(showBackground = true)
 @Composable
 fun BaseExposedDropDownMenuPreview() {
     BaseExposedDropDownMenu(
         optionsState = MutableStateFlow(listOf("Option 1", "Option 2", "Option 3")),
         selectedOptionState = MutableStateFlow("Option 2"),
+        onOptionSelect = { },
         textFieldValue = { it ?: "" },
         textFieldLabel = "Label",
         optionsLabel = { it },
-        onOptionSelect = { },
     )
-}
-
-enum class DropDownMenuTextFieldType {
-    Outlined,
-    Normal
 }

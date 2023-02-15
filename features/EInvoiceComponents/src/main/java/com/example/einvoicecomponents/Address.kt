@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -26,16 +26,16 @@ fun AddressComposable(
     onPostalCodeChange: (String) -> Unit = {},
 ) {
     val address by addressState.collectAsState()
-    TextField(
+    OutlinedTextField(
         value = address.countryName ?: "",
         onValueChange = onCountryChange,
-        label = { Text("Country") },
+        label = { Text("Country*") },
         modifier = Modifier.fillMaxWidth()
     )
-    TextField(
+    OutlinedTextField(
         value = address.adminArea ?: "",
         onValueChange = onGovernorateChange,
-        label = { Text("Governate") },
+        label = { Text("Governate*") },
         modifier = Modifier.fillMaxWidth()
     )
 
@@ -43,23 +43,23 @@ fun AddressComposable(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        TextField(
+        OutlinedTextField(
             value = address.subAdminArea ?: "",
             onValueChange = onCityChange,
-            label = { Text("City") },
+            label = { Text("City*") },
             modifier = Modifier.weight(1f)
         )
-        TextField(
+        OutlinedTextField(
             value = address.postalCode ?: "",
             onValueChange = onPostalCodeChange,
-            label = { Text("PostalCode") },
+            label = { Text("PostalCode*") },
             modifier = Modifier.weight(1f)
         )
     }
-    TextField(
+    OutlinedTextField(
         value = address.thoroughfare ?: "",
         onValueChange = onStreetChange,
-        label = { Text("Street") },
+        label = { Text("Street*") },
         modifier = Modifier.fillMaxWidth()
     )
 }
@@ -72,7 +72,7 @@ fun OptionalAddressComposable(
     onOptionalAddressChange: (OptionalAddress) -> Unit
 ) {
     val optionalAddress by optionalAddressState.collectAsState()
-    TextField(
+    OutlinedTextField(
         value = optionalAddress.buildingNumber,
         onValueChange = { onOptionalAddressChange(optionalAddress.copy(buildingNumber = it)) },
         label = { Text("Building Number") },
@@ -82,7 +82,7 @@ fun OptionalAddressComposable(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        TextField(
+        OutlinedTextField(
             value = optionalAddress.room,
             label = { Text("Room") },
             onValueChange = {
@@ -90,7 +90,7 @@ fun OptionalAddressComposable(
             },
             modifier = Modifier.weight(1f)
         )
-        TextField(
+        OutlinedTextField(
             value = optionalAddress.floor,
             label = { Text("Floor") },
             onValueChange = {
@@ -100,7 +100,7 @@ fun OptionalAddressComposable(
         )
     }
 
-    TextField(
+    OutlinedTextField(
         value = optionalAddress.additionalInformation,
         label = { Text("Additional Info") },
         onValueChange = {

@@ -1,6 +1,5 @@
 package com.example.einvoicecomponents
 
-import android.app.DatePickerDialog
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.material.icons.Icons
@@ -75,19 +74,22 @@ private fun DatePickerDialog(
                 it.isBefore(LocalDate.now().plusDays(1)) &&
                         it.isAfter(minDate)
             },
-            colors = DatePickerDefaults.colors(
-                headerBackgroundColor = MaterialTheme.colorScheme.primary,
-                headerTextColor = MaterialTheme.colorScheme.onPrimary,
-                calendarHeaderTextColor = MaterialTheme.colorScheme.onPrimary,
-                dateActiveBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
-                dateActiveTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            ),
+            colors = datePickerColors(),
             waitForPositiveButton = true,
         ) {
             onDatePicked(it.toDate())
         }
     }
 }
+
+@Composable
+fun datePickerColors() = DatePickerDefaults.colors(
+    headerBackgroundColor = MaterialTheme.colorScheme.primary,
+    headerTextColor = MaterialTheme.colorScheme.onPrimary,
+    calendarHeaderTextColor = MaterialTheme.colorScheme.onPrimary,
+    dateActiveBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
+    dateActiveTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+)
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun Date.toLocalDate(): LocalDate {

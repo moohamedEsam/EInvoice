@@ -85,9 +85,7 @@ private fun ClientItem(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(text = client.name, style = MaterialTheme.typography.headlineSmall)
-            Text(text = "Email: ${client.email}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Phone: ${client.phone}", style = MaterialTheme.typography.bodyMedium)
-
+            
             Text(
                 text = "Business type: ${client.businessType.asString()}",
                 style = MaterialTheme.typography.bodyMedium
@@ -110,12 +108,12 @@ private fun ClientItem(
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
-            IconButton(onClick = onEditClick, modifier = Modifier.align(Alignment.End)) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = "Edit"
-                )
-            }
+            AssistChip(
+                onClick = onEditClick,
+                leadingIcon = { Icon(Icons.Filled.Edit, null) },
+                label = { Text("Edit") },
+                modifier = Modifier.align(Alignment.End)
+            )
         }
     }
 }

@@ -10,12 +10,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.common.models.ValidationResult
 import com.example.einvoicecomponents.BaseExposedDropDownMenu
-import com.example.einvoicecomponents.DropDownMenuTextFieldType
-import com.example.einvoicecomponents.ValidationTextFieldContainer
+import com.example.einvoicecomponents.textField.ValidationOutlinedTextField
+import com.example.einvoicecomponents.textField.ValidationTextFieldContainer
 import com.example.models.invoiceLine.SubTax
 import com.example.models.invoiceLine.TaxView
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -75,8 +76,6 @@ private fun InvoiceTaxDialogContent(
 ) {
     val newTax by taxViewState.collectAsState()
     val newTaxSubCode by subTaxState.collectAsState()
-    val newTaxRate: String by taxRateState.collectAsState()
-    val taxRateValidationResult: ValidationResult by taxRateValidationResultState.collectAsState()
 
     Column {
         BaseExposedDropDownMenu(
@@ -87,12 +86,8 @@ private fun InvoiceTaxDialogContent(
                 if (it == null) ""
                 else "${it.name} (${it.code})"
             },
-            textFieldLabel = "Tax Code",
+            textFieldLabel = "Tax Code*",
             optionsLabel = { "${it.name} - ${it.code}" },
-            filterCriteria = { option, filter ->
-                option.name.contains(filter, true) || option.code.contains(filter, true)
-            },
-            textFieldType = DropDownMenuTextFieldType.Outlined,
             textStyle = MaterialTheme.typography.bodyMedium
         )
         BaseExposedDropDownMenu(
@@ -103,26 +98,17 @@ private fun InvoiceTaxDialogContent(
                 if (it == null) ""
                 else "${it.name} (${it.code})"
             },
-            textFieldLabel = "Tax Sub Code",
+            textFieldLabel = "Tax Sub Code*",
             optionsLabel = { "${it.name} - ${it.code}" },
-            filterCriteria = { option, filter ->
-                option.name.contains(filter, true) || option.code.contains(filter, true)
-            },
-            textFieldType = DropDownMenuTextFieldType.Outlined,
             textStyle = MaterialTheme.typography.bodyMedium
         )
-        ValidationTextFieldContainer(
-            validation = taxRateValidationResult
-        ) {
-            OutlinedTextField(
-                value = newTaxRate,
-                label = { Text("Tax Rate") },
-                onValueChange = onTaxRateChange,
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                isError = taxRateValidationResult is ValidationResult.Invalid
-            )
-        }
+        ValidationOutlinedTextField(
+            valueState = taxRateState,
+            validationState = taxRateValidationResultState,
+            label = "Tax Rate",
+            onValueChange = onTaxRateChange,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        )
         Button(
             onClick = onSaveTax,
             modifier = Modifier.align(Alignment.End)
@@ -130,4 +116,21 @@ private fun InvoiceTaxDialogContent(
             Text(text = "Save")
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun InvoiceTaxDialogPreview() {
+    InvoiceTaxDialog(
+        taxViewState = MutableStateFlow(null),
+        onTaxChange = {},
+        subTaxState = MutableStateFlow(null),
+        onSubTaxChange = {},
+        taxRateState = MutableStateFlow(""),
+        taxRateValidationResult = MutableStateFlow(ValidationResult.Valid),
+        onTaxRateChange = {},
+        onSaveTax = {},
+        availableTaxes = MutableStateFlow(emptyList()),
+        onDismiss = {}
+    )
 }

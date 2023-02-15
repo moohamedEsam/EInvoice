@@ -1,4 +1,4 @@
-package com.example.einvoicecomponents
+package com.example.einvoicecomponents.textField
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
@@ -21,8 +21,7 @@ fun ValidationTextField(
     validationState: StateFlow<ValidationResult>,
     label: String,
     modifier: Modifier = Modifier,
-    leadingIcon: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = null,
+    leadingIcon: @Composable() (() -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     onValueChange: (String) -> Unit
 ) {
@@ -32,10 +31,10 @@ fun ValidationTextField(
         TextField(
             value = value,
             onValueChange = onValueChange,
-            label = { Text(label) },
+            label = { Text("$label*") },
             isError = validation is ValidationResult.Invalid,
             modifier = Modifier.fillMaxWidth(),
-            trailingIcon = trailingIcon,
+            trailingIcon = { ValidationTrailingIcon(validation = validation) },
             leadingIcon = leadingIcon,
             keyboardOptions = keyboardOptions,
             singleLine = true,
@@ -49,8 +48,7 @@ fun ValidationTextField(
 fun ValidationTextFieldPreviews() {
     ValidationTextField(
         valueState = MutableStateFlow(""),
-        validationState = MutableStateFlow(ValidationResult.Empty),
-        label = "Email",
-        onValueChange = {}
-    )
+        validationState = MutableStateFlow(ValidationResult.Valid),
+        label = "Email"
+    ) {}
 }

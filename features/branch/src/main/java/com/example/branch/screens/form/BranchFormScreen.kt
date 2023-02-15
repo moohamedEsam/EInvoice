@@ -2,9 +2,9 @@ package com.example.branch.screens.form
 
 import android.location.Address
 import android.location.Geocoder
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MyLocation
@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.models.OptionalAddress
@@ -20,6 +21,7 @@ import com.example.common.models.Result
 import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
 import com.example.einvoicecomponents.*
+import com.example.einvoicecomponents.textField.ValidationOutlinedTextField
 import com.example.models.company.Company
 import com.example.models.company.CompanySettings
 import com.example.models.company.empty
@@ -113,69 +115,79 @@ private fun BranchFormScreenContent(
     isLoading: StateFlow<Boolean>,
     onSaveClick: () -> Unit = {},
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        CompanyDropDownMenuBox(
-            value = selectedCompany,
-            companies = companies,
-            onCompanyPicked = onCompanySelected,
-            filterCriteria = companyFilterCriteria,
-        )
-
-        ValidationTextField(
-            valueState = name,
-            validationState = nameValidationResult,
-            label = "Name",
-            onValueChange = onNameValueChange,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        ValidationTextField(
-            valueState = internalId,
-            validationState = internalIdValidationResult,
-            label = "Internal ID",
-            onValueChange = onInternalIdValueChange,
-            modifier = Modifier.fillMaxWidth()
-        )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+    Box {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(text = "Address", style = MaterialTheme.typography.headlineMedium)
-            IconButton(onClick = onAutoDetectLocationClick) {
-                Icon(imageVector = Icons.Outlined.MyLocation, contentDescription = "Add Address")
+
+            CompanyDropDownMenuBox(
+                value = selectedCompany,
+                companies = companies,
+                filterCriteria = companyFilterCriteria,
+                onCompanyPicked = onCompanySelected
+            )
+
+            ValidationOutlinedTextField(
+                valueState = name,
+                validationState = nameValidationResult,
+                label = "Name",
+                modifier = Modifier.fillMaxWidth(),
+                onValueChange = onNameValueChange
+            )
+
+            ValidationOutlinedTextField(
+                valueState = internalId,
+                validationState = internalIdValidationResult,
+                label = "Internal ID",
+                modifier = Modifier.fillMaxWidth(),
+                onValueChange = onInternalIdValueChange,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "Address", style = MaterialTheme.typography.headlineMedium)
+                IconButton(onClick = onAutoDetectLocationClick) {
+                    Icon(
+                        imageVector = Icons.Outlined.MyLocation,
+                        contentDescription = "Add Address"
+                    )
+                }
             }
+
+            AddressComposable(
+                addressState = address,
+                onCountryChange = onCountryChange,
+                onGovernorateChange = onGovernorateChange,
+                onCityChange = onCityChange,
+                onStreetChange = onStreetChange,
+                onPostalCodeChange = onPostalCodeChange
+            )
+
+            Text(
+                text = "Optional Address Information",
+                style = MaterialTheme.typography.headlineSmall
+            )
+            OptionalAddressComposable(
+                optionalAddressState = optionalAddress,
+                onOptionalAddressChange = onOptionalAddressChange
+            )
         }
-
-        AddressComposable(
-            addressState = address,
-            onCountryChange = onCountryChange,
-            onGovernorateChange = onGovernorateChange,
-            onCityChange = onCityChange,
-            onStreetChange = onStreetChange,
-            onPostalCodeChange = onPostalCodeChange
-        )
-
-        Text(text = "Optional Address Information", style = MaterialTheme.typography.headlineSmall)
-        OptionalAddressComposable(
-            optionalAddressState = optionalAddress,
-            onOptionalAddressChange = onOptionalAddressChange
-        )
-
-        OneTimeEventButton(
+        OneTimeEventFloatingButton(
             enabled = isSaveButtonEnabled,
             loading = isLoading,
             label = "Save",
             onClick = onSaveClick,
-            modifier = Modifier.align(Alignment.End)
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(8.dp)
         )
-
     }
 }
 

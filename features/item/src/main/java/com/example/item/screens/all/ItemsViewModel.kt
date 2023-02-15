@@ -40,8 +40,8 @@ class ItemsViewModel(
     val nameValidationResult = name.map(::notBlankValidator)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ValidationResult.Valid)
     private val _description = MutableStateFlow("")
-
     val description = _description.asStateFlow()
+
     private val _price = MutableStateFlow("")
     val price = _price.asStateFlow()
 
@@ -92,16 +92,13 @@ class ItemsViewModel(
         nameValidationResult,
         priceValidationResult,
         itemCodeValidationResult,
-        selectedBranch,
-        selectedUnitType,
         internalCodeValidationResult
-    ) { nameValidationResult, priceValidationResult, itemCodeValidationResult, selectedBranch, selectedUnitType, internalCode ->
-        nameValidationResult is ValidationResult.Valid &&
-                priceValidationResult is ValidationResult.Valid &&
-                itemCodeValidationResult is ValidationResult.Valid &&
-                internalCode is ValidationResult.Valid &&
-                selectedBranch != null &&
-                selectedUnitType != null
+    ) { validations ->
+        validations.all { it is ValidationResult.Valid }
+    }.combine(selectedBranch) { isFormValid, selectedBranch ->
+        isFormValid && selectedBranch != null
+    }.combine(selectedUnitType) { isFormValid, selectedUnitType ->
+        isFormValid && selectedUnitType != null
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
 
     private val _isLoading = MutableStateFlow(false)
@@ -206,17 +203,7 @@ class ItemsViewModel(
     fun saveItem(onResult: (Result<Item>) -> Unit) {
         viewModelScope.launch {
             _isLoading.update { true }
-            val item = Item(
-                id = itemId ?: UUID.randomUUID().toString(),
-                name = name.value,
-                description = description.value,
-                price = price.value.toDouble(),
-                status = status.value,
-                itemCode = itemCode.value,
-                internalCode = internalCode.value,
-                branchId = selectedBranch.value?.id ?: return@launch,
-                unitTypeCode = selectedUnitType.value?.code ?: return@launch
-            )
+            val item = getCurrentItem() ?: return@launch
             val result = if (itemId == null)
                 createItemUseCase(item)
             else
@@ -228,22 +215,17 @@ class ItemsViewModel(
         }
     }
 
-    private fun <T1, T2, T3, T4, T5, T6, R> combine(
-        flow: Flow<T1>,
-        flow2: Flow<T2>,
-        flow3: Flow<T3>,
-        flow4: Flow<T4>,
-        flow5: Flow<T5>,
-        flow6: Flow<T6>,
-        transform: suspend (T1, T2, T3, T4, T5, T6) -> R
-    ): Flow<R> = combine(flow, flow2, flow3, flow4, flow5, flow6) { args: Array<*> ->
-        transform(
-            args[0] as T1,
-            args[1] as T2,
-            args[2] as T3,
-            args[3] as T4,
-            args[4] as T5,
-            args[5] as T6
+    private fun getCurrentItem(): Item? {
+        return Item(
+            id = itemId ?: UUID.randomUUID().toString(),
+            name = name.value,
+            description = description.value,
+            price = price.value.toDouble(),
+            status = status.value,
+            itemCode = itemCode.value,
+            internalCode = internalCode.value,
+            branchId = selectedBranch.value?.id ?: return null,
+            unitTypeCode = selectedUnitType.value?.code ?: return null
         )
     }
 

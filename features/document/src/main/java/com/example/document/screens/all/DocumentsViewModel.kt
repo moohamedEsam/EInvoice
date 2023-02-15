@@ -14,6 +14,7 @@ import com.example.models.document.DocumentStatus
 import com.example.models.document.DocumentView
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.util.*
 
 class DocumentsViewModel(
     private val getDocumentsUseCase: GetDocumentsUseCase,
@@ -28,6 +29,7 @@ class DocumentsViewModel(
     private val _branchFilter: MutableStateFlow<Branch?> = MutableStateFlow(null)
     private val _statusFilter: MutableStateFlow<DocumentStatus?> = MutableStateFlow(null)
     private val _isSyncing = MutableStateFlow(false)
+    private val _dateFilter: MutableStateFlow<Date?> = MutableStateFlow(null)
     private val _lastFilterClicked: MutableStateFlow<FilterType?> = MutableStateFlow(null)
     val lastFilterClicked = _lastFilterClicked.asStateFlow()
     private val _isConnectedToNetwork = MutableStateFlow(false)
@@ -39,6 +41,8 @@ class DocumentsViewModel(
         _query,
     ) { companyFilter, clientFilter, branchFilter, statusFilter, query ->
         createScreenState(query, companyFilter, clientFilter, branchFilter, statusFilter)
+    }.combine(_dateFilter) { screenState, dateFilter ->
+        screenState.copy(dateFilter = dateFilter)
     }.combine(_documents) { screenState, documents ->
         val filteredDocuments = filterDocuments(documents, screenState)
         screenState.copy(documents = filteredDocuments)
@@ -73,7 +77,9 @@ class DocumentsViewModel(
         .filter { document -> filterByCompany(document, screenState) }
         .filter { document -> filterByClient(document, screenState) }
         .filter { document -> filterByBranch(document, screenState) }
-        .filter { document -> filterByStatus(document, screenState) }.toList()
+        .filter { document -> filterByStatus(document, screenState) }
+        .filter { document -> filterByDate(document, screenState) }
+        .toList()
 
     fun setQuery(value: String) = viewModelScope.launch {
         _query.update { value }
@@ -93,6 +99,10 @@ class DocumentsViewModel(
 
     fun setStatusFilter(value: DocumentStatus?) = viewModelScope.launch {
         _statusFilter.update { value }
+    }
+
+    fun setDateFilter(value: Date?) = viewModelScope.launch {
+        _dateFilter.update { value }
     }
 
     fun getAvailableCompanies(): List<Company> {
@@ -142,6 +152,23 @@ class DocumentsViewModel(
         }
         return queryMatches.any { it.contains(state.query, true) }
     }
+
+    private fun filterByDate(documentView: DocumentView, state: DocumentsScreenState): Boolean {
+        return if (state.dateFilter == null) true
+        else {
+            val documentDate = getDayFromDate(documentView.date)
+            val filterDate = getDayFromDate(state.dateFilter)
+            documentDate == filterDate
+        }
+    }
+
+    private fun getDayFromDate(date: Date) = Calendar.getInstance().apply {
+            time = date
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.time
 
     private fun filterByCompany(documentView: DocumentView, state: DocumentsScreenState): Boolean {
         return if (state.companyFilter != null)

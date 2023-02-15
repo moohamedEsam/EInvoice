@@ -24,7 +24,7 @@ val documentsModule = module {
             getTaxTypesUseCase = get(),
             documentId = params[0],
             getDocumentUseCase = get(),
-            getDocumentsInternalIdsByCompanyIdUseCase = get()
+            getDocumentsInternalIdsByCompanyIdUseCase = get(),
         )
     }
 

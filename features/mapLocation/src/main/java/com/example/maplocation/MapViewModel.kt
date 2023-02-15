@@ -32,7 +32,9 @@ class MapViewModel : ViewModel() {
     }
 
     fun animateCamera(animate: suspend () -> Unit) = viewModelScope.launch {
-        animate()
+        try {
+            animate()
+        } catch (_: Exception) { }
     }
 
     fun setAddress(address: LatLng) {

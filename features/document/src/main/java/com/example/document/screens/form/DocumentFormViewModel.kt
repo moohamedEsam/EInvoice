@@ -50,7 +50,6 @@ class DocumentFormViewModel(
 
     val branches = combine(_companiesViews, selectedCompany) { companies, selectedCompany ->
         companies.find { it.company.id == selectedCompany?.id }?.branches ?: emptyList()
-
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     val clients = combine(_companiesViews, selectedCompany) { companies, selectedCompany ->
@@ -173,6 +172,9 @@ class DocumentFormViewModel(
 
     fun setBranch(branch: Branch) = viewModelScope.launch {
         _selectedBranch.update { branch }
+        _invoices.update {
+            it.filter { invoice -> invoice.item.branchId == branch.id }
+        }
     }
 
     fun setClient(client: Client) = viewModelScope.launch {
@@ -346,10 +348,13 @@ class DocumentFormViewModel(
     private fun observeInternalIds() {
         viewModelScope.launch {
             _selectedCompany.filterNotNull().flatMapLatest {
-                getDocumentsInternalIdsByCompanyIdUseCase(it.id)
-            }.collectLatest {
-                _alreadyUsedInternalIds.update { _ -> it }
-            }
+                getDocumentsInternalIdsByCompanyIdUseCase(
+                    GetDocumentsInternalIdsByCompanyIdUseCase.Params(
+                        it.id,
+                        newDocumentId
+                    )
+                )
+            }.collectLatest(_alreadyUsedInternalIds::emit)
         }
     }
 
@@ -361,9 +366,7 @@ class DocumentFormViewModel(
 
     private fun observeCompanies() {
         viewModelScope.launch {
-            getCompaniesViewsUseCase().collectLatest {
-                _companiesViews.update { _ -> it }
-            }
+            getCompaniesViewsUseCase().collectLatest(_companiesViews::emit)
         }
     }
 
@@ -372,17 +375,13 @@ class DocumentFormViewModel(
         viewModelScope.launch {
             _selectedBranch.filterNotNull().flatMapLatest {
                 getItemsByBranchUseCase(it.id)
-            }.collectLatest {
-                _items.update { _ -> it }
-            }
+            }.collectLatest(_items::emit)
         }
     }
 
     private fun observeTaxes() {
         viewModelScope.launch {
-            getTaxTypesUseCase().collectLatest {
-                _taxTypes.update { _ -> it }
-            }
+            getTaxTypesUseCase().collectLatest(_taxTypes::emit)
         }
     }
 
@@ -393,6 +392,7 @@ class DocumentFormViewModel(
         _selectedClient.update { document.client }
         _internalId.update { document.internalId }
         _invoices.update { document.invoices }
+        _alreadyUsedInternalIds.update { it - document.internalId }
     }
 
     fun showInvoiceDialog(invoice: InvoiceLineView? = null) {

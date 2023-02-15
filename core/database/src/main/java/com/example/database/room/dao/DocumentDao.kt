@@ -42,14 +42,20 @@ interface DocumentDao {
 
     @Transaction
     @Query("SELECT * FROM Document WHERE issuerId = :id and isDeleted = 0 and date between :fromDate and :toDate order by date desc")
-    fun getDocumentsByCompany(
+    fun getDocumentsByCompanyInDuration(
         id: String,
         fromDate: Long,
         toDate: Long
     ): Flow<List<DocumentViewEntity>>
 
-    @Query("SELECT internalId FROM Document WHERE issuerId = :id and isDeleted = 0")
-    fun getDocumentsInternalIdsByCompanyId(id: String): Flow<List<String>>
+    @Query("SELECT internalId FROM Document WHERE issuerId = :id and isDeleted = 0 and id != :excludedDocumentId")
+    fun getDocumentsInternalIdsByCompanyId(
+        id: String,
+        excludedDocumentId: String
+    ): Flow<List<String>>
+
+    @Query("SELECT * FROM Document WHERE issuerId = :id and isDeleted = 0 order by date desc")
+    fun getDocumentsByCompany(id: String): Flow<List<DocumentEntity>>
 
     @Transaction
     @Query("SELECT * FROM Document WHERE branchId = :id and isDeleted = 0 and date between :fromDate and :toDate order by date desc")
@@ -73,7 +79,7 @@ interface DocumentDao {
 
     @Transaction
     @Query("SELECT * FROM Document order by date desc")
-    fun getAllDocuments() : Flow<List<DocumentViewEntity>>
+    fun getAllDocuments(): Flow<List<DocumentViewEntity>>
 
     @Transaction
     @Query("SELECT * FROM Document WHERE id = :id")

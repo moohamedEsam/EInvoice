@@ -13,7 +13,7 @@ fun interface GetDocumentsByTypeUseCase : (GetDocumentsByTypeUseCase.Params) -> 
         Company, Client, Branch;
 
         fun getDocumentFunction(documentsRepository: DocumentRepository) = when (this) {
-            Company -> documentsRepository::getDocumentsByCompany
+            Company -> documentsRepository::getDocumentsViewByCompanyInDuration
             Client -> documentsRepository::getDocumentsByClient
             Branch -> documentsRepository::getDocumentsByBranch
         }

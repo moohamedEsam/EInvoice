@@ -1,21 +1,23 @@
 package com.example.document.screens.all
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.einvoicecomponents.datePickerColors
+import com.example.einvoicecomponents.toDate
+import com.example.einvoicecomponents.toLocalDate
 import com.example.models.Client
 import com.example.models.branch.Branch
 import com.example.models.company.Company
@@ -23,7 +25,15 @@ import com.example.models.document.DocumentStatus
 import com.example.models.document.DocumentView
 import com.example.models.document.empty
 import com.example.models.invoiceLine.getTotals
+import com.google.accompanist.flowlayout.FlowRow
+import com.google.accompanist.flowlayout.MainAxisAlignment
+import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.datetime.date.datepicker
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import org.koin.androidx.compose.viewModel
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.util.*
 
 
 @Composable
@@ -73,6 +83,7 @@ fun DocumentsScreen(
             viewModel.setLastFilterClicked(FilterType.STATUS)
         },
         onDocumentCancelClick = viewModel::cancelDocument,
+        onDatePicked = viewModel::setDateFilter
     )
     if (showDialog && lastFilterClicked != null)
         ShowFilterDialog(
@@ -100,7 +111,11 @@ private fun DocumentsScreenContent(
     onFilterByClientClick: () -> Unit,
     onFilterByBranchClick: () -> Unit,
     onFilterByStatusClick: () -> Unit,
+    onDatePicked: (Date?) -> Unit
 ) {
+    val simpleDateFormat by remember {
+        mutableStateOf(SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()))
+    }
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -115,7 +130,9 @@ private fun DocumentsScreenContent(
                 onFilterByCompanyClick = onFilterByCompanyClick,
                 onFilterByClientClick = onFilterByClientClick,
                 onFilterByBranchClick = onFilterByBranchClick,
-                onFilterByStatusClick = onFilterByStatusClick
+                onFilterByStatusClick = onFilterByStatusClick,
+                onDatePicked = onDatePicked,
+                dateFormat = simpleDateFormat
             )
         }
         documentsList(
@@ -152,7 +169,8 @@ private fun LazyListScope.documentsList(
         DocumentItem(
             document = document,
             onClick = { onDocumentClick(document.id) },
-            onDocumentCancelClick = onDocumentCancelClick
+            onDocumentCancelClick = onDocumentCancelClick,
+            dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         )
     }
 
@@ -165,7 +183,9 @@ private fun FiltersRow(
     onFilterByCompanyClick: () -> Unit,
     onFilterByClientClick: () -> Unit,
     onFilterByBranchClick: () -> Unit,
-    onFilterByStatusClick: () -> Unit
+    onFilterByStatusClick: () -> Unit,
+    onDatePicked: (Date?) -> Unit,
+    dateFormat: SimpleDateFormat,
 ) {
     Text(text = "Filters", style = MaterialTheme.typography.headlineSmall)
     Row(
@@ -191,6 +211,56 @@ private fun FiltersRow(
             onClick = onFilterByStatusClick,
             label = { Text(state.statusFilter?.name ?: "Status") })
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            DateFilter(
+                currentDate = state.dateFilter,
+                onDatePicked = onDatePicked,
+                simpleDateFormat = dateFormat
+            )
+        }
+
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DateFilter(
+    currentDate: Date?,
+    modifier: Modifier = Modifier,
+    onDatePicked: (Date?) -> Unit,
+    simpleDateFormat: SimpleDateFormat
+) {
+    val materialDatePickerState = rememberMaterialDialogState()
+    FilterChip(
+        selected = currentDate != null,
+        onClick = {
+            if (currentDate != null)
+                onDatePicked(null)
+            else
+                materialDatePickerState.show()
+        },
+        label = { Text(if (currentDate != null) simpleDateFormat.format(currentDate) else "Date") },
+        modifier = modifier
+    )
+    MaterialDialog(
+        dialogState = materialDatePickerState,
+        buttons = {
+            positiveButton("Ok") {}
+            negativeButton("Cancel") {}
+        }
+    ) {
+        datepicker(
+            initialDate = currentDate?.toLocalDate() ?: LocalDate.now(),
+            onDateChange = {
+                onDatePicked(it.toDate())
+            },
+            waitForPositiveButton = true,
+            allowedDateValidator = {
+                it.isBefore(LocalDate.now().plusDays(1))
+            },
+            colors = datePickerColors()
+        )
     }
 }
 
@@ -235,7 +305,8 @@ private fun DocumentItem(
     document: DocumentView,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    onDocumentCancelClick: (String) -> Unit
+    onDocumentCancelClick: (String) -> Unit,
+    dateFormat: SimpleDateFormat
 ) {
     val total = document.invoices.sumOf { it.getTotals().total }
     OutlinedCard(modifier = modifier, onClick = onClick) {
@@ -246,51 +317,104 @@ private fun DocumentItem(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = "from: ${document.company.name}",
+                text = "company: ${document.company.name}",
                 style = MaterialTheme.typography.headlineSmall
             )
-            Text(
-                text = "to: ${document.client.name}",
-                style = MaterialTheme.typography.headlineSmall
-            )
-            Text(
-                text = "branch: ${document.branch.name}",
-                style = MaterialTheme.typography.headlineSmall
-            )
-            Row {
-                Text("Status: ")
+            FlowRow(
+                mainAxisSpacing = 4.dp,
+                crossAxisSpacing = 4.dp,
+                mainAxisAlignment = MainAxisAlignment.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Text(
-                    text = document.status.name,
-                    color = document.status.getStatusColor(MaterialTheme.colorScheme.onSecondaryContainer)
+                    text = "client: ${document.client.name}",
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                Text(
+                    text = "branch: ${document.branch.name}",
+                    style = MaterialTheme.typography.headlineSmall
                 )
             }
-            Text(
-                text = "invoices: ${document.invoices.size}",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = "total: %.2f $".format(total),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            if (document.status in listOf(
-                    DocumentStatus.Valid,
-                    DocumentStatus.Submitted,
-                    DocumentStatus.Invalid
+            Divider()
+            FlowRow(
+                mainAxisSpacing = 4.dp,
+                crossAxisSpacing = 4.dp,
+                mainAxisAlignment = MainAxisAlignment.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "invoices: ${document.invoices.size}",
+                    style = MaterialTheme.typography.bodyLarge
                 )
-            )
-                AssistChip(
-                    onClick = { onDocumentCancelClick(document.id) },
-                    label = { Text("Cancel") },
-                    colors = AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.errorContainer),
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Filled.Cancel,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onErrorContainer
-                        )
-                    },
-                    modifier = Modifier.align(Alignment.End)
+                Text(
+                    text = "total: %.2f $".format(total),
+                    style = MaterialTheme.typography.bodyLarge
                 )
+            }
+            Divider()
+            FlowRow(
+                mainAxisSpacing = 4.dp,
+                crossAxisSpacing = 4.dp,
+                mainAxisAlignment = MainAxisAlignment.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row {
+                    Text("Status: ", style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        text = document.status.name,
+                        color = document.status.getStatusColor(MaterialTheme.colorScheme.onSecondaryContainer),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+
+                Text(
+                    text = "date: ${dateFormat.format(document.date)}",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+            Divider()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                if (document.status.isUpdatable())
+                    AssistChip(
+                        onClick = { onDocumentCancelClick(document.id) },
+                        label = { Text("Update") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.Edit,
+                                contentDescription = null
+                            )
+                        }
+                    )
+                if (document.status.isSendable())
+                    AssistChip(
+                        onClick = { onDocumentCancelClick(document.id) },
+                        label = { Text("Send") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.Upload,
+                                contentDescription = null
+                            )
+                        }
+                    )
+                if (document.status.isCancelable())
+                    AssistChip(
+                        onClick = { onDocumentCancelClick(document.id) },
+                        label = { Text("Cancel") },
+                        colors = AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.Cancel,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        }
+                    )
+            }
         }
     }
 }
@@ -427,7 +551,7 @@ fun DocumentsScreenPreview() {
         onFilterByClientClick = {},
         onFilterByBranchClick = {},
         onDocumentCancelClick = {},
-    ) {
-
-    }
+        onDatePicked = {},
+        onFilterByStatusClick = {},
+    )
 }

@@ -1,4 +1,4 @@
-package com.example.einvoicecomponents
+package com.example.einvoicecomponents.textField
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search

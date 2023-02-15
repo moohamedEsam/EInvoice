@@ -18,8 +18,8 @@ import coil.compose.AsyncImage
 import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
 import com.example.einvoicecomponents.OneTimeEventButton
-import com.example.einvoicecomponents.ValidationPasswordTextField
-import com.example.einvoicecomponents.ValidationTextField
+import com.example.einvoicecomponents.textField.ValidationPasswordTextField
+import com.example.einvoicecomponents.textField.ValidationTextField
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.get
@@ -124,8 +124,8 @@ private fun RegisterScreenContent(
                 validationState = emailValidation,
                 label = "Email",
                 modifier = Modifier.fillMaxWidth(),
-                onValueChange = onEmailValueChange,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                onValueChange = onEmailValueChange
             )
 
             ValidationPasswordTextField(
