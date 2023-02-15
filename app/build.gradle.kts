@@ -2,6 +2,7 @@ plugins {
     id(Plugins.androidApplication)
     id(Plugins.kotlinAndroid)
     id(Plugins.ksp) version Versions.ksp
+    id(Plugins.proto) version Versions.protoPlugin
     kotlin(Plugins.kotlinSerialization) version Versions.kotlinSerialization
 }
 
@@ -76,6 +77,8 @@ dependencies {
     implementation(Dependencies.viewModelCompose)
     implementation(Dependencies.splashScreen)
     implementation(Dependencies.baselineProfile)
+    implementation(Dependencies.dataStore)
+    implementation(Dependencies.proto)
     implementation(project(":common"))
     implementation(project(":core:network"))
     implementation(project(":core:data"))

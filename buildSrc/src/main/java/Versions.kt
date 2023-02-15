@@ -14,14 +14,17 @@ object Versions {
     const val coroutinesVersion = "1.6.4"
     const val composeNavigation = "2.5.2"
     const val materialDialogsVersion = "0.8.1-rc"
-
     const val splashScreen = "1.0.0-beta02"
+
     const val koin = "3.1.6"
     const val workVersion = "2.7.1"
     const val ksp = "1.7.20-1.0.8"
     const val ktorVersion = "2.1.3"
     const val coil = "2.2.2"
     const val room = "2.4.3"
+    const val dataStore = "1.0.0"
+    const val proto = "3.21.9"
+    const val protoPlugin = "0.8.12"
 
 
     const val jUnit = "4.13.2"

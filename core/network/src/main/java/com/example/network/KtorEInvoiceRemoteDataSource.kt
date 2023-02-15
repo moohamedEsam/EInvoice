@@ -1,6 +1,5 @@
 package com.example.network
 
-import android.util.Log
 import com.example.common.functions.tryWrapper
 import com.example.common.models.Result
 import com.example.models.branch.Branch
@@ -25,7 +24,7 @@ import io.ktor.http.*
 
 class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRemoteDataSource {
     override suspend fun createCompany(company: Company): Result<Company> = tryWrapper {
-        val response = client.post(Urls.COMPANY) {
+        val response = client.post(Urls.company()) {
             setBody(company)
             contentType(ContentType.Application.Json)
         }
@@ -34,7 +33,7 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
     }
 
     override suspend fun login(credentials: Credentials): Result<Token> = tryWrapper {
-        val response = client.post(Urls.LOGIN) {
+        val response = client.post(Urls.login()) {
             setBody(credentials)
             contentType(ContentType.Application.Json)
         }
@@ -43,7 +42,7 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
     }
 
     override suspend fun register(register: Register): Result<Token> = tryWrapper {
-        val response = client.post(Urls.REGISTER) {
+        val response = client.post(Urls.register()) {
             setBody(register)
             contentType(ContentType.Application.Json)
         }
@@ -65,7 +64,7 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
     }
 
     override suspend fun getCompanies(): Result<List<Company>> = tryWrapper {
-        val response = client.get(Urls.COMPANY)
+        val response = client.get(Urls.company())
         val apiResponse = response.body<ApiResponse<List<Company>>>()
         apiResponse.asResult()
     }
@@ -86,7 +85,7 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
     }
 
     override suspend fun createClient(client: Client): Result<Client> = tryWrapper {
-        val response = this.client.post(Urls.CLIENT) {
+        val response = this.client.post(Urls.client()) {
             setBody(client.asNetworkClient())
             contentType(ContentType.Application.Json)
         }
@@ -101,7 +100,7 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
     }
 
     override suspend fun getClients(): Result<List<Client>> = tryWrapper {
-        val response = client.get(Urls.CLIENT)
+        val response = client.get(Urls.client())
         val apiResponse = response.body<ApiResponse<List<NetworkClient>>>()
         apiResponse.asResult().map { clients -> clients.map { it.asClient() } }
     }
@@ -122,7 +121,7 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
     }
 
     override suspend fun createItem(item: Item): Result<Item> = tryWrapper {
-        val response = this.client.post(Urls.ITEM) {
+        val response = this.client.post(Urls.item()) {
             setBody(item.asNetworkItem())
             contentType(ContentType.Application.Json)
         }
@@ -137,7 +136,7 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
     }
 
     override suspend fun getItems(): Result<List<Item>> = tryWrapper {
-        val response = client.get(Urls.ITEM)
+        val response = client.get(Urls.item())
         val apiResponse = response.body<ApiResponse<List<NetworkItem>>>()
         apiResponse.asResult().map { items -> items.map { it.asItem() } }
     }
@@ -152,7 +151,7 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
     }
 
     override suspend fun getTaxTypes(): Result<List<TaxView>> = tryWrapper {
-        val response = client.get(Urls.TAX_TYPES)
+        val response = client.get(Urls.taxTypes())
         val apiResponse = response.body<ApiResponse<List<TaxView>>>()
         apiResponse.asResult()
     }
@@ -165,14 +164,14 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
     }
 
     override suspend fun getUnitTypes(): Result<List<UnitType>> = tryWrapper {
-        val response = client.get(Urls.UNIT_TYPES)
+        val response = client.get(Urls.unitTypes())
         val apiResponse = response.body<ApiResponse<List<NetworkUnitType>>>()
         apiResponse.asResult().map { unitTypes -> unitTypes.map { it.asUnitType() } }
     }
 
     override suspend fun createDocument(document: CreateDocumentDto): Result<NetworkDocument> =
         tryWrapper {
-            val response = client.post(Urls.DOCUMENT) {
+            val response = client.post(Urls.document()) {
                 setBody(document)
                 contentType(ContentType.Application.Json)
             }
@@ -187,7 +186,7 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
     }
 
     override suspend fun getDocuments(): Result<List<NetworkDocument>> = tryWrapper {
-        val response = client.get(Urls.DOCUMENT)
+        val response = client.get(Urls.document())
         val apiResponse = response.body<ApiResponse<PagedResponse<NetworkDocument>>>()
         apiResponse.asResult().map { it.data }
     }
@@ -209,13 +208,13 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
     }
 
     override suspend fun syncDocumentsStatus(): Result<Unit> = tryWrapper {
-        val response = client.post(Urls.SYNC_DOCUMENTS_STATUS)
+        val response = client.post(Urls.syncDocumentStatus())
         val apiResponse = response.body<ApiResponse<Unit>>()
         apiResponse.asResult()
     }
 
     override suspend fun createBranch(branch: Branch): Result<Branch> = tryWrapper {
-        val response = client.post(Urls.BRANCH) {
+        val response = client.post(Urls.branch()) {
             setBody(branch)
             contentType(ContentType.Application.Json)
         }
@@ -236,7 +235,7 @@ class KtorEInvoiceRemoteDataSource(private val client: HttpClient) : EInvoiceRem
     }
 
     override suspend fun getBranches(): Result<List<Branch>> = tryWrapper {
-        val response = client.get(Urls.BRANCH)
+        val response = client.get(Urls.branch())
         val apiResponse = response.body<ApiResponse<List<Branch>>>()
         apiResponse.asResult()
     }

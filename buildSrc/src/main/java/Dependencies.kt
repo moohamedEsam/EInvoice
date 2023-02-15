@@ -5,6 +5,7 @@ object Plugins {
     const val kotlinJvm = "org.jetbrains.kotlin.jvm"
     const val kotlinSerialization = "plugin.serialization"
     const val ksp = "com.google.devtools.ksp"
+    const val proto = "com.google.protobuf"
 }
 
 
@@ -49,6 +50,9 @@ object Dependencies {
     const val roomCompiler = "androidx.room:room-compiler:${Versions.room}"
     const val roomKsp = "androidx.room:room-compiler:${Versions.room}"
     const val roomTesting = "androidx.room:room-testing:${Versions.room}"
+
+    const val dataStore = "androidx.datastore:datastore-preferences:${Versions.dataStore}"
+    const val proto = "com.google.protobuf:protobuf-javalite:${Versions.proto}"
 
     const val ktorClient = "io.ktor:ktor-client-android:${Versions.ktorVersion}"
     const val ktorCIO = "io.ktor:ktor-client-cio:${Versions.ktorVersion}"

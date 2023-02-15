@@ -53,7 +53,7 @@ fun Scope.provideHttpClient() = HttpClient(CIO) {
 
             refreshTokens {
                 val token = loadTokenFromSharedPref(androidContext()) ?: return@refreshTokens null
-                val refreshToken = client.post(Urls.REFRESH_TOKEN) {
+                val refreshToken = client.post(Urls.refreshToken()) {
                     setBody(mapOf("token" to token))
                     contentType(ContentType.Application.Json)
                     markAsRefreshTokenRequest()

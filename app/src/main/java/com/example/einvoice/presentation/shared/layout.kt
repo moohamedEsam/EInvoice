@@ -4,13 +4,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
@@ -21,7 +21,6 @@ import com.example.auth.login.LoginScreenRoute
 import com.example.auth.login.navigateToLoginScreen
 import com.example.branch.screens.all.BranchesScreenRoute
 import com.example.branch.screens.all.navigateToBranchesScreen
-import com.example.branch.screens.form.BranchFormScreenRoute
 import com.example.client.screens.all.ClientsScreenRoute
 import com.example.client.screens.all.navigateToClientsScreen
 import com.example.common.models.SnackBarEvent
@@ -31,11 +30,11 @@ import com.example.document.screens.all.DocumentsScreenRoute
 import com.example.document.screens.all.navigateToDocumentsScreen
 import com.example.domain.auth.LogoutUseCase
 import com.example.domain.sync.OneTimeSyncUseCase
-import com.example.einvoice.R
+import com.example.einvoice.presentation.settings.SettingsScreenRoute
+import com.example.einvoice.presentation.settings.navigateToSettingsScreen
 import com.example.functions.handleSnackBarEvent
 import com.example.item.screens.all.ItemsScreenRoute
 import com.example.item.screens.all.navigateToItemsScreen
-import com.example.maplocation.MapScreenRoute
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.inject
 
@@ -182,6 +181,18 @@ private fun DrawerContent(navController: NavHostController) {
             label = { Text("Documents") },
             selected = currentRoute == DocumentsScreenRoute,
             onClick = navController::navigateToDocumentsScreen
+        )
+        NavigationDrawerItem(
+            icon = {
+                Icon(
+//                    painterResource(id = R.drawable.invoice),
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = null
+                )
+            },
+            label = { Text("Settings") },
+            selected = currentRoute == SettingsScreenRoute,
+            onClick = navController::navigateToSettingsScreen
         )
     }
 }

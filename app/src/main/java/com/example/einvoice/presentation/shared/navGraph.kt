@@ -33,6 +33,7 @@ import com.example.document.screens.details.navigateToDocumentDetailsScreen
 import com.example.document.screens.form.documentFormScreen
 import com.example.document.screens.form.navigateToDocumentFormScreen
 import com.example.einvoice.R
+import com.example.einvoice.presentation.settings.settingsScreen
 import com.example.item.screens.all.itemsScreen
 import com.example.maplocation.latKey
 import com.example.maplocation.lngKey
@@ -137,5 +138,7 @@ fun EInvoiceNavGraph(
             onEditClick = navController::navigateToDocumentFormScreen,
             onShowSnackBarEvent = onShowSnackbarEvent
         )
+
+        settingsScreen()
     }
 }

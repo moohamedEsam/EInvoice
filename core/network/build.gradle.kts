@@ -1,6 +1,11 @@
+import com.google.protobuf.gradle.generateProtoTasks
+import com.google.protobuf.gradle.protobuf
+import com.google.protobuf.gradle.protoc
+
 plugins {
     id(Plugins.androidLibrary)
     id(Plugins.kotlinAndroid)
+    id(Plugins.proto) version Versions.protoPlugin
     kotlin(Plugins.kotlinSerialization) version Versions.kotlinSerialization
 }
 
@@ -21,7 +26,7 @@ android {
     composeOptions.kotlinCompilerExtensionVersion = Versions.kotlinCompilerExtensionVersion
 }
 
-dependencies{
+dependencies {
     implementation(Dependencies.ktorCIO)
     implementation(Dependencies.ktorClientLogging)
     implementation(Dependencies.ktorContentNegotiation)
@@ -29,6 +34,24 @@ dependencies{
     implementation(Dependencies.ktorAuthentication)
     implementation(Dependencies.koinAndroid)
     implementation(Dependencies.koinCore)
+    implementation(Dependencies.dataStore)
+    implementation(Dependencies.proto)
     implementation(project(":core:models"))
     implementation(project(":common"))
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.10.0"
+    }
+
+    generateProtoTasks {
+        all().forEach {
+            it.plugins{
+                create("java"){
+                    option("lite")
+                }
+            }
+        }
+    }
 }

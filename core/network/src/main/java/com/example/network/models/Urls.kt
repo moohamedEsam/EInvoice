@@ -1,28 +1,38 @@
 package com.example.network.models
 
+import android.content.Context
+import android.util.Log
+import com.example.network.serializers.settingsDataStore
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+
 object Urls {
-    private const val BASE_URL = "http://192.168.1.4:7081"
-    const val REFRESH_TOKEN = "$BASE_URL/User/refresh_token"
-    const val LOGIN = "$BASE_URL/User/sign_in"
-    const val REGISTER = "$BASE_URL/User/create"
-    const val COMPANY = "$BASE_URL/Company"
-    const val CLIENT = "$BASE_URL/Client"
-    const val BRANCH = "$BASE_URL/Branch"
-    const val ITEM = "$BASE_URL/Item"
-    private const val CONSTANTS = "$BASE_URL/Constants"
-    const val UNIT_TYPES = "$CONSTANTS/unit_types"
-    const val TAX_TYPES = "$CONSTANTS/tax_types"
-    const val DOCUMENT = "$BASE_URL/Document"
-    const val SYNC_DOCUMENTS_STATUS = "$DOCUMENT/sync"
-    fun getCompany(companyId: String) = "$COMPANY/$companyId"
-    fun getClient(clientId: String) = "$CLIENT/$clientId"
-    fun getBranch(branchId: String) = "$BRANCH/$branchId"
+    private var baseUrl = "http://192.168.1.4:7081"
+    fun refreshToken() = "$baseUrl/User/refresh_token"
+    fun login() = "$baseUrl/User/sign_in"
+    fun register() = "$baseUrl/User/create"
+    fun company() = "$baseUrl/Company"
+    fun client() = "$baseUrl/Client"
+    fun branch() = "$baseUrl/Branch"
+    fun item() = "$baseUrl/Item"
+    private fun constants() = "$baseUrl/Constants"
+    fun unitTypes() = "${constants()}/unit_types"
+    fun taxTypes() = "${constants()}/tax_types"
+    fun document() = "$baseUrl/Document"
+    fun syncDocumentStatus() = "${document()}/sync"
+    fun getCompany(companyId: String) = "${company()}/$companyId"
+    fun getClient(clientId: String) = "${client()}/$clientId"
+    fun getBranch(branchId: String) = "${branch()}/$branchId"
 
-    fun getItem(itemId: String) = "$ITEM/$itemId"
+    fun getItem(itemId: String) = "${item()}/$itemId"
 
-    fun getDocument(documentId: String) = "$DOCUMENT/$documentId"
+    fun getDocument(documentId: String) = "${document()}/$documentId"
 
-    fun cancelDocument(documentId: String) = "$DOCUMENT/cancel/$documentId"
+    fun cancelDocument(documentId: String) = "${document()}/cancel/$documentId"
 
-
+    suspend fun setIpAddress(context: Context) {
+        context.settingsDataStore.data.distinctUntilChanged()
+            .collectLatest { baseUrl = it.ipAddress }
+    }
 }
