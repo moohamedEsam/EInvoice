@@ -71,4 +71,6 @@ interface EInvoiceRemoteDataSource {
 
     suspend fun cancelDocument(documentId: String): Result<Unit>
 
+    suspend fun sendDocument(documentId: String): Result<Unit>
+
 }

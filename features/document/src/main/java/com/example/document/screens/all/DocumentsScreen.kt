@@ -39,7 +39,10 @@ import java.util.*
 @Composable
 fun DocumentsScreen(
     onDocumentClick: (String) -> Unit,
-    onAddDocumentClick: () -> Unit,
+    onCreateCreditClick: (String) -> Unit,
+    onCreateDebitClick: (String) -> Unit,
+    onDocumentUpdateClick: (String) -> Unit,
+    onAddDocumentClick: () -> Unit
 ) {
     val viewModel: DocumentsViewModel by viewModel()
     val state by viewModel.state.collectAsState()
@@ -83,7 +86,11 @@ fun DocumentsScreen(
             viewModel.setLastFilterClicked(FilterType.STATUS)
         },
         onDocumentCancelClick = viewModel::cancelDocument,
-        onDatePicked = viewModel::setDateFilter
+        onDocumentSendClick = viewModel::sendDocument,
+        onDatePicked = viewModel::setDateFilter,
+        onCreateCreditClick = onCreateCreditClick,
+        onCreateDebitClick = onCreateDebitClick,
+        onDocumentUpdateClick = onDocumentUpdateClick
     )
     if (showDialog && lastFilterClicked != null)
         ShowFilterDialog(
@@ -105,13 +112,17 @@ private fun DocumentsScreenContent(
     onQueryChange: (String) -> Unit,
     onDocumentClick: (String) -> Unit,
     onDocumentCancelClick: (String) -> Unit,
+    onDocumentSendClick: (String) -> Unit,
     onAddDocumentClick: () -> Unit,
     onSyncDocumentsClick: () -> Unit,
     onFilterByCompanyClick: () -> Unit,
     onFilterByClientClick: () -> Unit,
     onFilterByBranchClick: () -> Unit,
     onFilterByStatusClick: () -> Unit,
-    onDatePicked: (Date?) -> Unit
+    onDatePicked: (Date?) -> Unit,
+    onCreateDebitClick: (String) -> Unit,
+    onCreateCreditClick: (String) -> Unit,
+    onDocumentUpdateClick: (String) -> Unit
 ) {
     val simpleDateFormat by remember {
         mutableStateOf(SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()))
@@ -139,7 +150,12 @@ private fun DocumentsScreenContent(
             onDocumentClick = onDocumentClick,
             documents = state.documents,
             onDocumentCancelClick = onDocumentCancelClick,
-            onAddDocumentClick = onAddDocumentClick
+            onAddDocumentClick = onAddDocumentClick,
+            onCreateCreditClick = onCreateCreditClick,
+            onCreateDebitClick = onCreateDebitClick,
+            onDocumentSendClick = onDocumentSendClick,
+            isConnectedToNetwork = state.isConnectedToNetwork,
+            onDocumentUpdateClick = onDocumentUpdateClick
         )
     }
 }
@@ -148,7 +164,12 @@ private fun LazyListScope.documentsList(
     onDocumentClick: (String) -> Unit,
     onDocumentCancelClick: (String) -> Unit,
     onAddDocumentClick: () -> Unit,
-    documents: List<DocumentView>
+    onCreateCreditClick: (String) -> Unit,
+    onDocumentUpdateClick: (String) -> Unit,
+    onCreateDebitClick: (String) -> Unit,
+    onDocumentSendClick: (String) -> Unit,
+    documents: List<DocumentView>,
+    isConnectedToNetwork: Boolean
 ) {
     item {
         Row(
@@ -170,7 +191,12 @@ private fun LazyListScope.documentsList(
             document = document,
             onClick = { onDocumentClick(document.id) },
             onDocumentCancelClick = onDocumentCancelClick,
-            dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()),
+            onCreateCreditClick = onCreateCreditClick,
+            onCreateDebitClick = onCreateDebitClick,
+            onDocumentSendClick = onDocumentSendClick,
+            isConnectedToNetwork = isConnectedToNetwork,
+            onDocumentUpdateClick = onDocumentUpdateClick
         )
     }
 
@@ -303,9 +329,14 @@ private fun SearchField(
 @Composable
 private fun DocumentItem(
     document: DocumentView,
+    isConnectedToNetwork: Boolean,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
+    onDocumentUpdateClick: (String) -> Unit,
     onDocumentCancelClick: (String) -> Unit,
+    onDocumentSendClick: (String) -> Unit,
+    onCreateCreditClick: (String) -> Unit,
+    onCreateDebitClick: (String) -> Unit,
     dateFormat: SimpleDateFormat
 ) {
     val total = document.invoices.sumOf { it.getTotals().total }
@@ -381,7 +412,7 @@ private fun DocumentItem(
             ) {
                 if (document.status.isUpdatable())
                     AssistChip(
-                        onClick = { onDocumentCancelClick(document.id) },
+                        onClick = { onDocumentUpdateClick(document.id) },
                         label = { Text("Update") },
                         leadingIcon = {
                             Icon(
@@ -392,14 +423,15 @@ private fun DocumentItem(
                     )
                 if (document.status.isSendable())
                     AssistChip(
-                        onClick = { onDocumentCancelClick(document.id) },
+                        onClick = { onDocumentSendClick(document.id) },
                         label = { Text("Send") },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Filled.Upload,
                                 contentDescription = null
                             )
-                        }
+                        },
+                        enabled = isConnectedToNetwork
                     )
                 if (document.status.isCancelable())
                     AssistChip(
@@ -412,8 +444,20 @@ private fun DocumentItem(
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onErrorContainer
                             )
-                        }
+                        },
+                        enabled = isConnectedToNetwork
                     )
+
+                if (document.documentType != "I") return@Row
+                AssistChip(
+                    onClick = { onCreateCreditClick(document.id) },
+                    label = { Text("Create Credit") }
+                )
+
+                AssistChip(
+                    onClick = { onCreateDebitClick(document.id) },
+                    label = { Text("Create Debit") }
+                )
             }
         }
     }
@@ -534,7 +578,9 @@ private fun ShowStatusFilterDialog(
 fun DocumentsScreenPreview() {
     DocumentsScreenContent(
         state = DocumentsScreenState(
-            documents = List(50) { DocumentView.empty().copy(status = DocumentStatus.Invalid) },
+            documents = List(50) {
+                DocumentView.empty().copy(status = DocumentStatus.Invalid, documentType = "I")
+            },
             query = "",
             isSyncing = false,
             companyFilter = null,
@@ -553,5 +599,9 @@ fun DocumentsScreenPreview() {
         onDocumentCancelClick = {},
         onDatePicked = {},
         onFilterByStatusClick = {},
+        onCreateCreditClick = {},
+        onCreateDebitClick = {},
+        onDocumentSendClick = {},
+        onDocumentUpdateClick = {},
     )
 }

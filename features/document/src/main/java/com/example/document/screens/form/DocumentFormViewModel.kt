@@ -392,6 +392,7 @@ class DocumentFormViewModel(
         _selectedClient.update { document.client }
         _internalId.update { document.internalId }
         _invoices.update { document.invoices }
+        oldStatus = document.status
         _alreadyUsedInternalIds.update { it - document.internalId }
     }
 
@@ -433,7 +434,8 @@ class DocumentFormViewModel(
             documentType = "I",
             status = if (isUpdatingDocument && oldStatus in listOf(
                     DocumentStatus.SignError,
-                    DocumentStatus.Invalid
+                    DocumentStatus.Invalid,
+                    DocumentStatus.InvalidSent
                 )
             )
                 DocumentStatus.Updated

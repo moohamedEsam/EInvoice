@@ -50,9 +50,7 @@ fun <T> BaseExposedDropDownMenu(
             options.filter { filterCriteria(it, query) }
         }
     }
-    var shouldShowFilteredItems by remember {
-        mutableStateOf(false)
-    }
+
     Column(
         modifier = modifier
     ) {
@@ -61,11 +59,9 @@ fun <T> BaseExposedDropDownMenu(
             isExpanded = isExpanded,
             onValueChange = {
                 query = it
-                shouldShowFilteredItems = true
             },
             onCheckedChange = {
                 isExpanded = it
-                shouldShowFilteredItems = false
             },
             textFieldLabel = textFieldLabel
         )
@@ -76,19 +72,21 @@ fun <T> BaseExposedDropDownMenu(
                 .animateContentSize()
         ) {
             if (isExpanded)
-                items(if (shouldShowFilteredItems) filteredItems else options) {
-                    Text(
-                        text = optionsLabel(it),
-                        style = textStyle,
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxWidth()
-                            .clickable {
-                                onOptionSelect(it)
-                                isExpanded = false
-                            }
-                    )
-                    Divider()
+                items(filteredItems) {
+                    Column {
+                        Text(
+                            text = optionsLabel(it),
+                            style = textStyle,
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .fillMaxWidth()
+                                .clickable {
+                                    onOptionSelect(it)
+                                    isExpanded = false
+                                }
+                        )
+                        Divider()
+                    }
                 }
         }
     }

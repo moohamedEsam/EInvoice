@@ -1,11 +1,9 @@
 package com.example.network.models
 
 import android.content.Context
-import android.util.Log
 import com.example.network.serializers.settingsDataStore
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 
 object Urls {
     private var baseUrl = "http://192.168.1.4:7081"
@@ -31,8 +29,10 @@ object Urls {
 
     fun cancelDocument(documentId: String) = "${document()}/cancel/$documentId"
 
+    fun sendDocument(documentId: String) = "${document()}/submit/$documentId"
+
     suspend fun setIpAddress(context: Context) {
         context.settingsDataStore.data.distinctUntilChanged()
-            .collectLatest { baseUrl = it.ipAddress }
+            .collectLatest { baseUrl = "http://${it.ipAddress}:7081" }
     }
 }

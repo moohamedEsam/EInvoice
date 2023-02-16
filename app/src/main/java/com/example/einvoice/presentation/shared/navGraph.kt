@@ -31,6 +31,8 @@ import com.example.document.screens.all.documentsScreen
 import com.example.document.screens.details.documentDetailsScreen
 import com.example.document.screens.details.navigateToDocumentDetailsScreen
 import com.example.document.screens.form.documentFormScreen
+import com.example.document.screens.form.navigateToCreditDocumentFormScreen
+import com.example.document.screens.form.navigateToDebitDocumentFormScreen
 import com.example.document.screens.form.navigateToDocumentFormScreen
 import com.example.einvoice.R
 import com.example.einvoice.presentation.settings.settingsScreen
@@ -126,7 +128,10 @@ fun EInvoiceNavGraph(
 
         documentsScreen(
             onDocumentClick = navController::navigateToDocumentDetailsScreen,
-            onAddDocumentClick = navController::navigateToDocumentFormScreen
+            onAddDocumentClick = navController::navigateToDocumentFormScreen,
+            onCreateDebitClick = navController::navigateToDebitDocumentFormScreen,
+            onCreateCreditClick = navController::navigateToCreditDocumentFormScreen,
+            onDocumentUpdateClick = navController::navigateToDocumentFormScreen
         )
 
         documentFormScreen(onShowSnackbarEvent)

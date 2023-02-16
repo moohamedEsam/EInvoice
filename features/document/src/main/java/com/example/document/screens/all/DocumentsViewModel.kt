@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.domain.document.CancelDocumentUseCase
 import com.example.domain.document.GetDocumentsUseCase
+import com.example.domain.document.SendDocumentUseCase
 import com.example.domain.document.SyncDocumentsStatusUseCase
 import com.example.domain.networkStatus.NetworkObserver
 import com.example.domain.networkStatus.NetworkStatus
@@ -20,6 +21,7 @@ class DocumentsViewModel(
     private val getDocumentsUseCase: GetDocumentsUseCase,
     private val networkObserver: NetworkObserver,
     private val cancelDocumentUseCase: CancelDocumentUseCase,
+    private val sendDocumentUseCase: SendDocumentUseCase,
     private val syncDocumentsStatusUseCase: SyncDocumentsStatusUseCase
 ) : ViewModel() {
     private val _documents = MutableStateFlow(emptyList<DocumentView>())
@@ -123,6 +125,10 @@ class DocumentsViewModel(
 
     fun cancelDocument(documentId: String) = viewModelScope.launch {
         cancelDocumentUseCase(documentId)
+    }
+
+    fun sendDocument(documentId: String) = viewModelScope.launch {
+        sendDocumentUseCase(documentId)
     }
 
     fun syncDocumentsStatus() = viewModelScope.launch {

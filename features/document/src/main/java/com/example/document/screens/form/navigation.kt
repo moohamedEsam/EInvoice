@@ -13,11 +13,10 @@ fun NavGraphBuilder.documentFormScreen(
     onShowSnackBarEvent: (SnackBarEvent) -> Unit
 ) {
     composable(
-        route = "$DocumentFormScreenRoute/{documentId}",
+        route = "$DocumentFormScreenRoute/{documentId}/{status}",
         arguments = getScreenNavigationArguments()
     ) {
         val documentId = it.arguments?.getString("documentId") ?: " "
-
         DocumentFormScreen(
             documentId = documentId,
             onShowSnackBarEvent = onShowSnackBarEvent
@@ -29,14 +28,25 @@ private fun getScreenNavigationArguments() = listOf(
     navArgument("documentId") {
         defaultValue = " "
     },
-    navArgument("company") {
-        defaultValue = null
-        nullable = true
+    navArgument("status") {
+        defaultValue = "I"
     }
 )
 
 fun NavHostController.navigateToDocumentFormScreen(
     documentId: String = " "
 ) {
-    navigate("$DocumentFormScreenRoute/$documentId")
+    navigate("$DocumentFormScreenRoute/$documentId/I")
+}
+
+fun NavHostController.navigateToCreditDocumentFormScreen(
+    documentId: String
+) {
+    navigate("$DocumentFormScreenRoute/$documentId/C")
+}
+
+fun NavHostController.navigateToDebitDocumentFormScreen(
+    documentId: String
+) {
+    navigate("$DocumentFormScreenRoute/$documentId/D")
 }

@@ -12,7 +12,8 @@ val documentsModule = module {
             getDocumentsUseCase = get(),
             networkObserver = get(),
             cancelDocumentUseCase = get(),
-            syncDocumentsStatusUseCase = get()
+            syncDocumentsStatusUseCase = get(),
+            sendDocumentUseCase = get(),
         )
     }
     viewModel { params ->

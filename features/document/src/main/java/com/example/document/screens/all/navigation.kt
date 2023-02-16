@@ -9,17 +9,23 @@ const val DocumentsScreenRoute = "documents"
 fun NavGraphBuilder.documentsScreen(
     onDocumentClick: (String) -> Unit,
     onAddDocumentClick: () -> Unit,
+    onCreateCreditClick: (String) -> Unit,
+    onCreateDebitClick: (String) -> Unit,
+    onDocumentUpdateClick: (String) -> Unit,
 ) {
     composable(DocumentsScreenRoute) {
         DocumentsScreen(
             onDocumentClick = onDocumentClick,
             onAddDocumentClick = onAddDocumentClick,
+            onCreateCreditClick = onCreateCreditClick,
+            onCreateDebitClick = onCreateDebitClick,
+            onDocumentUpdateClick = onDocumentUpdateClick,
         )
     }
 }
 
 fun NavHostController.navigateToDocumentsScreen() {
-    navigate(DocumentsScreenRoute){
+    navigate(DocumentsScreenRoute) {
         launchSingleTop = true
     }
 }

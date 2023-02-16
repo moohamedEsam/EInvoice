@@ -7,15 +7,20 @@ import com.example.data.sync.handleSync
 import com.example.database.models.document.*
 import com.example.database.models.invoiceLine.asInvoiceLineEntity
 import com.example.database.room.dao.DocumentDao
+import com.example.models.document.Document
 import com.example.models.document.DocumentStatus
 import com.example.models.document.DocumentView
 import com.example.models.document.asDocument
+import com.example.models.invoiceLine.InvoiceLine
 import com.example.models.invoiceLine.asInvoiceLine
 import com.example.network.EInvoiceRemoteDataSource
 import com.example.network.models.document.asCreateDocumentDto
 import com.example.network.models.document.asNetworkDocumentView
 import com.example.network.models.document.asUpdateDocumentDto
 import kotlinx.coroutines.flow.*
+import java.util.UUID
+
+private const val DOCUMENT_NOT_FOUND = "Document not found"
 
 class OfflineFirstDocumentRepository(
     private val localDataSource: DocumentDao,
@@ -28,12 +33,15 @@ class OfflineFirstDocumentRepository(
         Result.Success(document)
     }
 
-    override fun getDocumentsInternalIdsByCompanyId(id: String, excludedDocumentId:String): Flow<List<String>> =
+    override fun getDocumentsInternalIdsByCompanyId(
+        id: String,
+        excludedDocumentId: String
+    ): Flow<List<String>> =
         localDataSource.getDocumentsInternalIdsByCompanyId(id, excludedDocumentId)
 
     override suspend fun cancelDocument(id: String): Result<Unit> = tryWrapper {
         val document = localDataSource.getDocumentById(id).firstOrNull()
-            ?: return@tryWrapper Result.Error("Document not found")
+            ?: return@tryWrapper Result.Error(DOCUMENT_NOT_FOUND)
         val cancelResult = remoteDataSource.cancelDocument(document.documentEntity.id)
         cancelResult.ifSuccess {
             localDataSource.updateDocumentStatus(
@@ -43,6 +51,32 @@ class OfflineFirstDocumentRepository(
         }
         cancelResult
     }
+
+    override suspend fun sendDocument(id: String): Result<Unit> = tryWrapper {
+        val document = localDataSource.getDocumentById(id).firstOrNull()
+            ?: return@tryWrapper Result.Error(DOCUMENT_NOT_FOUND)
+        val sendResult = remoteDataSource.sendDocument(document.documentEntity.id)
+        val status =
+            if (sendResult is Result.Success) DocumentStatus.Submitted else DocumentStatus.InvalidSent
+        val error = (sendResult as? Result.Error)?.exception
+        localDataSource.updateDocument(document.documentEntity.copy(status = status, error = error))
+        sendResult
+    }
+
+    override suspend fun createDerivedDocument(
+        id: String,
+        invoiceLines: List<InvoiceLine>
+    ): Result<Document> = tryWrapper {
+        val document = localDataSource.getDocumentById(id).firstOrNull()
+            ?: return@tryWrapper Result.Error(DOCUMENT_NOT_FOUND)
+
+        val creditDocument =
+            document.documentEntity.copy(id = UUID.randomUUID().toString(), isCreated = true)
+        val creditInvoiceLines = invoiceLines.map { it.asInvoiceLineEntity() }
+        localDataSource.insertDocumentWithInvoices(creditDocument, creditInvoiceLines)
+        Result.Success(creditDocument.asDocument())
+    }
+
 
     override fun getDocument(id: String): Flow<DocumentView> =
         localDataSource.getDocumentById(id).distinctUntilChanged().map { it.asDocumentView() }

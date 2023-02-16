@@ -53,11 +53,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-    override fun onStart() {
-        super.onStart()
-        lifecycleScope.launchWhenResumed {
-            Urls.setIpAddress(this@MainActivity)
-        }
-    }
 }

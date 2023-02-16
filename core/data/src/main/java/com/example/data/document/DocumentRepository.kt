@@ -4,6 +4,7 @@ import com.example.common.models.Result
 import com.example.data.sync.Syncable
 import com.example.models.document.Document
 import com.example.models.document.DocumentView
+import com.example.models.invoiceLine.InvoiceLine
 import kotlinx.coroutines.flow.Flow
 
 interface DocumentRepository : Syncable<Document> {
@@ -43,4 +44,9 @@ interface DocumentRepository : Syncable<Document> {
     suspend fun syncDocumentsStatus(): Result<Unit>
 
     suspend fun cancelDocument(id: String): Result<Unit>
+
+    suspend fun sendDocument(id: String): Result<Unit>
+
+    suspend fun createDerivedDocument(id:String, invoiceLines:List<InvoiceLine>) : Result<Document>
+
 }
