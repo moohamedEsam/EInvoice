@@ -48,6 +48,8 @@ dependencies {
     implementation(Dependencies.composeFlowLayout)
     implementation(Dependencies.materialDialogCore)
     implementation(Dependencies.materialDialogsDateTime)
+    implementation(Dependencies.paging)
+    implementation(Dependencies.pagingCompose)
     implementation(project(":common"))
     implementation(project(":core:models"))
     implementation(project(":core:domain"))

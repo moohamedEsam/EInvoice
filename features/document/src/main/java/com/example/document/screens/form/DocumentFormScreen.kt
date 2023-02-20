@@ -226,6 +226,7 @@ private fun DocumentFormScreenContent(
                     internalIdValidationResult = internalIdValidationResult,
                     createDate = createDate,
                     onCreateDateChanged = onCreateDateChanged,
+                    invoices = invoicePageInvoices,
                 )
 
                 1 -> DocumentInvoicesList(
@@ -254,8 +255,6 @@ private fun DocumentFormScreenContent(
                 )
             }
         }
-
-        DocumentSummery(invoicesState = invoicePageInvoices, modifier = Modifier.fillMaxWidth())
 
         OneTimeEventButton(
             enabled = isEnabled,

@@ -1,5 +1,6 @@
 package com.example.database.room.dao
 
+import androidx.paging.DataSource
 import androidx.room.*
 import com.example.database.models.company.CompanyEntity
 import com.example.database.models.company.CompanyViewEntity
@@ -10,6 +11,10 @@ import kotlinx.coroutines.flow.Flow
 interface CompanyDao {
     @Query("SELECT * FROM Company where isDeleted = 0")
     fun getCompanies(): Flow<List<CompanyEntity>>
+
+    @Transaction
+    @Query("SELECT * FROM Company where isDeleted = 0")
+    fun getPagedCompanies(): DataSource.Factory<Int, CompanyViewEntity>
 
     @Query("SELECT * FROM Company")
     fun getAllCompanies(): Flow<List<CompanyEntity>>

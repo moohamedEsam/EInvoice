@@ -33,5 +33,6 @@ dependencies {
     implementation(Dependencies.room)
     ksp(Dependencies.roomCompiler)
     implementation(Dependencies.roomKtx)
+    implementation(Dependencies.roomPaging)
     implementation(Dependencies.ktorKotlinSerialization)
 }

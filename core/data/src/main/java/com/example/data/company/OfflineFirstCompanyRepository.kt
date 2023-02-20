@@ -1,5 +1,6 @@
 package com.example.data.company
 
+import androidx.paging.*
 import com.example.common.functions.tryWrapper
 import com.example.common.models.Result
 import com.example.data.sync.Synchronizer
@@ -9,9 +10,7 @@ import com.example.database.room.dao.CompanyDao
 import com.example.models.company.Company
 import com.example.models.company.CompanyView
 import com.example.network.EInvoiceRemoteDataSource
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.map
 
 class OfflineFirstCompanyRepository(
@@ -28,10 +27,15 @@ class OfflineFirstCompanyRepository(
         .map(CompanyViewEntity::asCompanyView)
 
     override fun getCompaniesViews(): Flow<List<CompanyView>> = localDataSource.getCompaniesViews()
-        .map { companies -> companies.map(CompanyViewEntity::removeDeleted).map(CompanyViewEntity::asCompanyView) }
+        .map { companies ->
+            companies.map(CompanyViewEntity::removeDeleted).map(CompanyViewEntity::asCompanyView)
+        }
 
     override fun getCompanies(): Flow<List<Company>> = localDataSource.getCompanies()
         .map { companies -> companies.map(CompanyEntity::asCompany) }
+
+    override fun getCompanyPagingSource(): PagingSource<Int, CompanyView> =
+        localDataSource.getPagedCompanies().map(CompanyViewEntity::asCompanyView).asPagingSourceFactory().invoke()
 
 
     override suspend fun updateCompany(company: Company): Result<Company> = tryWrapper {

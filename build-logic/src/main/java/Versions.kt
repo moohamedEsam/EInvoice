@@ -23,6 +23,8 @@ object Versions {
     const val coil = "2.2.2"
     const val room = "2.4.3"
     const val dataStore = "1.0.0"
+    const val paging = "3.1.1"
+    const val pagingCompose = "1.0.0-alpha18"
     const val proto = "3.21.9"
     const val protoPlugin = "0.8.12"
 

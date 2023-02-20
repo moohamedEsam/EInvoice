@@ -38,8 +38,8 @@ fun DocumentTransaction(
     ) {
         FlowRow(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
-            mainAxisSpacing = 8.dp,
-            crossAxisSpacing = 8.dp,
+            mainAxisSpacing = 4.dp,
+            crossAxisSpacing = 4.dp,
             mainAxisAlignment = FlowMainAxisAlignment.SpaceBetween,
             crossAxisAlignment = FlowCrossAxisAlignment.Center
         ) {

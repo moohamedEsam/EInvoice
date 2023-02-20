@@ -9,7 +9,7 @@ import org.koin.dsl.module
 val companyModule = module {
     viewModel {
         CompaniesViewModel(
-            getCompaniesViewsUseCase = get(),
+            getCompanyPagingSource = get(),
             deleteCompanyUseCase = get(),
             undoDeleteCompanyUseCase = get()
         )

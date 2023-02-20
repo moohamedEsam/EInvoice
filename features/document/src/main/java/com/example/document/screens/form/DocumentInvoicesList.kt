@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -80,9 +81,7 @@ fun DocumentInvoicesList(
             items(invoices, key = { it.id }) { invoice ->
                 InvoiceLineItem(
                     invoiceLineView = invoice,
-                    modifier = Modifier
-                        .heightIn(max = 280.dp)
-                        .animateItemPlacement(),
+                    modifier = Modifier.animateItemPlacement(),
                     actionRow = {
                         InvoiceLineItemActions(
                             onAddTaxClick = onAddTaxClick,
@@ -193,9 +192,7 @@ fun InvoiceLineItem(
             Divider()
 
             Row(
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .horizontalScroll(rememberScrollState()),
+                modifier = Modifier.horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 actionRow()

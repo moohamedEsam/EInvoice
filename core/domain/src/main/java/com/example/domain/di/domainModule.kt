@@ -28,7 +28,10 @@ val domainModule = module {
     single { logoutUseCase(get(), androidContext()) }
     single { registerUseCase(get(), androidContext()) }
     single { isUserLoggedInUseCase(androidContext()) }
+
+
     single { GetCompaniesUseCase(get<CompanyRepository>()::getCompanies) }
+    single { GetCompanyPagingSource(get<CompanyRepository>()::getCompanyPagingSource) }
     single { GetCompaniesViewsUseCase(get<CompanyRepository>()::getCompaniesViews) }
     single { GetCompanyUseCase(get<CompanyRepository>()::getCompany) }
     single { CreateCompanyUseCase(get<CompanyRepository>()::createCompany) }

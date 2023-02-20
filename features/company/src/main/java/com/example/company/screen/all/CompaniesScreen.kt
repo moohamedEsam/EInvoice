@@ -6,6 +6,7 @@ import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
@@ -17,6 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import com.example.einvoicecomponents.ListScreenContent
 import com.example.models.Client
 import com.example.models.branch.Branch
@@ -41,7 +46,7 @@ fun CompaniesScreen(
     onCompanyEditClick: (Company) -> Unit,
 ) {
     val viewModel: CompaniesViewModel by viewModel()
-    val companies by viewModel.companies.collectAsState()
+    val companies = viewModel.pager.collectAsLazyPagingItems()
     CompaniesScreenContent(
         companies = companies,
         onCompanyClick = onCompanyClick,
@@ -53,11 +58,10 @@ fun CompaniesScreen(
 
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CompaniesScreenContent(
     modifier: Modifier = Modifier,
-    companies: List<CompanyView>,
+    companies: LazyPagingItems<CompanyView>,
     queryState: StateFlow<String>,
     onQueryChange: (String) -> Unit,
     onCompanyClick: (Company) -> Unit,
@@ -65,23 +69,38 @@ private fun CompaniesScreenContent(
     onCreateNewCompanyClick: () -> Unit = {}
 ) {
 
-    ListScreenContent(
-        queryState = queryState,
-        onQueryChange = onQueryChange,
-        floatingButtonText = "Create New Company",
-        adaptiveItemSize = 250.dp,
-        onFloatingButtonClick = onCreateNewCompanyClick,
-        modifier = modifier.testTag("CompaniesScreenList")
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .horizontalScroll(rememberScrollState())
     ) {
         items(companies) { companyView ->
             CompanyItem(
-                companyView = companyView,
+                companyView = companyView!!,
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { onCompanyClick(companyView.company) },
                 onEditClick = { onCompanyEditClick(companyView.company) },
             )
         }
     }
+
+//    ListScreenContent(
+//        queryState = queryState,
+//        onQueryChange = onQueryChange,
+//        floatingButtonText = "Create New Company",
+//        adaptiveItemSize = 250.dp,
+//        onFloatingButtonClick = onCreateNewCompanyClick,
+//        modifier = modifier.testTag("CompaniesScreenList")
+//    ) {
+//        items(companies) { companyView ->
+//            CompanyItem(
+//                companyView = companyView,
+//                modifier = Modifier.fillMaxWidth(),
+//                onClick = { onCompanyClick(companyView.company) },
+//                onEditClick = { onCompanyEditClick(companyView.company) },
+//            )
+//        }
+//    }
 }
 
 
@@ -152,13 +171,13 @@ fun CompaniesScreenPreview() {
         )
     }
 
-    CompaniesScreenContent(
-        companies = companies,
-        modifier = Modifier.fillMaxSize(),
-        queryState = MutableStateFlow(""),
-        onQueryChange = {},
-        onCompanyClick = {},
-        onCompanyEditClick = {},
-    ) {}
+//    CompaniesScreenContent(
+//        companies = Pag,
+//        modifier = Modifier.fillMaxSize(),
+//        queryState = MutableStateFlow(""),
+//        onQueryChange = {},
+//        onCompanyClick = {},
+//        onCompanyEditClick = {},
+//    ) {}
 
 }

@@ -2,6 +2,9 @@ package com.example.company.screen.all
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import com.example.common.models.Result
 import com.example.domain.company.*
 import com.example.models.company.Company
@@ -10,7 +13,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class CompaniesViewModel(
-    private val getCompaniesViewsUseCase: GetCompaniesViewsUseCase,
+    private val getCompanyPagingSource: GetCompanyPagingSource,
     private val deleteCompanyUseCase: DeleteCompanyUseCase,
     private val undoDeleteCompanyUseCase: UndoDeleteCompanyUseCase
 ) : ViewModel() {
@@ -26,12 +29,15 @@ class CompaniesViewModel(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
+    val pager = Pager(
+        config = PagingConfig(
+            pageSize = 20,
+            enablePlaceholders = false,
+            prefetchDistance = 5
+        ),
+        pagingSourceFactory = getCompanyPagingSource
+    ).flow.cachedIn(viewModelScope)
 
-    init {
-        viewModelScope.launch {
-            getCompaniesViewsUseCase().collectLatest(_companies::emit)
-        }
-    }
 
     fun setQuery(query: String) {
         _query.update { query }

@@ -29,4 +29,5 @@ dependencies {
     implementation(Dependencies.coroutinesAndroid)
     implementation(Dependencies.coroutinesCore)
     implementation(Dependencies.workManager)
+    implementation(Dependencies.paging)
 }

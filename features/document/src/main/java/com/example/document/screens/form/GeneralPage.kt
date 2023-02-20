@@ -18,6 +18,7 @@ import com.example.einvoicecomponents.textField.ValidationTextField
 import com.example.models.branch.Branch
 import com.example.models.Client
 import com.example.models.company.Company
+import com.example.models.invoiceLine.InvoiceLineView
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
@@ -44,6 +45,7 @@ fun GeneralPage(
     internalIdValidationResult: StateFlow<ValidationResult>,
     createDate: StateFlow<Date>,
     onCreateDateChanged: (Date) -> Unit,
+    invoices: StateFlow<List<InvoiceLineView>>
 ) {
     Column(
         modifier = Modifier
@@ -87,6 +89,8 @@ fun GeneralPage(
             createDateState = createDate,
             onCreateDateChanged = onCreateDateChanged
         )
+        Spacer(modifier = Modifier.weight(0.8f))
+        DocumentSummery(invoicesState = invoices, modifier = Modifier.fillMaxWidth())
     }
 }
 
@@ -185,5 +189,6 @@ fun GeneralPagePreview() {
         internalIdValidationResult = MutableStateFlow(ValidationResult.Valid),
         createDate = MutableStateFlow(Date()),
         onCreateDateChanged = {},
+        invoices = MutableStateFlow(listOf())
     )
 }
