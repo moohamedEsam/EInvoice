@@ -1,26 +1,25 @@
 plugins {
-    id(Plugins.androidLibrary)
-    id(Plugins.kotlinAndroid)
-    kotlin(Plugins.kotlinSerialization) version Versions.kotlinSerialization
+    id("com.android.library")
+    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.kotlin.serialization) apply true
 }
 
 android {
     namespace = "com.example.models"
-    compileSdk = Versions.compileSdk
+    compileSdk = 33
     defaultConfig {
-        minSdk = Versions.minSdk
-        targetSdk = Versions.compileSdk
-        vectorDrawables.useSupportLibrary = true
+        minSdk = 21
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions.jvmTarget = "1.8"
-    composeOptions.kotlinCompilerExtensionVersion = Versions.kotlinCompilerExtensionVersion
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11.toString()
+    }
 }
 
-dependencies{
-    implementation(Dependencies.ktorKotlinSerialization)
-    implementation(Dependencies.composeMaterial3)
+dependencies {
+    implementation(libs.kotlinx.serialization.json)
 }

@@ -1,42 +1,18 @@
 plugins {
-    id(Plugins.androidLibrary)
-    id(Plugins.kotlinAndroid)
+    id("einvoice.android.library.compose")
 }
 
 android {
     namespace = "com.example.einvoicecomponents"
-    compileSdk = Versions.compileSdk
-
-    defaultConfig {
-        minSdk = Versions.minSdk
-        targetSdk = Versions.compileSdk
-        vectorDrawables.useSupportLibrary = true
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    buildFeatures.compose = true
-    kotlinOptions.jvmTarget = "1.8"
-    composeOptions.kotlinCompilerExtensionVersion = Versions.kotlinCompilerExtensionVersion
-
 }
 
 dependencies {
-    implementation(Dependencies.composeUi)
-    implementation(Dependencies.composeMaterial3)
-    debugImplementation(Dependencies.composeUiTooling)
-    implementation(Dependencies.composeUiToolingPreview)
-    implementation(Dependencies.composeFlowLayout)
-    implementation(Dependencies.extendedIcons)
-    implementation(Dependencies.coil)
-    implementation(Dependencies.coilCompose)
-    implementation(Dependencies.coilGifs)
-    implementation(Dependencies.materialDialogCore)
-    implementation(Dependencies.materialDialogsDateTime)
-    implementation(project(":common"))
-    implementation(project(":core:models"))
+    implementation(libs.compose.material.dialog.core)
+    implementation(libs.compose.material.dialog.datetime)
+    implementation(libs.androidx.compose.foundation.layout)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.iconsExtended)
+    implementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.accompanist.flowlayout)
+    implementation(libs.androidx.paging.compose)
 }

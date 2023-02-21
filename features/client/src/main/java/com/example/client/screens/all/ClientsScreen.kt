@@ -2,6 +2,7 @@ package com.example.client.screens.all
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
@@ -55,7 +56,6 @@ private fun ClientsScreenContent(
         queryState = queryState,
         onQueryChange = onQueryChanged,
         floatingButtonText = "Create New Client",
-        adaptiveItemSize = 200.dp,
         onFloatingButtonClick = onCreateClientClicked
     ) {
         items(clients) { client ->

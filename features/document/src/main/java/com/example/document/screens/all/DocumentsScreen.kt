@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.example.einvoicecomponents.datePickerColors
 import com.example.einvoicecomponents.toDate
 import com.example.einvoicecomponents.toLocalDate
+import com.example.functions.getStatusColor
 import com.example.models.Client
 import com.example.models.branch.Branch
 import com.example.models.company.Company

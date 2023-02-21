@@ -1,21 +1,20 @@
 plugins {
-    id(Plugins.androidLibrary)
-    id(Plugins.kotlinAndroid)
+    id("com.android.library")
+    id("org.jetbrains.kotlin.android")
 }
 
 android {
     namespace = "com.example.common"
-    compileSdk = Versions.compileSdk
+    compileSdk = 33
     defaultConfig {
-        minSdk = Versions.minSdk
-        targetSdk = Versions.compileSdk
-        vectorDrawables.useSupportLibrary = true
+        minSdk = 21
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
-    kotlinOptions.jvmTarget = "1.8"
-    composeOptions.kotlinCompilerExtensionVersion = Versions.kotlinCompilerExtensionVersion
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11.toString()
+    }
 }

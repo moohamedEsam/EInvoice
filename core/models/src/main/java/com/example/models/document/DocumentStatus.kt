@@ -1,6 +1,5 @@
 package com.example.models.document
 
-import androidx.compose.ui.graphics.Color
 
 
 enum class DocumentStatus {
@@ -14,17 +13,6 @@ enum class DocumentStatus {
     Invalid,
     Rejected,
     Cancelled;
-
-    fun getStatusColor(defaultColor: Color) = when (this) {
-        SignError -> Color.Red
-        InvalidSent -> Color.Red
-        Submitted -> Color.Yellow
-        Valid -> Color.Green
-        Invalid -> Color.Red
-        Rejected -> Color.LightGray
-        Cancelled -> Color.LightGray
-        else -> defaultColor
-    }
 
     fun isSendable() = when (this) {
         Initial, Updated, SignError, Signed, InvalidSent -> true

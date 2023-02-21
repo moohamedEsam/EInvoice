@@ -1,11 +1,9 @@
 package com.example.data.company
 
-import androidx.paging.PagingData
 import androidx.paging.PagingSource
-import com.example.models.company.Company
 import com.example.common.models.Result
 import com.example.data.sync.Syncable
-import com.example.database.models.company.CompanyViewEntity
+import com.example.models.company.Company
 import com.example.models.company.CompanyView
 import kotlinx.coroutines.flow.Flow
 

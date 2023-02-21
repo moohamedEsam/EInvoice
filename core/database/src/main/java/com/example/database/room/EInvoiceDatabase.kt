@@ -12,7 +12,6 @@ import com.example.database.models.invoiceLine.InvoiceLineEntity
 import com.example.database.models.invoiceLine.tax.SubTaxEntity
 import com.example.database.models.invoiceLine.tax.TaxEntity
 import com.example.database.room.dao.*
-import com.example.database.room.typeConverters.AddressTypeConverter
 import com.example.database.room.typeConverters.DateTypeConverter
 import com.example.database.room.typeConverters.InvoiceTaxTypeConverter
 
@@ -25,7 +24,6 @@ import com.example.database.room.typeConverters.InvoiceTaxTypeConverter
     version = 1
 )
 @TypeConverters(
-    AddressTypeConverter::class,
     InvoiceTaxTypeConverter::class,
     DateTypeConverter::class
 )

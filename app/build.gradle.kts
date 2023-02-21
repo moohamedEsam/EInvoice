@@ -1,24 +1,18 @@
 plugins {
-    id(Plugins.androidApplication)
-    id(Plugins.kotlinAndroid)
-    id(Plugins.ksp) version Versions.ksp
-    id(Plugins.proto) version Versions.protoPlugin
-    kotlin(Plugins.kotlinSerialization) version Versions.kotlinSerialization
+    id("einvoice.android.application")
+    id("einvoice.android.application.compose")
+    alias(libs.plugins.protobuf) apply true
 }
 
 android {
     namespace = "com.example.einvoice"
-    compileSdk = Versions.compileSdk
 
     defaultConfig {
         applicationId = "com.example.einvoice"
-        minSdk = Versions.minSdk
-        targetSdk = Versions.compileSdk
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {
@@ -35,50 +29,34 @@ android {
             isDebuggable = false
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    buildFeatures.compose = true
-    kotlinOptions.jvmTarget = "1.8"
-    composeOptions.kotlinCompilerExtensionVersion = "1.3.2"
+
     packagingOptions {
         resources.excludes += "META-INF/atomicfu.kotlin_module"
     }
 }
 
 dependencies {
-    implementation(Dependencies.appCompact)
-    implementation(Dependencies.composeUi)
-    implementation(Dependencies.composeMaterial3)
-    debugImplementation(Dependencies.composeUiTooling)
-    implementation(Dependencies.composeUiToolingPreview)
-    implementation(Dependencies.activityCompose)
-    implementation(Dependencies.composeNavigation)
-    implementation(Dependencies.extendedIcons)
-    implementation(Dependencies.coil)
-    implementation(Dependencies.coilCompose)
-    implementation(Dependencies.coilGifs)
-    implementation(Dependencies.ktorClient)
-    implementation(Dependencies.ktorAuthentication)
-    implementation(Dependencies.ktorCIO)
-    implementation(Dependencies.ktorClientLogging)
-    implementation(Dependencies.ktorContentNegotiation)
-    implementation(Dependencies.ktorKotlinSerialization)
-    implementation(Dependencies.koinCore)
-    implementation(Dependencies.koinAndroid)
-    implementation(Dependencies.koinCompose)
-    implementation(Dependencies.koinWorkManager)
-    implementation(Dependencies.workManager)
-    implementation(Dependencies.lifecycleRuntimeKtx)
-    implementation(Dependencies.viewModelKtx)
-    implementation(Dependencies.coroutinesAndroid)
-    implementation(Dependencies.coroutinesCore)
-    implementation(Dependencies.viewModelCompose)
-    implementation(Dependencies.splashScreen)
-    implementation(Dependencies.baselineProfile)
-    implementation(Dependencies.dataStore)
-    implementation(Dependencies.proto)
+
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.lifecycle.runtimeCompose)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.profileinstaller)
+    implementation(libs.coil.kt)
+    implementation(libs.coil.gif)
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
+    implementation(libs.koin.workmanager)
+    implementation(libs.koin.compose)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.iconsExtended)
+    implementation(libs.androidx.work.ktx)
+    implementation(libs.androidx.dataStore.core)
+    implementation(libs.protobuf.kotlin.lite)
+
     implementation(project(":common"))
     implementation(project(":core:network"))
     implementation(project(":core:data"))

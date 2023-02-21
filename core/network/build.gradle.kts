@@ -3,41 +3,24 @@ import com.google.protobuf.gradle.protobuf
 import com.google.protobuf.gradle.protoc
 
 plugins {
-    id(Plugins.androidLibrary)
-    id(Plugins.kotlinAndroid)
-    id(Plugins.proto) version Versions.protoPlugin
-    kotlin(Plugins.kotlinSerialization) version Versions.kotlinSerialization
+    id("einvoice.android.library")
+    alias(libs.plugins.protobuf) apply true
 }
 
 android {
     namespace = "com.example.network"
-    compileSdk = Versions.compileSdk
-    defaultConfig {
-        minSdk = Versions.minSdk
-        targetSdk = Versions.compileSdk
-        vectorDrawables.useSupportLibrary = true
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions.jvmTarget = "1.8"
-    composeOptions.kotlinCompilerExtensionVersion = Versions.kotlinCompilerExtensionVersion
 }
 
 dependencies {
-    implementation(Dependencies.ktorCIO)
-    implementation(Dependencies.ktorClientLogging)
-    implementation(Dependencies.ktorContentNegotiation)
-    implementation(Dependencies.ktorKotlinSerialization)
-    implementation(Dependencies.ktorAuthentication)
-    implementation(Dependencies.koinAndroid)
-    implementation(Dependencies.koinCore)
-    implementation(Dependencies.dataStore)
-    implementation(Dependencies.proto)
-    implementation(project(":core:models"))
-    implementation(project(":common"))
+    implementation(libs.ktor.client.android)
+    implementation(libs.ktor.client.auth)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.client.serialization)
+    implementation(libs.androidx.dataStore.preferences)
+    implementation(libs.protobuf.protoc)
+    implementation(libs.protobuf.kotlin.lite)
 }
 
 protobuf {

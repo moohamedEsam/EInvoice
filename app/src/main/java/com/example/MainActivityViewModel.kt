@@ -1,11 +1,10 @@
 package com.example
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.domain.auth.IsUserLoggedInUseCase
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 class MainActivityViewModel(private val isUserLoggedInUseCase: IsUserLoggedInUseCase) :
     ViewModel() {

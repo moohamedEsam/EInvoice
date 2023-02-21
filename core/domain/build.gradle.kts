@@ -1,33 +1,14 @@
 plugins {
-    id(Plugins.androidLibrary)
-    id(Plugins.kotlinAndroid)
+    id("einvoice.android.library")
 }
 
 android {
     namespace = "com.example.domain"
-    compileSdk = Versions.compileSdk
-    defaultConfig {
-        minSdk = Versions.minSdk
-        targetSdk = Versions.compileSdk
-        vectorDrawables.useSupportLibrary = true
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions.jvmTarget = "1.8"
-    composeOptions.kotlinCompilerExtensionVersion = Versions.kotlinCompilerExtensionVersion
 }
 
 dependencies {
     implementation(project(":core:data"))
-    implementation(project(":core:models"))
     implementation(project(":core:worker"))
-    implementation(project(":common"))
-    implementation(Dependencies.koinCore)
-    implementation(Dependencies.koinAndroid)
-    implementation(Dependencies.coroutinesAndroid)
-    implementation(Dependencies.coroutinesCore)
-    implementation(Dependencies.workManager)
-    implementation(Dependencies.paging)
+    implementation(libs.androidx.work.ktx)
+    implementation(libs.androidx.paging.runtime)
 }

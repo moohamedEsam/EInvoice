@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -19,7 +20,6 @@ import com.example.einvoicecomponents.ItemCard
 import com.example.einvoicecomponents.ListScreenContent
 import com.example.item.screens.form.ItemFormScreenContent
 import com.example.models.item.Item
-import com.example.models.item.empty
 import com.example.models.utils.TaxStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -115,14 +115,12 @@ private fun ItemsScreenContent(
         queryState = queryState,
         onQueryChange = onQueryChange,
         floatingButtonText = "Create New Item",
-        adaptiveItemSize = 200.dp,
-        onFloatingButtonClick = onItemCreate,
-        listContent = {
-            this.items(items) { item ->
-                ItemCard(item = item, onClick = { onItemClick(item) })
-            }
+        onFloatingButtonClick = onItemCreate
+    ) {
+        this.items(items) { item ->
+            ItemCard(item = item, onClick = { onItemClick(item) })
         }
-    )
+    }
 }
 
 @Preview(showBackground = true)

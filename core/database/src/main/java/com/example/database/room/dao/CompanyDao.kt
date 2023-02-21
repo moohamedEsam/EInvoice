@@ -4,7 +4,6 @@ import androidx.paging.DataSource
 import androidx.room.*
 import com.example.database.models.company.CompanyEntity
 import com.example.database.models.company.CompanyViewEntity
-import com.example.models.company.CompanyView
 import kotlinx.coroutines.flow.Flow
 
 @Dao

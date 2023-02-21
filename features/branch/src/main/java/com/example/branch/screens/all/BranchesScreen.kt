@@ -2,6 +2,7 @@ package com.example.branch.screens.all
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
@@ -49,7 +50,6 @@ private fun BranchesScreenContent(
         queryState = queryState,
         onQueryChange = onQueryChange,
         floatingButtonText = "Create New Branch",
-        adaptiveItemSize = 250.dp,
         onFloatingButtonClick = onCreateBranchClick,
     ) {
         items(branches) { branch ->

@@ -1,7 +1,6 @@
 package com.example.worker
 
 import android.content.Context
-import android.util.Log
 import androidx.work.*
 import com.example.data.branch.BranchRepository
 import com.example.data.client.ClientRepository

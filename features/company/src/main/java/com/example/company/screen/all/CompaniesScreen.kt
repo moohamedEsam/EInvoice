@@ -1,14 +1,6 @@
 package com.example.company.screen.all
 
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
@@ -23,6 +15,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import com.example.einvoicecomponents.ListScreenContent
+import com.example.einvoicecomponents.loadStateItem
 import com.example.models.Client
 import com.example.models.branch.Branch
 import com.example.models.branch.empty
@@ -36,6 +29,7 @@ import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.MainAxisAlignment
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
 import org.koin.androidx.compose.viewModel
 import kotlin.random.Random
 
@@ -68,39 +62,23 @@ private fun CompaniesScreenContent(
     onCompanyEditClick: (Company) -> Unit,
     onCreateNewCompanyClick: () -> Unit = {}
 ) {
-
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .horizontalScroll(rememberScrollState())
+    ListScreenContent(
+        modifier = modifier.testTag("CompaniesScreenList"),
+        queryState = queryState,
+        onQueryChange = onQueryChange,
+        floatingButtonText = "Create New Company",
+        onFloatingButtonClick = onCreateNewCompanyClick
     ) {
         items(companies) { companyView ->
             CompanyItem(
-                companyView = companyView!!,
-                modifier = Modifier.fillMaxWidth(),
+                companyView = companyView ?: return@items,
                 onClick = { onCompanyClick(companyView.company) },
                 onEditClick = { onCompanyEditClick(companyView.company) },
+                modifier = Modifier.fillMaxWidth()
             )
         }
+        loadStateItem(companies)
     }
-
-//    ListScreenContent(
-//        queryState = queryState,
-//        onQueryChange = onQueryChange,
-//        floatingButtonText = "Create New Company",
-//        adaptiveItemSize = 250.dp,
-//        onFloatingButtonClick = onCreateNewCompanyClick,
-//        modifier = modifier.testTag("CompaniesScreenList")
-//    ) {
-//        items(companies) { companyView ->
-//            CompanyItem(
-//                companyView = companyView,
-//                modifier = Modifier.fillMaxWidth(),
-//                onClick = { onCompanyClick(companyView.company) },
-//                onEditClick = { onCompanyEditClick(companyView.company) },
-//            )
-//        }
-//    }
 }
 
 
@@ -162,7 +140,7 @@ private fun CompanyItem(
 @Preview(showBackground = true)
 @Composable
 fun CompaniesScreenPreview() {
-    val companies = List(10) {
+    val companies = List(100) {
         CompanyView.empty().copy(
             company = Company.empty().copy(name = "Company $it"),
             branches = List(Random.nextInt(0, 100)) { Branch.empty() },
@@ -171,13 +149,13 @@ fun CompaniesScreenPreview() {
         )
     }
 
-//    CompaniesScreenContent(
-//        companies = Pag,
-//        modifier = Modifier.fillMaxSize(),
-//        queryState = MutableStateFlow(""),
-//        onQueryChange = {},
-//        onCompanyClick = {},
-//        onCompanyEditClick = {},
-//    ) {}
+    CompaniesScreenContent(
+        companies = flowOf(PagingData.from(companies)).collectAsLazyPagingItems(),
+        modifier = Modifier.fillMaxSize(),
+        queryState = MutableStateFlow(""),
+        onQueryChange = {},
+        onCompanyClick = {},
+        onCompanyEditClick = {},
+    ) {}
 
 }

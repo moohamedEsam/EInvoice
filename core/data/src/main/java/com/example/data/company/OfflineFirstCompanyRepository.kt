@@ -1,6 +1,6 @@
 package com.example.data.company
 
-import androidx.paging.*
+import androidx.paging.PagingSource
 import com.example.common.functions.tryWrapper
 import com.example.common.models.Result
 import com.example.data.sync.Synchronizer

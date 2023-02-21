@@ -1,10 +1,8 @@
 package com.example.einvoicecomponents
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -17,21 +15,18 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.einvoicecomponents.textField.OutlinedSearchTextField
 import kotlinx.coroutines.flow.StateFlow
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ListScreenContent(
     modifier: Modifier = Modifier,
     queryState: StateFlow<String>,
     onQueryChange: (String) -> Unit,
     floatingButtonText: String,
-    adaptiveItemSize: Dp,
     onFloatingButtonClick: () -> Unit,
-    listContent: LazyStaggeredGridScope.() -> Unit,
+    listContent: LazyListScope.() -> Unit,
 ) {
     var expanded by remember {
         mutableStateOf(false)
@@ -58,13 +53,11 @@ fun ListScreenContent(
                 onQueryChange = onQueryChange,
                 modifier = Modifier.fillMaxWidth()
             )
-            LazyVerticalStaggeredGrid(
+            LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier
                     .weight(1f)
                     .nestedScroll(nestedScrollConnection),
-                columns = StaggeredGridCells.Adaptive(adaptiveItemSize),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 listContent()
             }
