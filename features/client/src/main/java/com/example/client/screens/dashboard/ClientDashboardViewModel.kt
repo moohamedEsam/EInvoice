@@ -7,7 +7,7 @@ import com.example.domain.client.DeleteClientUseCase
 import com.example.domain.client.GetClientUseCase
 import com.example.domain.client.UndoDeleteClientUseCase
 import com.example.domain.document.DaysRange
-import com.example.domain.document.GetDocumentsByTypeUseCase
+import com.example.domain.document.GetDocumentsByTypeInDurationUseCase
 import com.example.models.Client
 import com.example.models.document.DocumentView
 import kotlinx.coroutines.flow.*
@@ -17,7 +17,7 @@ import java.util.*
 class ClientDashboardViewModel(
     private val clientId: String,
     private val getClientUseCase: GetClientUseCase,
-    private val getDocumentsByClientUseCase: GetDocumentsByTypeUseCase,
+    private val getDocumentsByClientUseCase: GetDocumentsByTypeInDurationUseCase,
     private val deleteClientUseCase: DeleteClientUseCase,
     private val undoDeleteClientUseCase: UndoDeleteClientUseCase
 ) : ViewModel() {
@@ -72,8 +72,8 @@ class ClientDashboardViewModel(
                     time = endDate
                     add(Calendar.MONTH, -1)
                 }.time
-                val params = GetDocumentsByTypeUseCase.Params(
-                    type = GetDocumentsByTypeUseCase.Types.Client,
+                val params = GetDocumentsByTypeInDurationUseCase.Params(
+                    type = GetDocumentsByTypeInDurationUseCase.Types.Client,
                     id = clientId,
                     daysRange = DaysRange(startDate, endDate)
                 )

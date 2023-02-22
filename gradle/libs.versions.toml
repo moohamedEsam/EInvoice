@@ -49,6 +49,7 @@ turbine = "0.12.1"
 composeMaps = "2.7.2"
 googlePlayServicesMaps = "18.1.0"
 googlePlayServicesLocation = "20.0.0"
+googleTruth = "1.1.3"
 
 [libraries]
 accompanist-flowlayout = { group = "com.google.accompanist", name = "accompanist-flowlayout", version.ref = "accompanist" }
@@ -133,6 +134,7 @@ compose-material-dialog-datetime = { group = "io.github.vanpra.compose-material-
 compose-maps = { group = "com.google.maps.android", name = "maps-compose", version.ref = "composeMaps" }
 google-play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "googlePlayServicesMaps" }
 google-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "googlePlayServicesLocation" }
+google-truth = { group = "com.google.truth", name = "truth", version.ref = "googleTruth" }
 
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }

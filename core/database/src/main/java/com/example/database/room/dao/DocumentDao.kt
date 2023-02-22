@@ -9,34 +9,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DocumentDao {
-    @Query("SELECT * FROM InvoiceLine")
-    fun getInvoiceLines(): Flow<List<InvoiceLineEntity>>
-
-    @Query("SELECT * FROM InvoiceLine WHERE id = :id")
-    fun getInvoiceLineById(id: String): Flow<InvoiceLineEntity>
-
-    @Insert
-    suspend fun insertInvoiceLine(invoiceLine: InvoiceLineEntity)
-
     @Insert
     suspend fun insertInvoiceLines(invoiceLines: List<InvoiceLineEntity>)
-
-    @Update
-    suspend fun updateInvoiceLine(invoiceLine: InvoiceLineEntity)
-
-    @Query("update InvoiceLine set documentId =:newId where documentId = :oldId")
-    suspend fun updateInvoiceLinesDocumentId(oldId: String, newId: String)
-
-    @Query("DELETE FROM InvoiceLine where id = :id")
-    suspend fun deleteInvoiceLine(id: String)
-
-    @Query("delete from InvoiceLine where documentId = :documentId")
-    suspend fun deleteInvoiceLinesByDocumentId(documentId: String)
-
-    @Query("delete from InvoiceLine")
-    suspend fun deleteAllInvoiceLines()
-
-    //document
     @Query("SELECT * FROM Document WHERE isDeleted = 0 order by date desc")
     fun getDocuments(): Flow<List<DocumentEntity>>
 

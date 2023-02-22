@@ -1,10 +1,7 @@
 package com.example.einvoice.presentation.shared
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.example.auth.login.loginScreen
@@ -73,15 +70,14 @@ fun EInvoiceNavGraph(
             onCreateNewCompany = navController::navigateToCompanyFormScreen
         ) { navController.navigateToCompanyFormScreen(it) }
 
-        companyFormScreen(onShowSnackbarEvent)
+        companyFormScreen()
 
         companyDashboardScreen(
             onClientClick = navController::navigateToClientDashboardScreen,
             onBranchClick = navController::navigateToBranchDashboardScreen,
             onDocumentClick = navController::navigateToDocumentDetailsScreen,
             onEditClick = navController::navigateToCompanyFormScreen,
-            onCreateDocumentClick = navController::navigateToDocumentFormScreen,
-            onShowSnackbar = onShowSnackbarEvent
+            onCreateDocumentClick = navController::navigateToDocumentFormScreen
         )
 
         branchFormScreen(onShowSnackbarEvent) {

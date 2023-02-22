@@ -1,6 +1,7 @@
 plugins {
     id("einvoice.android.library")
     id("einvoice.android.room")
+    id("einvoice.android.test")
     alias(libs.plugins.kotlin.serialization) apply true
 }
 

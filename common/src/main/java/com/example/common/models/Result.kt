@@ -19,14 +19,35 @@ sealed interface Result<T> {
         is Loading -> Loading()
         is Empty -> Empty()
     }
-    
+
     suspend fun ifFailure(block: suspend (String?) -> Unit): Result<T> {
         if (this is Error) block(exception)
         return this
     }
-    
+
     suspend fun ifSuccess(block: suspend (T) -> Unit): Result<T> {
         if (this is Success) block(data)
         return this
     }
+
+    suspend fun getSnackBarEvent(
+        successMessage: String,
+        successActionLabel: String? = null,
+        successAction: () -> Unit = {},
+        errorActionLabel: String? = null,
+        errorAction: () -> Unit = {}
+    ): SnackBarEvent =
+        when (this) {
+            is Success -> SnackBarEvent(
+                message = successMessage,
+                actionLabel = successActionLabel,
+                action = successAction
+            )
+            is Error -> SnackBarEvent(
+                message = exception ?: "Error",
+                actionLabel = errorActionLabel,
+                action = errorAction
+            )
+            else -> SnackBarEvent(message = successMessage)
+        }
 }

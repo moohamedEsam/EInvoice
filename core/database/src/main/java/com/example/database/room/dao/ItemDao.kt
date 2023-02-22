@@ -10,14 +10,17 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ItemDao {
-    @Query("SELECT * FROM Item")
+    @Query("SELECT * FROM Item where isDeleted = 0")
     fun getItems(): Flow<List<ItemEntity>>
 
-    @Query("SELECT * FROM Item WHERE branchId = :branchId")
+    @Query("SELECT * FROM Item")
+    suspend fun getAllItems() : List<ItemEntity>
+
+    @Query("SELECT * FROM Item WHERE branchId = :branchId and isDeleted = 0")
     fun getItemsByBranchId(branchId: String): Flow<List<ItemEntity>>
 
-    @Query("SELECT * FROM Item WHERE id = :id")
-    fun getItemById(id: String): Flow<ItemEntity>
+    @Query("SELECT * FROM Item WHERE id = :id and isDeleted = 0")
+    suspend fun getItemById(id: String): ItemEntity?
 
     @Insert
     suspend fun insertItem(item: ItemEntity)
@@ -30,12 +33,6 @@ interface ItemDao {
 
     @Query("update InvoiceLine set itemId =:newId where itemId = :oldId")
     suspend fun updateInvoiceLinesItemId(oldId: String, newId: String)
-
-    @Query("SELECT * FROM Item WHERE isDeleted = 0 and isUpdated = 1")
-    suspend fun getUpdatedItems(): List<ItemEntity>
-
-    @Query("SELECT * FROM Item WHERE isDeleted = 1")
-    suspend fun getDeletedItems(): List<ItemEntity>
 
     @Query("delete from item")
     suspend fun deleteAllItems()

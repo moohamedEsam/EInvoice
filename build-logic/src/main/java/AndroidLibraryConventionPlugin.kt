@@ -3,6 +3,7 @@ import com.android.build.gradle.LibraryExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.kotlin.dsl.*
@@ -37,6 +38,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             }
         }
     }
+
 }
 
 fun Project.configureKotlinAndroid(
@@ -46,6 +48,7 @@ fun Project.configureKotlinAndroid(
         compileSdk = Versions.compileSdk
         defaultConfig {
             minSdk = Versions.minSdk
+            testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
         compileOptions {
             sourceCompatibility = JavaVersion.VERSION_11
@@ -55,8 +58,10 @@ fun Project.configureKotlinAndroid(
         kotlinOptions {
             jvmTarget = JavaVersion.VERSION_11.toString()
         }
+
     }
 }
+
 
 fun CommonExtension<*, *, *, *>.kotlinOptions(block: KotlinJvmOptions.() -> Unit) {
     (this as ExtensionAware).extensions.configure("kotlinOptions", block)

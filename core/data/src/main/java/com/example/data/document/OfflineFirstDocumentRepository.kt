@@ -126,7 +126,7 @@ class OfflineFirstDocumentRepository(
         .distinctUntilChanged()
         .map { documents -> documents.map { it.asDocumentView() } }
 
-    override fun getDocumentsByBranch(
+    override fun getDocumentsByBranchInDuration(
         branchId: String,
         fromDateMillis: Long,
         toDateMillis: Long
@@ -135,7 +135,7 @@ class OfflineFirstDocumentRepository(
         .distinctUntilChanged()
         .map { documents -> documents.map { it.asDocumentView() } }
 
-    override fun getDocumentsByClient(
+    override fun getDocumentsByClientInDuration(
         clientId: String,
         fromDateMillis: Long,
         toDateMillis: Long

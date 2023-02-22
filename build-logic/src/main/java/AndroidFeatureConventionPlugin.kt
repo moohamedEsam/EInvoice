@@ -5,7 +5,6 @@ import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.DependencyHandlerScope
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.kotlin
 
 class AndroidFeatureConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -18,11 +17,10 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
 
             dependencies {
                 add("implementation", project(":features:EInvoiceComponents"))
+                add("implementation", libs.findLibrary("androidx-paging-runtime").get())
+                add("implementation", libs.findLibrary("androidx-paging-compose").get())
                 addComposeDependencies(libs)
                 add("implementation", project(":core:domain"))
-
-                add("testImplementation", kotlin("test"))
-                add("androidTestImplementation", kotlin("test"))
 
                 add("implementation", libs.findLibrary("coil.kt").get())
                 add("implementation", libs.findLibrary("coil.kt.compose").get())
@@ -32,8 +30,8 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 add("implementation", libs.findLibrary("androidx.lifecycle.viewModelCompose").get())
 
 
-
                 add("implementation", libs.findLibrary("kotlinx.coroutines.android").get())
+                add("androidTestImplementation", libs.findLibrary("androidx.compose-ui-test").get())
             }
         }
     }

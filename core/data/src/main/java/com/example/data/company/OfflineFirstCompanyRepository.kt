@@ -13,6 +13,8 @@ import com.example.network.EInvoiceRemoteDataSource
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.map
 
+private const val COMPANY_NOT_FOUND = "Company Not Found"
+
 class OfflineFirstCompanyRepository(
     private val localDataSource: CompanyDao,
     private val remoteDataSource: EInvoiceRemoteDataSource
@@ -24,6 +26,7 @@ class OfflineFirstCompanyRepository(
 
     override fun getCompany(id: String): Flow<CompanyView> = localDataSource.getCompanyViewById(id)
         .filterNotNull()
+        .map(CompanyViewEntity::removeDeleted)
         .map(CompanyViewEntity::asCompanyView)
 
     override fun getCompaniesViews(): Flow<List<CompanyView>> = localDataSource.getCompaniesViews()
@@ -35,11 +38,13 @@ class OfflineFirstCompanyRepository(
         .map { companies -> companies.map(CompanyEntity::asCompany) }
 
     override fun getCompanyPagingSource(): PagingSource<Int, CompanyView> =
-        localDataSource.getPagedCompanies().map(CompanyViewEntity::asCompanyView).asPagingSourceFactory().invoke()
+        localDataSource.getPagedCompanies().map(CompanyViewEntity::asCompanyView)
+            .asPagingSourceFactory().invoke()
 
 
     override suspend fun updateCompany(company: Company): Result<Company> = tryWrapper {
-        val companyEntity = localDataSource.getCompanyById(company.id).first()
+        val companyEntity = localDataSource.getCompanyById(company.id)
+            ?: return@tryWrapper Result.Error(COMPANY_NOT_FOUND)
         if (companyEntity.isCreated)
             localDataSource.updateCompany(company.asCompanyEntity(isCreated = true))
         else
@@ -48,7 +53,8 @@ class OfflineFirstCompanyRepository(
     }
 
     override suspend fun deleteCompany(id: String): Result<Unit> = tryWrapper {
-        val company = localDataSource.getCompanyById(id).first()
+        val company = localDataSource.getCompanyById(id)
+            ?: return@tryWrapper Result.Error(COMPANY_NOT_FOUND)
         if (company.isCreated)
             localDataSource.deleteCompany(company.id)
         else
@@ -62,8 +68,9 @@ class OfflineFirstCompanyRepository(
     }
 
     override suspend fun syncWith(synchronizer: Synchronizer): Boolean {
-        val companies = localDataSource.getAllCompanies().first()
+        val companies = localDataSource.getAllCompanies()
         val idMappings = HashMap<String, String>()
+        val remotelySavedCompanies = mutableListOf<String>()
         val isSuccessfulSync = synchronizer.handleSync(
             remoteFetcher = remoteDataSource::getCompanies,
             remoteDeleter = {
@@ -104,12 +111,17 @@ class OfflineFirstCompanyRepository(
                 }
             },
             localCreator = { company ->
+                remotelySavedCompanies.add(company.id)
                 if (company.id !in companies.map { it.id })
                     localDataSource.insertCompany(company.asCompanyEntity())
                 else
                     localDataSource.updateCompany(company.asCompanyEntity())
             }
         )
+        val remotelyDeletedCompanies = companies.filterNot { it.id in remotelySavedCompanies }
+        remotelyDeletedCompanies.forEach { company ->
+            localDataSource.deleteCompany(company.id) // will delete all related data
+        }
         return isSuccessfulSync
     }
 

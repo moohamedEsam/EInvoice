@@ -3,18 +3,13 @@ package com.example.company.screen.form
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.common.models.Result
-import com.example.common.models.SnackBarEvent
 import com.example.common.models.ValidationResult
 import com.example.einvoicecomponents.OneTimeEventFloatingButton
 import com.example.einvoicecomponents.textField.EInvoiceOutlinedTextField
@@ -25,10 +20,7 @@ import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
-fun CompanyFormScreen(
-    companyId: String,
-    onShowSnackBarEvent: (SnackBarEvent) -> Unit,
-) {
+fun CompanyFormScreen(companyId: String) {
     val viewModel: CompanyFormViewModel by viewModel { parametersOf(companyId) }
 
     CompanyFormScreenContent(
@@ -58,20 +50,7 @@ fun CompanyFormScreen(
         taxActivityCodeValidationResult = viewModel.taxActivityCodeValidationResult,
         onTaxPayerActivityCodeChange = viewModel::setTaxPayerActivityCode,
         isFormValid = viewModel.isFormValid,
-        onCreateClick = {
-            viewModel.saveCompany { result ->
-                val event = if (result is Result.Success)
-                    SnackBarEvent("Company saved successfully")
-                else
-                    SnackBarEvent(
-                        message = (result as? Result.Error)?.exception ?: "Error saving company",
-                        actionLabel = "Retry",
-                        action = { viewModel.saveCompany() }
-                    )
-
-                onShowSnackBarEvent(event)
-            }
-        },
+        onCreateClick = viewModel::saveCompany,
     )
 }
 

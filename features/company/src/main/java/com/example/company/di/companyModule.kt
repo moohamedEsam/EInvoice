@@ -7,19 +7,15 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val companyModule = module {
-    viewModel {
-        CompaniesViewModel(
-            getCompanyPagingSource = get(),
-            deleteCompanyUseCase = get(),
-            undoDeleteCompanyUseCase = get()
-        )
-    }
+    viewModel { CompaniesViewModel(companyPagingSource = get()) }
+
     viewModel { (companyId: String) ->
         CompanyFormViewModel(
             getCompanyUseCase = get(),
             createCompanyUseCase = get(),
             updateCompanyUseCase = get(),
-            companyId = companyId
+            companyId = companyId,
+            snackBarManager = get()
         )
     }
     viewModel { (companyId: String) ->
@@ -28,7 +24,8 @@ val companyModule = module {
             getDocumentsUseCase = get(),
             deleteCompanyUseCase = get(),
             undoDeleteCompanyUseCase = get(),
-            companyId = companyId
+            companyId = companyId,
+            snackBarManager = get()
         )
     }
 

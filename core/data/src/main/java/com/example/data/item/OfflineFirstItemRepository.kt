@@ -19,9 +19,12 @@ import com.example.network.EInvoiceRemoteDataSource
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+
+private const val ITEM_NOT_FOUND = "Item Not Found"
 
 class OfflineFirstItemRepository(
     private val localSource: ItemDao,
@@ -30,16 +33,14 @@ class OfflineFirstItemRepository(
     override fun getItems(): Flow<List<Item>> =
         localSource.getItems().map { items -> items.map { it.asItem() } }
 
-    override fun getItem(id: String): Flow<Item> =
-        localSource.getItemById(id).map { it.asItem() }
-
     override suspend fun createItem(item: Item): Result<Item> = tryWrapper {
         localSource.insertItem(item.asItemEntity(isCreated = true))
         Result.Success(item)
     }
 
     override suspend fun updateItem(item: Item): Result<Item> = tryWrapper {
-        val itemEntity = localSource.getItemById(item.id).first()
+        val itemEntity =
+            localSource.getItemById(item.id) ?: return@tryWrapper Result.Error(ITEM_NOT_FOUND)
         if (itemEntity.isCreated)
             localSource.updateItem(item.asItemEntity(isCreated = true))
         else
@@ -48,7 +49,8 @@ class OfflineFirstItemRepository(
     }
 
     override suspend fun deleteItem(id: String): Result<Unit> = tryWrapper {
-        val itemEntity = localSource.getItemById(id).first()
+        val itemEntity =
+            localSource.getItemById(id) ?: return@tryWrapper Result.Error(ITEM_NOT_FOUND)
         if (itemEntity.isCreated)
             localSource.deleteItem(id)
         else
@@ -100,7 +102,7 @@ class OfflineFirstItemRepository(
         )
 
     private suspend fun syncItems(synchronizer: Synchronizer): Boolean {
-        val items = localSource.getItems().first()
+        val items = localSource.getAllItems()
         val idMappings = HashMap<String, String>()
         return synchronizer.handleSync(
             remoteCreator = {
@@ -114,7 +116,7 @@ class OfflineFirstItemRepository(
                 Result.Success(Unit)
             },
             remoteUpdater = {
-                val updatedItems = localSource.getUpdatedItems()
+                val updatedItems = items.filter { it.isUpdated }
                 updatedItems.forEach { item ->
                     val result = remoteSource.updateItem(item.asItem())
                     if (result is Result.Success) {
@@ -124,7 +126,7 @@ class OfflineFirstItemRepository(
                 Result.Success(Unit)
             },
             remoteDeleter = {
-                val deletedItems = localSource.getDeletedItems()
+                val deletedItems = items.filter { it.isDeleted }
                 deletedItems.forEach { item ->
                     val result = remoteSource.deleteItem(item.id)
                     if (result is Result.Success) {

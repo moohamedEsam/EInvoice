@@ -36,7 +36,6 @@ fun CompanyDashboardScreen(
     onBranchClick: (String) -> Unit,
     onDocumentClick: (String) -> Unit,
     onEditClick: (String) -> Unit,
-    onShowSnackBarEvent: (SnackBarEvent) -> Unit,
     onCreateDocumentClick: () -> Unit
 ) {
     val viewModel: CompanyDashboardViewModel by viewModel { parametersOf(companyId) }
@@ -48,32 +47,11 @@ fun CompanyDashboardScreen(
         onClientClick = onClientClick,
         onBranchClick = onBranchClick,
         onEditClick = { onEditClick(companyId) },
-        onDeleteClick = {
-            viewModel.deleteCompany { result ->
-                val event = getSnackBarEventFromResult(result, viewModel)
-                onShowSnackBarEvent(event)
-            }
-        },
+        onDeleteClick = viewModel::deleteCompany,
         onDocumentClick = onDocumentClick,
         onDatePicked = { viewModel.setPickedDate(it) },
         onCreateDocumentClick = onCreateDocumentClick
     )
-}
-
-private fun getSnackBarEventFromResult(
-    result: Result<Unit>,
-    viewModel: CompanyDashboardViewModel
-) = when (result) {
-    is Result.Success -> SnackBarEvent(
-        message = "Company deleted",
-        actionLabel = "Undo"
-    ) {
-        viewModel.undoDeleteCompany {}
-    }
-    is Result.Error -> SnackBarEvent(
-        message = result.exception ?: "Error Deleting company"
-    )
-    else -> SnackBarEvent(message = "Error Deleting company")
 }
 
 @OptIn(ExperimentalPagerApi::class)

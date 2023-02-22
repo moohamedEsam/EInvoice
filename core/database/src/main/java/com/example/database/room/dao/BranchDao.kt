@@ -11,14 +11,17 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BranchDao {
-    @Query("SELECT * FROM Branch")
+    @Query("SELECT * FROM Branch where isDeleted = 0")
     fun getBranches(): Flow<List<BranchEntity>>
+
+    @Query("SELECT * FROM Branch")
+    suspend fun getAllBranches(): List<BranchEntity>
 
     @Query("SELECT * FROM Branch WHERE companyId = :companyId and isDeleted = 0")
     fun getBranchesByCompanyId(companyId: String): Flow<List<BranchEntity>>
 
     @Query("SELECT * FROM Branch WHERE id = :id")
-    fun getBranchById(id: String): Flow<BranchEntity?>
+    suspend fun getBranchById(id: String): BranchEntity?
 
     @Transaction
     @Query("select * from branch where id = :id")

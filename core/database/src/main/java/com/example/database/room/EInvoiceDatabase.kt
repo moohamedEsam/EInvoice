@@ -3,6 +3,7 @@ package com.example.database.room
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.test.core.app.ApplicationProvider
 import com.example.database.models.*
 import com.example.database.models.branch.BranchEntity
 import com.example.database.models.client.ClientEntity
@@ -36,4 +37,13 @@ abstract class EInvoiceDatabase : RoomDatabase() {
     abstract fun getItemDao(): ItemDao
 
     abstract fun getDocumentDao(): DocumentDao
+
+    companion object {
+        fun createInMemoryDatabase(): EInvoiceDatabase {
+            return androidx.room.Room.inMemoryDatabaseBuilder(
+                ApplicationProvider.getApplicationContext(),
+                EInvoiceDatabase::class.java
+            ).build()
+        }
+    }
 }

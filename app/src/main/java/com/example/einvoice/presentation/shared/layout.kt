@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
@@ -30,6 +31,7 @@ import com.example.document.screens.all.DocumentsScreenRoute
 import com.example.document.screens.all.navigateToDocumentsScreen
 import com.example.domain.auth.LogoutUseCase
 import com.example.domain.sync.OneTimeSyncUseCase
+import com.example.einvoice.R
 import com.example.einvoice.presentation.settings.SettingsScreenRoute
 import com.example.einvoice.presentation.settings.navigateToSettingsScreen
 import com.example.functions.handleSnackBarEvent
@@ -116,8 +118,7 @@ private fun DrawerContent(navController: NavHostController) {
         NavigationDrawerItem(
             icon = {
                 Icon(
-//                    painterResource(id = R.drawable.office_building),
-                    imageVector = Icons.Default.Home,
+                    painterResource(id = R.drawable.office_building),
                     contentDescription = null,
                     modifier = Modifier.size(iconSize.dp)
                 )
@@ -130,8 +131,7 @@ private fun DrawerContent(navController: NavHostController) {
         NavigationDrawerItem(
             icon = {
                 Icon(
-//                    painterResource(id = R.drawable.branch),
-                    imageVector = Icons.Default.Home,
+                    painterResource(id = R.drawable.branch),
                     contentDescription = null,
                     modifier = Modifier.size(iconSize.dp)
                 )
@@ -144,8 +144,7 @@ private fun DrawerContent(navController: NavHostController) {
         NavigationDrawerItem(
             icon = {
                 Icon(
-//                    painterResource(id = R.drawable.rating),
-                    imageVector = Icons.Default.Home,
+                    painterResource(id = R.drawable.rating),
                     contentDescription = null,
                     modifier = Modifier.size(iconSize.dp)
                 )
@@ -158,8 +157,7 @@ private fun DrawerContent(navController: NavHostController) {
         NavigationDrawerItem(
             icon = {
                 Icon(
-//                    painterResource(id = R.drawable.list_tems),
-                    imageVector = Icons.Default.Home,
+                    painterResource(id = R.drawable.list_tems),
                     contentDescription = null,
                     modifier = Modifier.size(iconSize.dp)
                 )
@@ -172,8 +170,7 @@ private fun DrawerContent(navController: NavHostController) {
         NavigationDrawerItem(
             icon = {
                 Icon(
-//                    painterResource(id = R.drawable.invoice),
-                    imageVector = Icons.Default.Home,
+                    painterResource(id = R.drawable.invoice),
                     contentDescription = null,
                     modifier = Modifier.size(iconSize.dp)
                 )
@@ -185,7 +182,6 @@ private fun DrawerContent(navController: NavHostController) {
         NavigationDrawerItem(
             icon = {
                 Icon(
-//                    painterResource(id = R.drawable.invoice),
                     imageVector = Icons.Default.Settings,
                     contentDescription = null
                 )

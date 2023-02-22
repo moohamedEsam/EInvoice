@@ -5,6 +5,7 @@ import coil.ImageLoader
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import com.example.MainActivityViewModel
+import com.example.functions.BaseSnackBarManager
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.scope.Scope
@@ -13,6 +14,7 @@ import org.koin.dsl.module
 val appModule = module {
     single { provideImageLoader() }
     viewModel { MainActivityViewModel(get()) }
+    factory { BaseSnackBarManager() }
 }
 
 

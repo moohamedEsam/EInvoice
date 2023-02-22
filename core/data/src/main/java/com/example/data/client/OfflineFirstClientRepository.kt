@@ -61,7 +61,7 @@ class OfflineFirstClientRepository(
             .map { clients -> clients.map { it.asClient() } }
 
     override suspend fun syncWith(synchronizer: Synchronizer): Boolean {
-        val clients = localSource.getClients().first()
+        val clients = localSource.getAllClients()
         val idMappings = HashMap<String, String>()
         return synchronizer.handleSync(
             remoteCreator = {

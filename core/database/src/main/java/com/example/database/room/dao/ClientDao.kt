@@ -7,8 +7,11 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ClientDao {
-    @Query("SELECT * FROM Client")
+    @Query("SELECT * FROM Client where isDeleted = 0")
     fun getClients(): Flow<List<ClientEntity>>
+
+    @Query("SELECT * FROM Client")
+    suspend fun getAllClients(): List<ClientEntity>
 
     @Query("SELECT * FROM Client WHERE companyId = :companyId")
     fun getClientsByCompanyId(companyId: String): Flow<List<ClientEntity>>

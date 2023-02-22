@@ -7,7 +7,7 @@ import com.example.domain.branch.DeleteBranchUseCase
 import com.example.domain.branch.GetBranchViewUseCase
 import com.example.domain.branch.UndoDeleteBranchUseCase
 import com.example.domain.document.DaysRange
-import com.example.domain.document.GetDocumentsByTypeUseCase
+import com.example.domain.document.GetDocumentsByTypeInDurationUseCase
 import com.example.models.branch.BranchView
 import com.example.models.document.DocumentView
 import kotlinx.coroutines.flow.*
@@ -17,7 +17,7 @@ import java.util.*
 class BranchDashboardViewModel(
     private val branchId: String,
     private val getBranchViewUseCase: GetBranchViewUseCase,
-    private val getDocumentsByBranchUseCase: GetDocumentsByTypeUseCase,
+    private val getDocumentsByBranchUseCase: GetDocumentsByTypeInDurationUseCase,
     private val deleteBranchUseCase: DeleteBranchUseCase,
     private val undoDeleteBranchUseCase: UndoDeleteBranchUseCase
 ) : ViewModel() {
@@ -73,8 +73,8 @@ class BranchDashboardViewModel(
                     time = endDate
                     add(Calendar.MONTH, -1)
                 }.time
-                val params = GetDocumentsByTypeUseCase.Params(
-                    type = GetDocumentsByTypeUseCase.Types.Branch,
+                val params = GetDocumentsByTypeInDurationUseCase.Params(
+                    type = GetDocumentsByTypeInDurationUseCase.Types.Branch,
                     id = branchId,
                     daysRange = DaysRange(startDate, endDate)
                 )

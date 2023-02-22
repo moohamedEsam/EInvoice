@@ -1,5 +1,6 @@
 package com.example.company.screen.all
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
@@ -52,6 +53,7 @@ fun CompaniesScreen(
 
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CompaniesScreenContent(
     modifier: Modifier = Modifier,
@@ -74,7 +76,7 @@ private fun CompaniesScreenContent(
                 companyView = companyView ?: return@items,
                 onClick = { onCompanyClick(companyView.company) },
                 onEditClick = { onCompanyEditClick(companyView.company) },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().animateItemPlacement()
             )
         }
         loadStateItem(companies)

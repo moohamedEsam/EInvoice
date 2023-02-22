@@ -16,4 +16,16 @@ data class NetworkDocument(
     @Serializable(with = DateSerializer::class)
     val date: Date,
     val status:Int
+){
+    companion object
+}
+
+fun NetworkDocument.Companion.empty() = NetworkDocument(
+    id = "",
+    branchName = "",
+    companyName = "",
+    clientName = "",
+    internalId = "",
+    date = Date(),
+    status = 0
 )

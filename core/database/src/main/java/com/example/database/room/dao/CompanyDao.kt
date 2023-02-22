@@ -16,7 +16,7 @@ interface CompanyDao {
     fun getPagedCompanies(): DataSource.Factory<Int, CompanyViewEntity>
 
     @Query("SELECT * FROM Company")
-    fun getAllCompanies(): Flow<List<CompanyEntity>>
+    suspend fun getAllCompanies(): List<CompanyEntity>
 
     @Transaction
     @Query("SELECT * FROM Company where isDeleted = 0")
@@ -24,7 +24,7 @@ interface CompanyDao {
 
 
     @Query("SELECT * FROM Company WHERE id = :id and isDeleted = 0")
-    fun getCompanyById(id: String): Flow<CompanyEntity>
+    suspend fun getCompanyById(id: String): CompanyEntity?
 
     @Transaction
     @Query("SELECT * FROM Company WHERE id = :id and isDeleted = 0")

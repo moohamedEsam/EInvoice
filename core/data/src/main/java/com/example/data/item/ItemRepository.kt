@@ -14,8 +14,6 @@ interface ItemRepository : Syncable<Item> {
 
     fun getTaxTypes(): Flow<List<TaxView>>
 
-    fun getItem(id: String): Flow<Item>
-
     suspend fun createItem(item: Item): Result<Item>
 
     suspend fun updateItem(item: Item): Result<Item>

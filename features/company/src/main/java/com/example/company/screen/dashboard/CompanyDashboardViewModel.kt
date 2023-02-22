@@ -2,12 +2,13 @@ package com.example.company.screen.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.common.models.Result
 import com.example.domain.company.DeleteCompanyUseCase
 import com.example.domain.company.GetCompanyUseCase
 import com.example.domain.company.UndoDeleteCompanyUseCase
 import com.example.domain.document.DaysRange
-import com.example.domain.document.GetDocumentsByTypeUseCase
+import com.example.domain.document.GetDocumentsByTypeInDurationUseCase
+import com.example.functions.BaseSnackBarManager
+import com.example.functions.SnackBarManager
 import com.example.models.company.CompanyView
 import com.example.models.company.empty
 import com.example.models.document.DocumentView
@@ -18,14 +19,16 @@ import java.util.*
 class CompanyDashboardViewModel(
     private val companyId: String,
     private val getCompanyUseCase: GetCompanyUseCase,
-    private val getDocumentsUseCase: GetDocumentsByTypeUseCase,
+    private val getDocumentsUseCase: GetDocumentsByTypeInDurationUseCase,
     private val deleteCompanyUseCase: DeleteCompanyUseCase,
-    private val undoDeleteCompanyUseCase: UndoDeleteCompanyUseCase
-) : ViewModel() {
+    private val undoDeleteCompanyUseCase: UndoDeleteCompanyUseCase,
+    private val snackBarManager: BaseSnackBarManager
+) : ViewModel(), SnackBarManager by snackBarManager {
 
     private val _companyView: MutableStateFlow<CompanyView> = MutableStateFlow(CompanyView.empty())
     private val _pickedDate = MutableStateFlow(Date())
     private val _documents = MutableStateFlow<List<DocumentView>>(emptyList())
+
 
     private fun getDateMinusOneMonth(fromDate: Date) = Calendar.getInstance().apply {
         time = fromDate
@@ -57,17 +60,30 @@ class CompanyDashboardViewModel(
         observeDocuments()
     }
 
-    fun deleteCompany(onResult: (Result<Unit>) -> Unit) {
+    fun deleteCompany() {
         viewModelScope.launch {
             val result = deleteCompanyUseCase(companyId)
-            onResult(result)
+            val event = result.getSnackBarEvent(
+                successMessage = "Company deleted",
+                successActionLabel = "Undo",
+                successAction = ::undoDeleteCompany,
+                errorActionLabel = "Try again",
+                errorAction = ::deleteCompany
+            )
+
+            snackBarManager.showSnackBarEvent(event)
         }
     }
 
-    fun undoDeleteCompany(onResult: (Result<Unit>) -> Unit) {
+    private fun undoDeleteCompany() {
         viewModelScope.launch {
             val result = undoDeleteCompanyUseCase(companyId)
-            onResult(result)
+            val event = result.getSnackBarEvent(
+                successMessage = "Company restored",
+                errorActionLabel = "Try again",
+                errorAction = ::undoDeleteCompany
+            )
+            snackBarManager.showSnackBarEvent(event)
         }
     }
 
@@ -79,10 +95,10 @@ class CompanyDashboardViewModel(
 
     private fun observeDocuments() {
         viewModelScope.launch {
-            _pickedDate.collectLatest {endDate->
+            _pickedDate.collectLatest { endDate ->
                 val startDate = getDateMinusOneMonth(endDate)
-                val params = GetDocumentsByTypeUseCase.Params(
-                    type = GetDocumentsByTypeUseCase.Types.Company,
+                val params = GetDocumentsByTypeInDurationUseCase.Params(
+                    type = GetDocumentsByTypeInDurationUseCase.Types.Company,
                     id = companyId,
                     daysRange = DaysRange(startDate, endDate)
                 )

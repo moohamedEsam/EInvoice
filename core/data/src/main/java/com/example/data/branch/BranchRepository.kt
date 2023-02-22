@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.Flow
 interface BranchRepository : Syncable<Branch> {
     fun getBranches(): Flow<List<Branch>>
 
-    fun getBranch(id: String): Flow<Branch>
 
     fun getBranchView(id: String): Flow<BranchView>
 

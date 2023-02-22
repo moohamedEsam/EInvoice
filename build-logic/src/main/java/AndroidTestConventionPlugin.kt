@@ -1,63 +1,20 @@
-import com.android.build.api.dsl.CommonExtension
-import com.android.build.api.dsl.ManagedVirtualDevice
-import com.android.build.gradle.TestExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.invoke
-import java.util.*
+import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.kotlin.dsl.getByType
 
 class AndroidTestConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        with(target) {
-            with(pluginManager) {
-                apply("com.android.test")
-                apply("org.jetbrains.kotlin.android")
-            }
-
-            extensions.configure<TestExtension> {
-                configureKotlinAndroid(this)
-                defaultConfig.targetSdk = 31
-                configureGradleManagedDevices(this)
-            }
+        with(target.dependencies) {
+            val libs = target.extensions.getByType<VersionCatalogsExtension>().named("libs")
+            add("api", libs.findLibrary("androidx-test-core").get())
+            add("api", libs.findLibrary("androidx-test-ext").get())
+            add("api", libs.findLibrary("androidx-test-espresso-core").get())
+            add("api", libs.findLibrary("androidx-test-runner").get())
+            add("api", libs.findLibrary("androidx-test-rules").get())
+            add("api", libs.findLibrary("google-truth").get())
+            add("api", libs.findLibrary("turbine").get())
+            add("api", libs.findLibrary("kotlinx-coroutines-test").get())
         }
-    }
-
-}
-
-internal fun configureGradleManagedDevices(
-    commonExtension: CommonExtension<*, *, *, *>,
-) {
-    val deviceConfigs = listOf(
-        DeviceConfig("Pixel 4", 30, "aosp-atd"),
-        DeviceConfig("Pixel 6", 31, "aosp"),
-        DeviceConfig("Pixel C", 30, "aosp-atd"),
-    )
-
-    commonExtension.testOptions {
-        managedDevices {
-            devices {
-                deviceConfigs.forEach { deviceConfig ->
-                    maybeCreate(deviceConfig.taskName, ManagedVirtualDevice::class.java).apply {
-                        device = deviceConfig.device
-                        apiLevel = deviceConfig.apiLevel
-                        systemImageSource = deviceConfig.systemImageSource
-                    }
-                }
-            }
-        }
-    }
-}
-
-private data class DeviceConfig(
-    val device: String,
-    val apiLevel: Int,
-    val systemImageSource: String,
-) {
-    val taskName = buildString {
-        append(device.toLowerCase(Locale.ROOT).replace(" ", ""))
-        append("api")
-        append(apiLevel.toString())
-        append(systemImageSource.replace("-", ""))
     }
 }

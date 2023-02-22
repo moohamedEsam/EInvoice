@@ -1,5 +1,6 @@
 plugins {
     id("einvoice.android.library")
+    id("einvoice.android.test")
 }
 
 android {
@@ -11,4 +12,5 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(project(":core:network"))
     implementation(project(":core:database"))
+    androidTestImplementation(libs.room.runtime)
 }

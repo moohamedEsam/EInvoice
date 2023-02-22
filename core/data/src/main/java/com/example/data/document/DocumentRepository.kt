@@ -29,13 +29,13 @@ interface DocumentRepository : Syncable<Document> {
     ): Flow<List<DocumentView>>
 
 
-    fun getDocumentsByBranch(
+    fun getDocumentsByBranchInDuration(
         branchId: String,
         fromDateMillis: Long,
         toDateMillis: Long
     ): Flow<List<DocumentView>>
 
-    fun getDocumentsByClient(
+    fun getDocumentsByClientInDuration(
         clientId: String,
         fromDateMillis: Long,
         toDateMillis: Long
