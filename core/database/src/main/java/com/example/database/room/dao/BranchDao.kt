@@ -1,5 +1,6 @@
 package com.example.database.room.dao
 
+import androidx.paging.DataSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -13,6 +14,9 @@ import kotlinx.coroutines.flow.Flow
 interface BranchDao {
     @Query("SELECT * FROM Branch where isDeleted = 0")
     fun getBranches(): Flow<List<BranchEntity>>
+
+    @Query("SELECT * FROM Branch where isDeleted = 0")
+    fun getPagedBranches(): DataSource.Factory<Int, BranchEntity>
 
     @Query("SELECT * FROM Branch")
     suspend fun getAllBranches(): List<BranchEntity>

@@ -1,5 +1,6 @@
 package com.example.data.client
 
+import androidx.paging.PagingSource
 import com.example.common.models.Result
 import com.example.data.sync.Syncable
 import com.example.models.Client
@@ -8,6 +9,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface ClientRepository : Syncable<Client> {
     fun getClients(): Flow<List<Client>>
+
+    fun getClientsPagingSource() : PagingSource<Int, Client>
 
     fun getClient(id: String): Flow<Client>
 

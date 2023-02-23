@@ -9,7 +9,7 @@ import org.koin.dsl.module
 val documentsModule = module {
     viewModel {
         DocumentsViewModel(
-            getDocumentsUseCase = get(),
+            getDocumentsPagingSourceUseCase = get(),
             networkObserver = get(),
             cancelDocumentUseCase = get(),
             syncDocumentsStatusUseCase = get(),

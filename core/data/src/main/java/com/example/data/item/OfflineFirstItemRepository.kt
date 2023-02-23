@@ -1,13 +1,11 @@
 package com.example.data.item
 
+import androidx.paging.PagingSource
 import com.example.common.functions.tryWrapper
 import com.example.common.models.Result
 import com.example.data.sync.Synchronizer
 import com.example.data.sync.handleSync
-import com.example.database.models.asItem
-import com.example.database.models.asItemEntity
-import com.example.database.models.asUnitType
-import com.example.database.models.asUnitTypeEntity
+import com.example.database.models.*
 import com.example.database.models.invoiceLine.tax.asSubTaxEntity
 import com.example.database.models.invoiceLine.tax.asTaxEntity
 import com.example.database.models.invoiceLine.tax.asTaxView
@@ -47,6 +45,9 @@ class OfflineFirstItemRepository(
             localSource.updateItem(item.asItemEntity(isUpdated = true))
         Result.Success(item)
     }
+
+    override fun getItemPagingSource(): PagingSource<Int, Item> =
+        localSource.getPagedItems().map(ItemEntity::asItem).asPagingSourceFactory().invoke()
 
     override suspend fun deleteItem(id: String): Result<Unit> = tryWrapper {
         val itemEntity =
@@ -104,7 +105,8 @@ class OfflineFirstItemRepository(
     private suspend fun syncItems(synchronizer: Synchronizer): Boolean {
         val items = localSource.getAllItems()
         val idMappings = HashMap<String, String>()
-        return synchronizer.handleSync(
+        val remotelyCreatedItems = mutableListOf<String>()
+        val result = synchronizer.handleSync(
             remoteCreator = {
                 val createdItems = items.filter { it.isCreated }
                 createdItems.forEach { item ->
@@ -136,6 +138,7 @@ class OfflineFirstItemRepository(
                 Result.Success(Unit)
             },
             localCreator = { item ->
+                remotelyCreatedItems.add(item.id)
                 val ids = items.map { it.id }
                 if (item.id in ids)
                     localSource.updateItem(item.asItemEntity())
@@ -152,6 +155,11 @@ class OfflineFirstItemRepository(
             },
             remoteFetcher = remoteSource::getItems
         )
+        val remotelyDeletedItems = items.filterNot { it.id in remotelyCreatedItems }
+        remotelyDeletedItems.forEach { item ->
+            localSource.deleteItem(item.id)
+        }
+        return result
     }
 
     override fun getUnitTypes(): Flow<List<UnitType>> =

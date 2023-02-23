@@ -1,5 +1,6 @@
 package com.example.data.document
 
+import androidx.paging.PagingSource
 import com.example.common.functions.tryWrapper
 import com.example.common.models.Result
 import com.example.data.sync.Synchronizer
@@ -62,6 +63,10 @@ class OfflineFirstDocumentRepository(
         localDataSource.updateDocument(document.documentEntity.copy(status = status, error = error))
         sendResult
     }
+
+    override fun getDocumentsPagingSource(): PagingSource<Int, DocumentView> =
+        localDataSource.getPagedDocuments().map { it.asDocumentView() }.asPagingSourceFactory()
+            .invoke()
 
     override suspend fun createDerivedDocument(
         id: String,
@@ -147,7 +152,8 @@ class OfflineFirstDocumentRepository(
     override suspend fun syncWith(synchronizer: Synchronizer): Boolean {
         val documents = localDataSource.getAllDocuments().first()
         val idMappings = HashMap<String, String>()
-        return synchronizer.handleSync(
+        val remotelyCreatedDocuments = mutableListOf<String>()
+        val result = synchronizer.handleSync(
             remoteFetcher = fetcher@{
                 val ids = remoteDataSource.getDocuments()
                     .map { documents -> documents.map { it.id } }
@@ -193,13 +199,17 @@ class OfflineFirstDocumentRepository(
                 Result.Success(Unit)
             },
             localCreator = { documentView ->
+                remotelyCreatedDocuments.add(documentView.documentEntity.id)
                 if (documentView.documentEntity.id !in documents.map { it.documentEntity.id })
                     localDataSource.insertDocumentWithInvoices(
                         documentView.documentEntity,
                         documentView.invoices.map { it.asInvoiceLineEntity() }
                     )
-                else
+                else {
                     localDataSource.updateDocument(documentView.documentEntity)
+                    localDataSource.deleteInvoicesByDocumentId(documentView.documentEntity.id)
+                    localDataSource.insertInvoiceLines(documentView.invoices.map { it.asInvoiceLineEntity() })
+                }
             },
             afterLocalCreate = {
                 idMappings.forEach { (oldId, _) ->
@@ -207,6 +217,13 @@ class OfflineFirstDocumentRepository(
                 }
             },
         )
+        val remotelyDeletedDocumentsIds = documents.filterNot { it.documentEntity.id in remotelyCreatedDocuments }
+            .map { it.documentEntity.id }
+
+        remotelyDeletedDocumentsIds.forEach { id ->
+            localDataSource.deleteDocument(id)
+        }
+        return result
     }
 
     private fun DocumentViewEntity.convertToUpdateDocument() =

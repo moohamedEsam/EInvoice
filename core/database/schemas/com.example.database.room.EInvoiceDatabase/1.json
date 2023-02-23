@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "085f302a975331f15ddf88c8e4040d5a",
+    "identityHash": "b2c02680edf9841a32b9133f7e9397ba",
     "entities": [
       {
         "tableName": "Branch",
@@ -112,10 +112,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "id"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [
           {
@@ -144,7 +144,7 @@
       },
       {
         "tableName": "Company",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `registrationNumber` TEXT NOT NULL, `ceo` TEXT NOT NULL, `phone` TEXT NOT NULL, `website` TEXT, `isDeleted` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isCreated` INTEGER NOT NULL, `id` TEXT NOT NULL, `clientId` TEXT NOT NULL, `clientSecret` TEXT NOT NULL, `tokenPin` TEXT NOT NULL, `taxActivityCode` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `registrationNumber` TEXT NOT NULL, `ceo` TEXT NOT NULL, `phone` TEXT NOT NULL, `website` TEXT, `isDeleted` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isCreated` INTEGER NOT NULL, `id` TEXT NOT NULL, `isSynced` INTEGER NOT NULL, `syncError` TEXT, `clientId` TEXT NOT NULL, `clientSecret` TEXT NOT NULL, `tokenPin` TEXT NOT NULL, `taxActivityCode` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "name",
@@ -201,6 +201,18 @@
             "notNull": true
           },
           {
+            "fieldPath": "isSynced",
+            "columnName": "isSynced",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "syncError",
+            "columnName": "syncError",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
             "fieldPath": "settings.clientId",
             "columnName": "clientId",
             "affinity": "TEXT",
@@ -226,10 +238,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "id"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [],
         "foreignKeys": []
@@ -366,10 +378,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "id"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [
           {
@@ -474,10 +486,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "id"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [
           {
@@ -528,10 +540,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "id"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [],
         "foreignKeys": []
@@ -590,10 +602,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "id"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [
           {
@@ -724,10 +736,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "id"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [
           {
@@ -818,10 +830,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "id"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [],
         "foreignKeys": []
@@ -856,10 +868,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "id"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [
           {
@@ -890,7 +902,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '085f302a975331f15ddf88c8e4040d5a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b2c02680edf9841a32b9133f7e9397ba')"
     ]
   }
 }

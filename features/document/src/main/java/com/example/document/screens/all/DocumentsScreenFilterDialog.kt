@@ -3,24 +3,32 @@ package com.example.document.screens.all
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.paging.PagingData
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
-fun <T> FilterDialog(
-    items: List<T>,
+fun <T : Any> FilterDialog(
+    items: Flow<PagingData<T>>,
     onItemSelect: (T) -> Unit,
     setItemName: (T) -> String,
     onDismiss: () -> Unit,
 ) {
     Dialog(onDismissRequest = onDismiss) {
         Card {
+            val options = items.collectAsLazyPagingItems()
             LazyColumn(
                 modifier = Modifier
                     .padding(16.dp)
@@ -28,7 +36,8 @@ fun <T> FilterDialog(
                     .heightIn(max = 400.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(items) { item ->
+                items(options) { item ->
+                    if (item == null) return@items
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -59,7 +68,7 @@ fun DocumentsScreenFilterDialogPreview() {
     }
 
     FilterDialog(
-        items = List(50) { it.toString() },
+        items = flowOf(PagingData.from(List(50) { it.toString() })),
         onItemSelect = {},
         setItemName = { it }
     ) {

@@ -1,5 +1,6 @@
 package com.example.data.client
 
+import androidx.paging.PagingSource
 import com.example.common.functions.tryWrapper
 import com.example.data.sync.Synchronizer
 import com.example.models.Client
@@ -33,6 +34,9 @@ class OfflineFirstClientRepository(
     override fun getClient(id: String): Flow<Client> =
         localSource.getClientById(id).filterNotNull().map(ClientEntity::asClient)
 
+    override fun getClientsPagingSource(): PagingSource<Int, Client> =
+        localSource.getPagedClients().map { it.asClient() }.asPagingSourceFactory().invoke()
+
     override suspend fun createClient(client: Client): Result<Client> = tryWrapper {
         localSource.insertClient(client.asClientEntity(isCreated = true))
         Result.Success(client)
@@ -63,7 +67,8 @@ class OfflineFirstClientRepository(
     override suspend fun syncWith(synchronizer: Synchronizer): Boolean {
         val clients = localSource.getAllClients()
         val idMappings = HashMap<String, String>()
-        return synchronizer.handleSync(
+        val remotelyCreatedClients = mutableListOf<String>()
+        val result = synchronizer.handleSync(
             remoteCreator = {
                 val createdClients = clients.filter { it.isCreated }
                 createdClients.forEach { client ->
@@ -94,6 +99,7 @@ class OfflineFirstClientRepository(
             },
 
             localCreator = { client ->
+                remotelyCreatedClients.add(client.id)
                 val ids = clients.map { it.id }
                 if (client.id in ids)
                     localSource.updateClient(client)
@@ -110,6 +116,11 @@ class OfflineFirstClientRepository(
                 remoteSource.getClients().map { clients -> clients.map { it.asClientEntity() } }
             },
         )
+        val remotelyDeletedClients = clients.filterNot { it.id in remotelyCreatedClients }
+        remotelyDeletedClients.forEach { client ->
+            localSource.deleteClient(client.id)
+        }
+        return result
     }
 
 }

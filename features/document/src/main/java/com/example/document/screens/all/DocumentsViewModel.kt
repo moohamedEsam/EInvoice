@@ -2,10 +2,8 @@ package com.example.document.screens.all
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.domain.document.CancelDocumentUseCase
-import com.example.domain.document.GetDocumentsUseCase
-import com.example.domain.document.SendDocumentUseCase
-import com.example.domain.document.SyncDocumentsStatusUseCase
+import androidx.paging.*
+import com.example.domain.document.*
 import com.example.domain.networkStatus.NetworkObserver
 import com.example.domain.networkStatus.NetworkStatus
 import com.example.models.Client
@@ -14,17 +12,17 @@ import com.example.models.company.Company
 import com.example.models.document.DocumentStatus
 import com.example.models.document.DocumentView
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import java.util.*
 
 class DocumentsViewModel(
-    private val getDocumentsUseCase: GetDocumentsUseCase,
+    private val getDocumentsPagingSourceUseCase: GetDocumentsPagingSourceUseCase,
     private val networkObserver: NetworkObserver,
     private val cancelDocumentUseCase: CancelDocumentUseCase,
     private val sendDocumentUseCase: SendDocumentUseCase,
     private val syncDocumentsStatusUseCase: SyncDocumentsStatusUseCase
 ) : ViewModel() {
-    private val _documents = MutableStateFlow(emptyList<DocumentView>())
     private val _query = MutableStateFlow("")
     private val _companyFilter: MutableStateFlow<Company?> = MutableStateFlow(null)
     private val _clientFilter: MutableStateFlow<Client?> = MutableStateFlow(null)
@@ -35,6 +33,12 @@ class DocumentsViewModel(
     private val _lastFilterClicked: MutableStateFlow<FilterType?> = MutableStateFlow(null)
     val lastFilterClicked = _lastFilterClicked.asStateFlow()
     private val _isConnectedToNetwork = MutableStateFlow(false)
+    private val _documents = Pager(
+        config = PagingConfig(pageSize = 20),
+        pagingSourceFactory = { getDocumentsPagingSourceUseCase() }
+    ).flow.cachedIn(viewModelScope)
+
+
     val state = combine(
         _companyFilter,
         _clientFilter,
@@ -61,7 +65,7 @@ class DocumentsViewModel(
         branchFilter: Branch?,
         statusFilter: DocumentStatus?
     ) = DocumentsScreenState(
-        documents = _documents.value,
+        documents = PagingData.empty(),
         query = query,
         isSyncing = _isSyncing.value,
         companyFilter = companyFilter,
@@ -72,16 +76,16 @@ class DocumentsViewModel(
     )
 
     private fun filterDocuments(
-        documents: List<DocumentView>,
+        documents: PagingData<DocumentView>,
         screenState: DocumentsScreenState
-    ) = documents.asSequence()
+    ) = documents
         .filter { document -> filterByQuery(document, screenState) }
         .filter { document -> filterByCompany(document, screenState) }
         .filter { document -> filterByClient(document, screenState) }
         .filter { document -> filterByBranch(document, screenState) }
         .filter { document -> filterByStatus(document, screenState) }
         .filter { document -> filterByDate(document, screenState) }
-        .toList()
+
 
     fun setQuery(value: String) = viewModelScope.launch {
         _query.update { value }
@@ -107,18 +111,6 @@ class DocumentsViewModel(
         _dateFilter.update { value }
     }
 
-    fun getAvailableCompanies(): List<Company> {
-        return _documents.value.map { it.company }.distinct().sortedBy { it.name }
-    }
-
-    fun getAvailableClients(): List<Client> {
-        return _documents.value.map { it.client }.distinct().sortedBy { it.name }
-    }
-
-    fun getAvailableBranches(): List<Branch> {
-        return _documents.value.map { it.branch }.distinct().sortedBy { it.name }
-    }
-
     fun setLastFilterClicked(value: FilterType?) = viewModelScope.launch {
         _lastFilterClicked.update { value }
     }
@@ -138,11 +130,6 @@ class DocumentsViewModel(
     }
 
     init {
-        viewModelScope.launch {
-            getDocumentsUseCase().collectLatest {
-                _documents.update { _ -> it }
-            }
-        }
         viewModelScope.launch {
             networkObserver.observeNetworkStatus().collectLatest {
                 _isConnectedToNetwork.update { _ -> it == NetworkStatus.CONNECTED }
@@ -169,12 +156,12 @@ class DocumentsViewModel(
     }
 
     private fun getDayFromDate(date: Date) = Calendar.getInstance().apply {
-            time = date
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }.time
+        time = date
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }.time
 
     private fun filterByCompany(documentView: DocumentView, state: DocumentsScreenState): Boolean {
         return if (state.companyFilter != null)

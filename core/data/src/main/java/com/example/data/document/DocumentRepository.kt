@@ -1,5 +1,6 @@
 package com.example.data.document
 
+import androidx.paging.PagingSource
 import com.example.common.models.Result
 import com.example.data.sync.Syncable
 import com.example.models.document.Document
@@ -21,6 +22,8 @@ interface DocumentRepository : Syncable<Document> {
     suspend fun undoDeleteDocument(id: String): Result<Unit>
 
     fun getDocuments(): Flow<List<DocumentView>>
+
+    fun getDocumentsPagingSource(): PagingSource<Int, DocumentView>
 
     fun getDocumentsViewByCompanyInDuration(
         companyId: String,

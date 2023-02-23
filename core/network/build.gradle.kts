@@ -5,6 +5,7 @@ import com.google.protobuf.gradle.protoc
 plugins {
     id("einvoice.android.library")
     alias(libs.plugins.protobuf) apply true
+    alias(libs.plugins.kotlin.serialization) apply true
 }
 
 android {
@@ -30,8 +31,8 @@ protobuf {
 
     generateProtoTasks {
         all().forEach {
-            it.plugins{
-                create("java"){
+            it.plugins {
+                create("java") {
                     option("lite")
                 }
             }

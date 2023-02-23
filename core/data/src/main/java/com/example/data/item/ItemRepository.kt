@@ -1,5 +1,6 @@
 package com.example.data.item
 
+import androidx.paging.PagingSource
 import com.example.common.models.Result
 import com.example.data.sync.Syncable
 import com.example.models.invoiceLine.TaxView
@@ -9,6 +10,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface ItemRepository : Syncable<Item> {
     fun getItems(): Flow<List<Item>>
+
+    fun getItemPagingSource(): PagingSource<Int, Item>
 
     fun getUnitTypes(): Flow<List<UnitType>>
 

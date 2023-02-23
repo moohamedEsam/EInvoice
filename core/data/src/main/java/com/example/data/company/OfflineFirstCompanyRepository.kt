@@ -69,44 +69,25 @@ class OfflineFirstCompanyRepository(
 
     override suspend fun syncWith(synchronizer: Synchronizer): Boolean {
         val companies = localDataSource.getAllCompanies()
-        val idMappings = HashMap<String, String>()
+        var idMappings: Map<String, String?> = emptyMap()
         val remotelySavedCompanies = mutableListOf<String>()
         val isSuccessfulSync = synchronizer.handleSync(
             remoteFetcher = remoteDataSource::getCompanies,
-            remoteDeleter = {
-                val deletedCompanies = companies.filter { it.isDeleted }
-                deletedCompanies.forEach { company ->
-                    val result = remoteDataSource.deleteCompany(company.id)
-                    if (result is Result.Success)
-                        localDataSource.deleteCompany(company.id)
-                }
-                Result.Success(Unit)
-            },
+            remoteDeleter = { handleRemoteDelete(companies) },
             remoteCreator = {
-                val createdCompanies = companies.filter { it.isCreated }
-                createdCompanies.forEach { company ->
-                    val result = remoteDataSource.createCompany(company.asCompany())
-                    if (result is Result.Success) {
-                        idMappings[company.id] = result.data.id
-                    }
-                }
-                Result.Success(Unit)
+                idMappings = handleRemoteCreate(companies)
             },
             remoteUpdater = {
                 val updatedCompanies = companies.filter { it.isUpdated }
                 updatedCompanies.forEach { company ->
-                    val result = remoteDataSource.updateCompany(company.asCompany())
-                    if (result is Result.Success)
-                        localDataSource.updateCompany(company.copy(isUpdated = false))
-
+                    updateCompanyRemotelyAndLocal(company)
                 }
-                Result.Success(Unit)
             },
             afterLocalCreate = {
                 idMappings.forEach { (oldId, newId) ->
-                    localDataSource.updateBranchesCompanyId(oldId, newId)
-                    localDataSource.updateClientsCompanyId(oldId, newId)
-                    localDataSource.updateDocumentsIssuerId(oldId, newId)
+                    if(newId != null)
+                        updateRelationsKeys(oldId, newId)
+
                     localDataSource.deleteCompany(oldId)
                 }
             },
@@ -123,6 +104,56 @@ class OfflineFirstCompanyRepository(
             localDataSource.deleteCompany(company.id) // will delete all related data
         }
         return isSuccessfulSync
+    }
+
+    private suspend fun handleRemoteCreate(
+        companies: List<CompanyEntity>
+    ): Map<String, String?> {
+        return companies
+            .filter { it.isCreated }
+            .associateBy { companyEntity ->
+                val result = remoteDataSource.createCompany(companyEntity.asCompany())
+                if (result is Result.Success)
+                    result.data.id
+                else {
+                    val error = (result as? Result.Error)?.exception
+                    localDataSource.updateCompany(
+                        companyEntity.copy(
+                            isSynced = false,
+                            syncError = error
+                        )
+                    )
+                    null
+                }
+            }.map { (newId, company) ->
+                company.id to newId
+            }.toMap()
+    }
+
+    private suspend fun handleRemoteDelete(
+        companies: List<CompanyEntity>
+    ) {
+        val deletedCompanies = companies.filter { it.isDeleted }
+        deletedCompanies.forEach { company ->
+            deleteCompanyRemotelyAndLocal(company)
+        }
+    }
+
+    private suspend fun updateRelationsKeys(oldId: String, newId: String) {
+        localDataSource.updateBranchesCompanyId(oldId, newId)
+        localDataSource.updateClientsCompanyId(oldId, newId)
+        localDataSource.updateDocumentsIssuerId(oldId, newId)
+    }
+
+    private suspend fun updateCompanyRemotelyAndLocal(company: CompanyEntity) {
+        val result = remoteDataSource.updateCompany(company.asCompany())
+        if (result is Result.Success)
+            localDataSource.updateCompany(company.copy(isUpdated = false))
+    }
+
+    private suspend fun deleteCompanyRemotelyAndLocal(company: CompanyEntity) {
+        val result = remoteDataSource.deleteCompany(company.id)
+        result.ifSuccess { localDataSource.deleteCompany(it.id) }
     }
 
 

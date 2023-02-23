@@ -1,5 +1,6 @@
 package com.example.database.room.dao
 
+import androidx.paging.DataSource
 import androidx.room.*
 import com.example.database.models.client.ClientEntity
 import com.example.database.models.client.ClientViewEntity
@@ -9,6 +10,9 @@ import kotlinx.coroutines.flow.Flow
 interface ClientDao {
     @Query("SELECT * FROM Client where isDeleted = 0")
     fun getClients(): Flow<List<ClientEntity>>
+
+    @Query("SELECT * FROM Client where isDeleted = 0")
+    fun getPagedClients(): DataSource.Factory<Int, ClientEntity>
 
     @Query("SELECT * FROM Client")
     suspend fun getAllClients(): List<ClientEntity>

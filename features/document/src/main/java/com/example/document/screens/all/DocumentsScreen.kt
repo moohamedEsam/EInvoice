@@ -15,7 +15,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import com.example.einvoicecomponents.datePickerColors
+import com.example.einvoicecomponents.loadStateItem
 import com.example.einvoicecomponents.toDate
 import com.example.einvoicecomponents.toLocalDate
 import com.example.functions.getStatusColor
@@ -31,6 +36,8 @@ import com.google.accompanist.flowlayout.MainAxisAlignment
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import org.koin.androidx.compose.viewModel
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -93,18 +100,18 @@ fun DocumentsScreen(
         onCreateDebitClick = onCreateDebitClick,
         onDocumentUpdateClick = onDocumentUpdateClick
     )
-    if (showDialog && lastFilterClicked != null)
-        ShowFilterDialog(
-            companies = viewModel.getAvailableCompanies(),
-            clients = viewModel.getAvailableClients(),
-            branches = viewModel.getAvailableBranches(),
-            onDismiss = { showDialog = false },
-            onCompanySelected = viewModel::setCompanyFilter,
-            onClientSelected = viewModel::setClientFilter,
-            onBranchSelected = viewModel::setBranchFilter,
-            onStatusSelected = viewModel::setStatusFilter,
-            lastFilterClicked = lastFilterClicked!!
-        )
+//    if (showDialog && lastFilterClicked != null)
+//        ShowFilterDialog(
+//            companies = viewModel.availableCompanies,
+//            clients = viewModel.availableClients,
+//            branches = viewModel.availableBranches,
+//            onDismiss = { showDialog = false },
+//            onCompanySelected = viewModel::setCompanyFilter,
+//            onClientSelected = viewModel::setClientFilter,
+//            onBranchSelected = viewModel::setBranchFilter,
+//            onStatusSelected = viewModel::setStatusFilter,
+//            lastFilterClicked = lastFilterClicked!!
+//        )
 }
 
 @Composable
@@ -128,6 +135,7 @@ private fun DocumentsScreenContent(
     val simpleDateFormat by remember {
         mutableStateOf(SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()))
     }
+    val documents = flowOf(state.documents).collectAsLazyPagingItems()
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -137,19 +145,20 @@ private fun DocumentsScreenContent(
         item { SearchField(state, onQueryChange) }
         item { ActionsRow(onSyncDocumentsClick, state) }
         item {
-            FiltersRow(
-                state = state,
-                onFilterByCompanyClick = onFilterByCompanyClick,
-                onFilterByClientClick = onFilterByClientClick,
-                onFilterByBranchClick = onFilterByBranchClick,
-                onFilterByStatusClick = onFilterByStatusClick,
-                onDatePicked = onDatePicked,
-                dateFormat = simpleDateFormat
-            )
+//            FiltersRow(
+//                state = state,
+//                onFilterByCompanyClick = onFilterByCompanyClick,
+//                onFilterByClientClick = onFilterByClientClick,
+//                onFilterByBranchClick = onFilterByBranchClick,
+//                onFilterByStatusClick = onFilterByStatusClick,
+//                onDatePicked = onDatePicked,
+//                dateFormat = simpleDateFormat
+//            )
         }
+
         documentsList(
             onDocumentClick = onDocumentClick,
-            documents = state.documents,
+            documents = documents,
             onDocumentCancelClick = onDocumentCancelClick,
             onAddDocumentClick = onAddDocumentClick,
             onCreateCreditClick = onCreateCreditClick,
@@ -169,9 +178,10 @@ private fun LazyListScope.documentsList(
     onDocumentUpdateClick: (String) -> Unit,
     onCreateDebitClick: (String) -> Unit,
     onDocumentSendClick: (String) -> Unit,
-    documents: List<DocumentView>,
+    documents: LazyPagingItems<DocumentView>,
     isConnectedToNetwork: Boolean
 ) {
+
     item {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -189,7 +199,7 @@ private fun LazyListScope.documentsList(
 
     items(documents) { document ->
         DocumentItem(
-            document = document,
+            document = document ?: return@items,
             onClick = { onDocumentClick(document.id) },
             onDocumentCancelClick = onDocumentCancelClick,
             dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()),
@@ -200,6 +210,8 @@ private fun LazyListScope.documentsList(
             onDocumentUpdateClick = onDocumentUpdateClick
         )
     }
+
+    loadStateItem(documents)
 
 }
 
@@ -466,9 +478,9 @@ private fun DocumentItem(
 
 @Composable
 private fun ShowFilterDialog(
-    companies: List<Company>,
-    clients: List<Client>,
-    branches: List<Branch>,
+    companies: Flow<PagingData<Company>>,
+    clients: Flow<PagingData<Client>>,
+    branches: Flow<PagingData<Branch>>,
     onDismiss: () -> Unit,
     onCompanySelected: (Company) -> Unit,
     onClientSelected: (Client) -> Unit,
@@ -521,7 +533,7 @@ private fun ShowFilterDialog(
 
 @Composable
 private fun ShowCompanyFilterDialog(
-    companies: List<Company>,
+    companies: Flow<PagingData<Company>>,
     onDismiss: () -> Unit,
     onCompanySelected: (Company) -> Unit
 ) {
@@ -535,7 +547,7 @@ private fun ShowCompanyFilterDialog(
 
 @Composable
 private fun ShowClientFilterDialog(
-    clients: List<Client>,
+    clients: Flow<PagingData<Client>>,
     onDismiss: () -> Unit,
     onClientSelected: (Client) -> Unit
 ) {
@@ -549,7 +561,7 @@ private fun ShowClientFilterDialog(
 
 @Composable
 private fun ShowBranchFilterDialog(
-    branches: List<Branch>,
+    branches: Flow<PagingData<Branch>>,
     onDismiss: () -> Unit,
     onBranchSelected: (Branch) -> Unit
 ) {
@@ -567,7 +579,7 @@ private fun ShowStatusFilterDialog(
     onStatusSelected: (DocumentStatus) -> Unit
 ) {
     FilterDialog(
-        items = DocumentStatus.values().toList(),
+        items = flowOf(PagingData.from(DocumentStatus.values().toList())),
         onItemSelect = onStatusSelected,
         setItemName = { it.name },
         onDismiss = onDismiss
@@ -579,9 +591,9 @@ private fun ShowStatusFilterDialog(
 fun DocumentsScreenPreview() {
     DocumentsScreenContent(
         state = DocumentsScreenState(
-            documents = List(50) {
+            documents = PagingData.from(List(50) {
                 DocumentView.empty().copy(status = DocumentStatus.Invalid, documentType = "I")
-            },
+            }),
             query = "",
             isSyncing = false,
             companyFilter = null,

@@ -41,6 +41,7 @@ val domainModule = module {
 
     //branch
     single { GetBranchesUseCase(get<BranchRepository>()::getBranches) }
+    single { GetBranchesPagingSourceUseCase(get<BranchRepository>()::getBranchesPagingSource) }
     single { GetBranchesByCompanyUseCase(get<BranchRepository>()::getBranchesByCompanyId) }
     single { GetBranchViewUseCase(get<BranchRepository>()::getBranchView) }
     single { CreateBranchUseCase(get<BranchRepository>()::createBranch) }
@@ -50,6 +51,7 @@ val domainModule = module {
 
     //client
     single { GetClientsUseCase(get<ClientRepository>()::getClients) }
+    single { GetClientsPagingSourceUseCase(get<ClientRepository>()::getClientsPagingSource) }
     single { GetClientUseCase(get<ClientRepository>()::getClient) }
     single { GetClientViewUseCase(get<ClientRepository>()::getClientView) }
     single { CreateClientUseCase(get<ClientRepository>()::createClient) }
@@ -59,6 +61,7 @@ val domainModule = module {
 
     //item
     single { GetItemsUseCase(get<ItemRepository>()::getItems) }
+    single { GetItemsPagingSourceUseCase(get<ItemRepository>()::getItemPagingSource) }
     single { GetItemsByBranchUseCase(get<ItemRepository>()::getItemsByBranchId) }
     single { CreateItemUseCase(get<ItemRepository>()::createItem) }
     single { UpdateItemUseCase(get<ItemRepository>()::updateItem) }
@@ -68,6 +71,7 @@ val domainModule = module {
 
     //document
     single { GetDocumentsUseCase(get<DocumentRepository>()::getDocuments) }
+    single { GetDocumentsPagingSourceUseCase(get<DocumentRepository>()::getDocumentsPagingSource) }
     single { getDocumentsInternalIdsByCompanyIdUseCase(get()) }
     single { getDocumentsByTypeUseCase(get()) }
     single { GetDocumentUseCase(get<DocumentRepository>()::getDocument) }

@@ -1,5 +1,6 @@
 package com.example.data.branch
 
+import androidx.paging.PagingSource
 import com.example.common.functions.tryWrapper
 import com.example.common.models.Result
 import com.example.data.sync.Synchronizer
@@ -22,6 +23,9 @@ class OfflineFirstBranchRepository(
 ) : BranchRepository {
     override fun getBranches(): Flow<List<Branch>> =
         localSource.getBranches().map { branches -> branches.map { it.asBranch() } }
+
+    override fun getBranchesPagingSource(): PagingSource<Int, Branch> =
+        localSource.getPagedBranches().map { it.asBranch() }.asPagingSourceFactory().invoke()
 
 
     override fun getBranchView(id: String): Flow<BranchView> =
@@ -59,6 +63,7 @@ class OfflineFirstBranchRepository(
     override suspend fun syncWith(synchronizer: Synchronizer): Boolean {
         val branches = localSource.getAllBranches()
         val idMappings = HashMap<String, String>()
+        val remotelyCreatedBranches = mutableListOf<String>()
         val syncResult = synchronizer.handleSync(
             remoteCreator = {
                 val createdBranches = branches.filter { it.isCreated }
@@ -90,6 +95,7 @@ class OfflineFirstBranchRepository(
             },
 
             localCreator = { branch ->
+                remotelyCreatedBranches.add(branch.id)
                 val ids = branches.map { it.id }
                 if (branch.id in ids)
                     localSource.updateBranch(branch)
@@ -109,6 +115,10 @@ class OfflineFirstBranchRepository(
                     .map { branches -> branches.map { it.asBranchEntity() } }
             },
         )
+        val remotelyDeletedBranches = branches.filterNot { it.id in remotelyCreatedBranches }
+        remotelyDeletedBranches.forEach { branch ->
+            localSource.deleteBranch(branch.id)
+        }
         return syncResult
     }
 

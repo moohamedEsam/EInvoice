@@ -1,5 +1,6 @@
 package com.example.database.room.dao
 
+import androidx.paging.DataSource
 import androidx.room.*
 import com.example.database.models.document.DocumentEntity
 import com.example.database.models.document.DocumentViewEntity
@@ -54,6 +55,10 @@ interface DocumentDao {
     @Transaction
     @Query("SELECT * FROM Document order by date desc")
     fun getAllDocuments(): Flow<List<DocumentViewEntity>>
+
+    @Transaction
+    @Query("SELECT * FROM Document WHERE isDeleted = 0 order by date desc")
+    fun getPagedDocuments(): DataSource.Factory<Int, DocumentViewEntity>
 
     @Transaction
     @Query("SELECT * FROM Document WHERE id = :id")

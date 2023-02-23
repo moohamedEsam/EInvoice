@@ -345,6 +345,7 @@ class DocumentFormViewModel(
         observeTaxes()
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeInternalIds() {
         viewModelScope.launch {
             _selectedCompany.filterNotNull().flatMapLatest {

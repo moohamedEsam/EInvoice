@@ -1,5 +1,6 @@
 package com.example.data.branch
 
+import androidx.paging.PagingSource
 import com.example.common.models.Result
 import com.example.data.sync.Syncable
 import com.example.models.branch.Branch
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 interface BranchRepository : Syncable<Branch> {
     fun getBranches(): Flow<List<Branch>>
 
+    fun getBranchesPagingSource(): PagingSource<Int, Branch>
 
     fun getBranchView(id: String): Flow<BranchView>
 

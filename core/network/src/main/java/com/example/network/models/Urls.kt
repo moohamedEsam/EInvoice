@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 object Urls {
-    private var baseUrl = "http://192.168.1.4:7081"
+    private var baseUrl = "http://192.168.1.5:7081"
     fun refreshToken() = "$baseUrl/User/refresh_token"
     fun login() = "$baseUrl/User/sign_in"
     fun register() = "$baseUrl/User/create"

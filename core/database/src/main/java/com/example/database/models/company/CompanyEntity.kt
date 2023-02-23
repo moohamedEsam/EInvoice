@@ -19,7 +19,9 @@ data class CompanyEntity(
     val isDeleted: Boolean = false,
     val isUpdated: Boolean = false,
     val isCreated: Boolean = false,
-    @PrimaryKey val id: String = UUID.randomUUID().toString()
+    @PrimaryKey val id: String = UUID.randomUUID().toString(),
+    val isSynced: Boolean = false,
+    val syncError: String? = null,
 )
 
 fun CompanyEntity.asCompany() = Company(
@@ -29,7 +31,9 @@ fun CompanyEntity.asCompany() = Company(
     phone = phone,
     website = website,
     id = id,
-    settings = settings
+    settings = settings,
+    isSynced = isSynced,
+    syncError = syncError,
 )
 
 fun Company.asCompanyEntity(
@@ -46,5 +50,7 @@ fun Company.asCompanyEntity(
     settings = settings,
     isCreated = isCreated,
     isUpdated = isUpdated,
-    isDeleted = isDeleted
+    isDeleted = isDeleted,
+    isSynced = isSynced,
+    syncError = syncError,
 )

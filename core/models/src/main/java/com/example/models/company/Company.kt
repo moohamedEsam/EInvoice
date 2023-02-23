@@ -11,7 +11,9 @@ data class Company(
     val phone: String,
     val website: String?,
     val settings: CompanySettings,
-    val id: String = UUID.randomUUID().toString()
+    val id: String = UUID.randomUUID().toString(),
+    val isSynced: Boolean = false,
+    val syncError: String? = null,
 ){
     companion object
 }

@@ -1,5 +1,6 @@
 package com.example.database.room.dao
 
+import androidx.paging.DataSource
 import androidx.room.*
 import com.example.database.models.ItemEntity
 import com.example.database.models.UnitTypeEntity
@@ -12,6 +13,9 @@ import kotlinx.coroutines.flow.Flow
 interface ItemDao {
     @Query("SELECT * FROM Item where isDeleted = 0")
     fun getItems(): Flow<List<ItemEntity>>
+
+    @Query("SELECT * FROM Item where isDeleted = 0")
+    fun getPagedItems(): DataSource.Factory<Int, ItemEntity>
 
     @Query("SELECT * FROM Item")
     suspend fun getAllItems() : List<ItemEntity>

@@ -1,5 +1,6 @@
 package com.example.document.screens.all
 
+import androidx.paging.PagingData
 import com.example.models.Client
 import com.example.models.branch.Branch
 import com.example.models.company.Company
@@ -8,7 +9,7 @@ import com.example.models.document.DocumentView
 import java.util.*
 
 data class DocumentsScreenState(
-    val documents: List<DocumentView>,
+    val documents: PagingData<DocumentView>,
     val query: String,
     val isSyncing: Boolean,
     val isConnectedToNetwork: Boolean,
@@ -22,7 +23,7 @@ data class DocumentsScreenState(
 }
 
 fun DocumentsScreenState.Companion.empty() = DocumentsScreenState(
-    documents = emptyList(),
+    documents = PagingData.empty(),
     query = "",
     isSyncing = false,
     companyFilter = null,

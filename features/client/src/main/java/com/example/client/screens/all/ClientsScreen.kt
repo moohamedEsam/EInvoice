@@ -1,26 +1,27 @@
 package com.example.client.screens.all
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import com.example.einvoicecomponents.ListScreenContent
+import com.example.einvoicecomponents.loadStateItem
 import com.example.models.Client
 import com.example.models.utils.Address
 import com.example.models.utils.BusinessType
 import com.example.models.utils.TaxStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
 import org.koin.androidx.compose.viewModel
 
 @Composable
@@ -30,7 +31,7 @@ fun ClientsScreen(
     onEditClick: (String) -> Unit,
 ) {
     val viewModel: ClientsViewModel by viewModel()
-    val clients by viewModel.clients.collectAsState()
+    val clients = viewModel.clients.collectAsLazyPagingItems()
 
     ClientsScreenContent(
         clients = clients,
@@ -42,10 +43,9 @@ fun ClientsScreen(
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ClientsScreenContent(
-    clients: List<Client>,
+    clients: LazyPagingItems<Client>,
     queryState: StateFlow<String>,
     onQueryChanged: (String) -> Unit,
     onClientClicked: (Client) -> Unit,
@@ -60,12 +60,13 @@ private fun ClientsScreenContent(
     ) {
         items(clients) { client ->
             ClientItem(
-                client = client,
+                client = client ?: return@items,
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { onClientClicked(client) },
                 onEditClick = { onEditClick(client.id) }
             )
         }
+        loadStateItem(clients)
     }
 }
 
@@ -85,7 +86,7 @@ private fun ClientItem(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(text = client.name, style = MaterialTheme.typography.headlineSmall)
-            
+
             Text(
                 text = "Business type: ${client.businessType.asString()}",
                 style = MaterialTheme.typography.bodyMedium
@@ -144,8 +145,9 @@ fun ClientsScreenPreview() {
         status = TaxStatus.Taxable,
         companyId = "Company Id 1",
     )
+    val clients = List(20) { client }
     ClientsScreenContent(
-        clients = List(20) { client },
+        clients = flowOf(PagingData.from(clients)).collectAsLazyPagingItems(),
         queryState = MutableStateFlow(""),
         onQueryChanged = {},
         onClientClicked = {},

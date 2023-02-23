@@ -1,9 +1,6 @@
 package com.example.branch.screens.all
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
@@ -12,10 +9,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import com.example.einvoicecomponents.ListScreenContent
+import com.example.einvoicecomponents.loadStateItem
 import com.example.models.branch.Branch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
 import org.koin.androidx.compose.viewModel
 
 @Composable
@@ -25,7 +28,7 @@ fun BranchesScreen(
     onAddBranchClick: () -> Unit
 ) {
     val viewModel: BranchesViewModel by viewModel()
-    val branches by viewModel.branches.collectAsState()
+    val branches = viewModel.branches.collectAsLazyPagingItems()
     BranchesScreenContent(
         branches = branches,
         onBranchClick = { onBranchClick(it.id) },
@@ -36,10 +39,9 @@ fun BranchesScreen(
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun BranchesScreenContent(
-    branches: List<Branch>,
+    branches: LazyPagingItems<Branch>,
     onBranchClick: (Branch) -> Unit,
     onCreateBranchClick: () -> Unit,
     onBranchEditClick: (String) -> Unit,
@@ -54,12 +56,14 @@ private fun BranchesScreenContent(
     ) {
         items(branches) { branch ->
             BranchItem(
-                branch = branch,
+                branch = branch ?: return@items,
                 onBranchClick = { onBranchClick(branch) },
                 modifier = Modifier.fillMaxWidth(),
                 onBranchEditClick = { onBranchEditClick(branch.id) }
             )
         }
+
+        loadStateItem(branches)
     }
 }
 
@@ -146,7 +150,7 @@ fun BranchesScreenPreview() {
             )
         }
     BranchesScreenContent(
-        branches = branches,
+        branches = flowOf(PagingData.from(branches)).collectAsLazyPagingItems(),
         onBranchClick = {},
         onCreateBranchClick = {},
         queryState = MutableStateFlow(""),
