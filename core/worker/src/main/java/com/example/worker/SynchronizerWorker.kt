@@ -1,6 +1,9 @@
 package com.example.worker
 
 import android.content.Context
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.work.*
 import com.example.data.branch.BranchRepository
 import com.example.data.client.ClientRepository
@@ -47,5 +50,7 @@ class SynchronizerWorker(
             .build()
 
         const val workName = "SynchronizerWorker"
+
+        const val Progress = "Progress"
     }
 }

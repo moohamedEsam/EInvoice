@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.example.database.models.DataEntity
 import com.example.database.models.company.CompanyEntity
 import com.example.models.branch.Branch
 import java.util.UUID
@@ -35,11 +36,13 @@ data class BranchEntity(
     val room: String,
     val landmark: String,
     val additionalInformation: String,
-    val isCreated: Boolean = false,
-    val isUpdated: Boolean = false,
-    val isDeleted: Boolean = false,
-    @PrimaryKey val id: String = UUID.randomUUID().toString()
-)
+    override val isCreated: Boolean = false,
+    override val isUpdated: Boolean = false,
+    override val isDeleted: Boolean = false,
+    @PrimaryKey override val id: String = UUID.randomUUID().toString(),
+    override val isSynced: Boolean = false,
+    override val syncError: String? = null
+) : DataEntity
 
 fun BranchEntity.asBranch() = Branch(
     id = id,
@@ -55,7 +58,9 @@ fun BranchEntity.asBranch() = Branch(
     floor = floor,
     room = room,
     landmark = landmark,
-    additionalInformation = additionalInformation
+    additionalInformation = additionalInformation,
+    isSynced = isSynced,
+    syncError = syncError
 )
 
 fun Branch.asBranchEntity(

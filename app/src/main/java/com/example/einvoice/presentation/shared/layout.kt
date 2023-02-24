@@ -1,15 +1,18 @@
 package com.example.einvoice.presentation.shared
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
@@ -19,7 +22,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.auth.login.LoginScreenRoute
-import com.example.auth.login.navigateToLoginScreen
 import com.example.branch.screens.all.BranchesScreenRoute
 import com.example.branch.screens.all.navigateToBranchesScreen
 import com.example.client.screens.all.ClientsScreenRoute
@@ -29,20 +31,21 @@ import com.example.company.screen.all.CompaniesScreenRoute
 import com.example.company.screen.all.navigateToCompaniesScreen
 import com.example.document.screens.all.DocumentsScreenRoute
 import com.example.document.screens.all.navigateToDocumentsScreen
-import com.example.domain.auth.LogoutUseCase
-import com.example.domain.sync.OneTimeSyncUseCase
 import com.example.einvoice.R
 import com.example.einvoice.presentation.settings.SettingsScreenRoute
 import com.example.einvoice.presentation.settings.navigateToSettingsScreen
 import com.example.functions.handleSnackBarEvent
 import com.example.item.screens.all.ItemsScreenRoute
 import com.example.item.screens.all.navigateToItemsScreen
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.inject
+import org.koin.androidx.compose.viewModel
+import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun EInvoiceLayout(startScreen: String) {
+    val viewModel: LayoutViewModel by viewModel()
     val snackbarHostState by remember {
         mutableStateOf(SnackbarHostState())
     }
@@ -52,12 +55,21 @@ fun EInvoiceLayout(startScreen: String) {
             snackbarHostState.handleSnackBarEvent(it)
         }
     }
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getReceiverChannel().collectLatest {
+            snackbarHostState.handleSnackBarEvent(it)
+        }
+    }
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     Scaffold(
-        modifier = Modifier.fillMaxSize().semantics { testTagsAsResourceId = true },
+        modifier = Modifier
+            .fillMaxSize()
+            .semantics { testTagsAsResourceId = true },
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
+            SnackbarHost(hostState = snackbarHostState) {
+                DraggableSnackBar(it, snackbarHostState)
+            }
         },
         content = {
             EInvoiceDrawer(
@@ -72,8 +84,28 @@ fun EInvoiceLayout(startScreen: String) {
             EInvoiceTopBar(
                 navController = navController,
                 drawerState = drawerState,
+                viewModel = viewModel
             )
         }
+    )
+}
+
+@Composable
+private fun DraggableSnackBar(
+    snackbarData: SnackbarData,
+    snackbarHostState: SnackbarHostState
+) {
+    Snackbar(
+        snackbarData,
+        modifier = Modifier
+            .draggable(
+                orientation = Orientation.Horizontal,
+                state = rememberDraggableState(
+                    onDelta = { delta ->
+                        if (abs(delta) > 20) snackbarHostState.currentSnackbarData?.dismiss()
+                    }
+                )
+            )
     )
 }
 
@@ -196,12 +228,14 @@ private fun DrawerContent(navController: NavHostController) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EInvoiceTopBar(navController: NavHostController, drawerState: DrawerState) {
+fun EInvoiceTopBar(
+    navController: NavHostController,
+    drawerState: DrawerState,
+    viewModel: LayoutViewModel
+) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route ?: return
-    val coroutine = rememberCoroutineScope()
-    val logoutUseCase: LogoutUseCase by inject()
-    val syncUseCase: OneTimeSyncUseCase by inject()
+    val coroutineScope = rememberCoroutineScope()
     if (currentRoute == LoginScreenRoute) return
     TopAppBar(
         title = {
@@ -210,11 +244,10 @@ fun EInvoiceTopBar(navController: NavHostController, drawerState: DrawerState) {
         navigationIcon = {
             IconButton(
                 onClick = {
-                    coroutine.launch {
+                    coroutineScope.launch {
                         if (drawerState.isOpen)
                             drawerState.close()
-                        else
-                            drawerState.open()
+                        else drawerState.open()
                     }
                 }
             ) {
@@ -238,10 +271,8 @@ fun EInvoiceTopBar(navController: NavHostController, drawerState: DrawerState) {
                     contentDescription = "Back"
                 )
             }
-
-            IconButton(onClick = {
-                syncUseCase()
-            }) {
+            val lifecycleOwner = LocalLifecycleOwner.current
+            IconButton(onClick = { viewModel.sync(lifecycleOwner) }) {
                 Icon(
                     imageVector = Icons.Outlined.Sync,
                     contentDescription = "Sync"
@@ -249,14 +280,7 @@ fun EInvoiceTopBar(navController: NavHostController, drawerState: DrawerState) {
             }
 
             IconButton(
-                onClick = {
-                    coroutine.launch {
-                        val result = logoutUseCase()
-                        result.ifSuccess {
-                            navController.navigateToLoginScreen()
-                        }
-                    }
-                },
+                onClick = viewModel::logout,
                 modifier = Modifier.testTag("Logout")
             ) {
                 Icon(

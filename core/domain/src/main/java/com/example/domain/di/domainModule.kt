@@ -21,67 +21,67 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val domainModule = module {
-    single { oneTimeSyncUseCase(androidContext()) }
-    single { getAndroidNetworkObserver(androidContext()) }
+    factory { oneTimeSyncUseCase(androidContext()) }
+    factory { getAndroidNetworkObserver(androidContext()) }
 
-    single { loginUseCase(get(), androidContext(), get()) }
-    single { logoutUseCase(get(), androidContext()) }
-    single { registerUseCase(get(), androidContext()) }
-    single { isUserLoggedInUseCase(androidContext()) }
+    factory { loginUseCase(get(), androidContext(), get()) }
+    factory { logoutUseCase(get(), androidContext()) }
+    factory { registerUseCase(get(), androidContext()) }
+    factory { isUserLoggedInUseCase(androidContext()) }
 
 
-    single { GetCompaniesUseCase(get<CompanyRepository>()::getCompanies) }
-    single { GetCompanyPagingSource(get<CompanyRepository>()::getCompanyPagingSource) }
-    single { GetCompaniesViewsUseCase(get<CompanyRepository>()::getCompaniesViews) }
-    single { GetCompanyUseCase(get<CompanyRepository>()::getCompany) }
-    single { CreateCompanyUseCase(get<CompanyRepository>()::createCompany) }
-    single { UpdateCompanyUseCase(get<CompanyRepository>()::updateCompany) }
-    single { DeleteCompanyUseCase(get<CompanyRepository>()::deleteCompany) }
-    single { UndoDeleteCompanyUseCase(get<CompanyRepository>()::undoDeleteCompany) }
+    factory { GetCompaniesUseCase(get<CompanyRepository>()::getCompanies) }
+    factory { GetCompanyPagingSource(get<CompanyRepository>()::getCompanyPagingSource) }
+    factory { GetCompaniesViewsUseCase(get<CompanyRepository>()::getCompaniesViews) }
+    factory { GetCompanyUseCase(get<CompanyRepository>()::getCompany) }
+    factory { CreateCompanyUseCase(get<CompanyRepository>()::createCompany) }
+    factory { UpdateCompanyUseCase(get<CompanyRepository>()::updateCompany) }
+    factory { DeleteCompanyUseCase(get<CompanyRepository>()::deleteCompany) }
+    factory { UndoDeleteCompanyUseCase(get<CompanyRepository>()::undoDeleteCompany) }
 
     //branch
-    single { GetBranchesUseCase(get<BranchRepository>()::getBranches) }
-    single { GetBranchesPagingSourceUseCase(get<BranchRepository>()::getBranchesPagingSource) }
-    single { GetBranchesByCompanyUseCase(get<BranchRepository>()::getBranchesByCompanyId) }
-    single { GetBranchViewUseCase(get<BranchRepository>()::getBranchView) }
-    single { CreateBranchUseCase(get<BranchRepository>()::createBranch) }
-    single { UpdateBranchUseCase(get<BranchRepository>()::updateBranch) }
-    single { DeleteBranchUseCase(get<BranchRepository>()::deleteBranch) }
-    single { UndoDeleteBranchUseCase(get<BranchRepository>()::undoDeleteBranch) }
+    factory { GetBranchesUseCase(get<BranchRepository>()::getBranches) }
+    factory { GetBranchesPagingSourceUseCase(get<BranchRepository>()::getBranchesPagingSource) }
+    factory { GetBranchesByCompanyUseCase(get<BranchRepository>()::getBranchesByCompanyId) }
+    factory { GetBranchViewUseCase(get<BranchRepository>()::getBranchView) }
+    factory { CreateBranchUseCase(get<BranchRepository>()::createBranch) }
+    factory { UpdateBranchUseCase(get<BranchRepository>()::updateBranch) }
+    factory { DeleteBranchUseCase(get<BranchRepository>()::deleteBranch) }
+    factory { UndoDeleteBranchUseCase(get<BranchRepository>()::undoDeleteBranch) }
 
     //client
-    single { GetClientsUseCase(get<ClientRepository>()::getClients) }
-    single { GetClientsPagingSourceUseCase(get<ClientRepository>()::getClientsPagingSource) }
-    single { GetClientUseCase(get<ClientRepository>()::getClient) }
-    single { GetClientViewUseCase(get<ClientRepository>()::getClientView) }
-    single { CreateClientUseCase(get<ClientRepository>()::createClient) }
-    single { UpdateClientUseCase(get<ClientRepository>()::updateClient) }
-    single { DeleteClientUseCase(get<ClientRepository>()::deleteClient) }
-    single { UndoDeleteClientUseCase(get<ClientRepository>()::undoDeleteClient) }
+    factory { GetClientsUseCase(get<ClientRepository>()::getClients) }
+    factory { GetClientsPagingSourceUseCase(get<ClientRepository>()::getClientsPagingSource) }
+    factory { GetClientUseCase(get<ClientRepository>()::getClient) }
+    factory { GetClientViewUseCase(get<ClientRepository>()::getClientView) }
+    factory { CreateClientUseCase(get<ClientRepository>()::createClient) }
+    factory { UpdateClientUseCase(get<ClientRepository>()::updateClient) }
+    factory { DeleteClientUseCase(get<ClientRepository>()::deleteClient) }
+    factory { UndoDeleteClientUseCase(get<ClientRepository>()::undoDeleteClient) }
 
     //item
-    single { GetItemsUseCase(get<ItemRepository>()::getItems) }
-    single { GetItemsPagingSourceUseCase(get<ItemRepository>()::getItemPagingSource) }
-    single { GetItemsByBranchUseCase(get<ItemRepository>()::getItemsByBranchId) }
-    single { CreateItemUseCase(get<ItemRepository>()::createItem) }
-    single { UpdateItemUseCase(get<ItemRepository>()::updateItem) }
-    single { DeleteItemUseCase(get<ItemRepository>()::deleteItem) }
-    single { GetUnitTypesUseCase(get<ItemRepository>()::getUnitTypes) }
-    single { GetTaxTypesUseCase(get<ItemRepository>()::getTaxTypes) }
+    factory { GetItemsUseCase(get<ItemRepository>()::getItems) }
+    factory { GetItemsPagingSourceUseCase(get<ItemRepository>()::getItemPagingSource) }
+    factory { GetItemsByBranchUseCase(get<ItemRepository>()::getItemsByBranchId) }
+    factory { CreateItemUseCase(get<ItemRepository>()::createItem) }
+    factory { UpdateItemUseCase(get<ItemRepository>()::updateItem) }
+    factory { DeleteItemUseCase(get<ItemRepository>()::deleteItem) }
+    factory { GetUnitTypesUseCase(get<ItemRepository>()::getUnitTypes) }
+    factory { GetTaxTypesUseCase(get<ItemRepository>()::getTaxTypes) }
 
     //document
-    single { GetDocumentsUseCase(get<DocumentRepository>()::getDocuments) }
-    single { GetDocumentsPagingSourceUseCase(get<DocumentRepository>()::getDocumentsPagingSource) }
-    single { getDocumentsInternalIdsByCompanyIdUseCase(get()) }
-    single { getDocumentsByTypeUseCase(get()) }
-    single { GetDocumentUseCase(get<DocumentRepository>()::getDocument) }
-    single { CreateDocumentUseCase(get<DocumentRepository>()::createDocument) }
-    single { UpdateDocumentUseCase(get<DocumentRepository>()::updateDocument) }
-    single { DeleteDocumentUseCase(get<DocumentRepository>()::deleteDocument) }
-    single { UndoDeleteDocumentUseCase(get<DocumentRepository>()::undoDeleteDocument) }
-    single { SyncDocumentsStatusUseCase(get<DocumentRepository>()::syncDocumentsStatus) }
-    single { CancelDocumentUseCase(get<DocumentRepository>()::cancelDocument) }
-    single { SendDocumentUseCase(get<DocumentRepository>()::sendDocument) }
-    single { CreateDerivedDocumentUseCase(get<DocumentRepository>()::createDerivedDocument) }
+    factory { GetDocumentsUseCase(get<DocumentRepository>()::getDocuments) }
+    factory { GetDocumentsPagingSourceUseCase(get<DocumentRepository>()::getDocumentsPagingSource) }
+    factory { getDocumentsInternalIdsByCompanyIdUseCase(get()) }
+    factory { getDocumentsByTypeUseCase(get()) }
+    factory { GetDocumentUseCase(get<DocumentRepository>()::getDocument) }
+    factory { CreateDocumentUseCase(get<DocumentRepository>()::createDocument) }
+    factory { UpdateDocumentUseCase(get<DocumentRepository>()::updateDocument) }
+    factory { DeleteDocumentUseCase(get<DocumentRepository>()::deleteDocument) }
+    factory { UndoDeleteDocumentUseCase(get<DocumentRepository>()::undoDeleteDocument) }
+    factory { SyncDocumentsStatusUseCase(get<DocumentRepository>()::syncDocumentsStatus) }
+    factory { CancelDocumentUseCase(get<DocumentRepository>()::cancelDocument) }
+    factory { SendDocumentUseCase(get<DocumentRepository>()::sendDocument) }
+    factory { CreateDerivedDocumentUseCase(get<DocumentRepository>()::createDerivedDocument) }
 
 }

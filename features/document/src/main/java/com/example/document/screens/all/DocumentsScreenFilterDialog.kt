@@ -27,13 +27,13 @@ fun <T : Any> FilterDialog(
     onDismiss: () -> Unit,
 ) {
     Dialog(onDismissRequest = onDismiss) {
-        Card {
+        Card(modifier=Modifier.fillMaxHeight(0.5f)) {
             val options = items.collectAsLazyPagingItems()
             LazyColumn(
                 modifier = Modifier
                     .padding(16.dp)
                     .fillMaxWidth()
-                    .heightIn(max = 400.dp),
+                    .fillMaxHeight(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(options) { item ->
@@ -52,6 +52,7 @@ fun <T : Any> FilterDialog(
                         Divider()
                     }
                 }
+
             }
         }
     }

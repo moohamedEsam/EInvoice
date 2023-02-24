@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 
 private const val CLIENT_NOT_FOUND = "Client not found"
+
 class OfflineFirstClientRepository(
     private val localSource: ClientDao,
     private val remoteSource: EInvoiceRemoteDataSource
@@ -43,7 +44,10 @@ class OfflineFirstClientRepository(
     }
 
     override suspend fun updateClient(client: Client): Result<Client> = tryWrapper {
-        val clientEntity = localSource.getClientById(client.id).first() ?: return@tryWrapper Result.Error(CLIENT_NOT_FOUND)
+        val clientEntity =
+            localSource.getClientById(client.id).first() ?: return@tryWrapper Result.Error(
+                CLIENT_NOT_FOUND
+            )
         if (clientEntity.isCreated)
             localSource.updateClient(client.asClientEntity(isCreated = true))
         else
@@ -52,7 +56,9 @@ class OfflineFirstClientRepository(
     }
 
     override suspend fun deleteClient(id: String): Result<Unit> = tryWrapper {
-        val clientEntity = localSource.getClientById(id).first() ?: return@tryWrapper Result.Error(CLIENT_NOT_FOUND)
+        val clientEntity = localSource.getClientById(id).first() ?: return@tryWrapper Result.Error(
+            CLIENT_NOT_FOUND
+        )
         if (clientEntity.isCreated)
             localSource.deleteClient(id)
         else
@@ -66,38 +72,12 @@ class OfflineFirstClientRepository(
 
     override suspend fun syncWith(synchronizer: Synchronizer): Boolean {
         val clients = localSource.getAllClients()
-        val idMappings = HashMap<String, String>()
+        var idMappings = emptyMap<String, String?>()
         val remotelyCreatedClients = mutableListOf<String>()
         val result = synchronizer.handleSync(
-            remoteCreator = {
-                val createdClients = clients.filter { it.isCreated }
-                createdClients.forEach { client ->
-                    val result = remoteSource.createClient(client.asClient())
-                    if (result is Result.Success)
-                        idMappings[client.id] = result.data.id
-
-                }
-                Result.Success(Unit)
-            },
-            remoteDeleter = {
-                val deletedClients = clients.filter { it.isDeleted }
-                deletedClients.forEach { client ->
-                    val result = remoteSource.deleteClient(client.id)
-                    if (result is Result.Success)
-                        localSource.deleteClient(client.id)
-                }
-                Result.Success(Unit)
-            },
-            remoteUpdater = {
-                val updatedClients = clients.filter { it.isUpdated }
-                updatedClients.forEach { client ->
-                    val result = remoteSource.updateClient(client.asClient())
-                    if (result is Result.Success)
-                        localSource.updateClient(client.copy(isUpdated = false))
-                }
-                Result.Success(Unit)
-            },
-
+            remoteCreator = { idMappings = createAndGetIdMappings(clients) },
+            remoteDeleter = { deleteRemoteAndLocal(clients) },
+            remoteUpdater = { updateRemoteAndLocal(clients) },
             localCreator = { client ->
                 remotelyCreatedClients.add(client.id)
                 val ids = clients.map { it.id }
@@ -108,12 +88,13 @@ class OfflineFirstClientRepository(
             },
             afterLocalCreate = {
                 idMappings.forEach { (old, new) ->
+                    if(new == null) return@forEach
                     localSource.updateDocumentsReceiverId(old, new)
                     localSource.deleteClient(old)
                 }
             },
             remoteFetcher = {
-                remoteSource.getClients().map { clients -> clients.map { it.asClientEntity() } }
+                remoteSource.getClients().map { clients -> clients.map { it.asClientEntity().copy(isSynced = true) } }
             },
         )
         val remotelyDeletedClients = clients.filterNot { it.id in remotelyCreatedClients }
@@ -121,6 +102,51 @@ class OfflineFirstClientRepository(
             localSource.deleteClient(client.id)
         }
         return result
+    }
+
+    private suspend fun updateRemoteAndLocal(clients: List<ClientEntity>) {
+        clients.filter { it.isUpdated }
+            .forEach { client ->
+                val result = remoteSource.updateClient(client.asClient())
+                if (result is Result.Success)
+                    localSource.updateClient(client.copy(isUpdated = false))
+            }
+    }
+
+    private suspend fun deleteRemoteAndLocal(clients: List<ClientEntity>) {
+        clients.filter { it.isDeleted }
+            .forEach { client ->
+                val result = remoteSource.deleteClient(client.id)
+                if (result is Result.Success)
+                    localSource.deleteClient(client.id)
+            }
+    }
+
+    private suspend fun createAndGetIdMappings(clients: List<ClientEntity>) =
+        clients.filter { it.isCreated }
+            .associateBy {
+                val result = remoteSource.createClient(it.asClient())
+                handleCreateResult(result, it)
+            }.map { (newId, client) ->
+                client.id to newId
+            }.toMap()
+
+    private suspend fun handleCreateResult(
+        result: Result<Client>,
+        clientEntity: ClientEntity
+    ) = if (result is Result.Success)
+        result.data.id
+    else
+        null.also { handleCreateError(result, clientEntity) }
+
+
+
+    private suspend fun handleCreateError(
+        result: Result<Client>,
+        it: ClientEntity
+    ) {
+        val error = (result as? Result.Error)?.exception
+        localSource.updateClient(it.copy(isSynced = false, syncError = error))
     }
 
 }

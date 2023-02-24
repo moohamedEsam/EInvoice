@@ -13,6 +13,8 @@ data class Document(
     val documentType: String,
     val status: DocumentStatus,
     val error: String? = null,
+    val isSynced: Boolean = false,
+    val syncError: String? = null,
 ){
     companion object
 }

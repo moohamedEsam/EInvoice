@@ -3,6 +3,7 @@ package com.example.database.models.company
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.database.models.DataEntity
 import com.example.models.company.Company
 import com.example.models.company.CompanySettings
 import java.util.UUID
@@ -16,13 +17,13 @@ data class CompanyEntity(
     val phone: String,
     val website: String?,
     @Embedded val settings: CompanySettings,
-    val isDeleted: Boolean = false,
-    val isUpdated: Boolean = false,
-    val isCreated: Boolean = false,
-    @PrimaryKey val id: String = UUID.randomUUID().toString(),
-    val isSynced: Boolean = false,
-    val syncError: String? = null,
-)
+    override val isDeleted: Boolean = false,
+    override val isUpdated: Boolean = false,
+    override val isCreated: Boolean = false,
+    @PrimaryKey override val id: String = UUID.randomUUID().toString(),
+    override val isSynced: Boolean = false,
+    override val syncError: String? = null,
+) : DataEntity
 
 fun CompanyEntity.asCompany() = Company(
     name = name,

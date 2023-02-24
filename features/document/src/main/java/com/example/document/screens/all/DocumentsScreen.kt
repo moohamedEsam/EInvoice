@@ -61,33 +61,34 @@ fun DocumentsScreen(
 
     DocumentsScreenContent(
         state = state,
+        documentsFlow = viewModel.documents,
         onQueryChange = viewModel::setQuery,
         onDocumentClick = onDocumentClick,
         onAddDocumentClick = onAddDocumentClick,
         onSyncDocumentsClick = viewModel::syncDocumentsStatus,
         onFilterByCompanyClick = {
-            if (state.companyFilter != null)
+            if (state.filters.company != null)
                 viewModel.setCompanyFilter(null)
             else
                 showDialog = true
             viewModel.setLastFilterClicked(FilterType.COMPANY)
         },
         onFilterByClientClick = {
-            if (state.clientFilter != null)
+            if (state.filters.client != null)
                 viewModel.setClientFilter(null)
             else
                 showDialog = true
             viewModel.setLastFilterClicked(FilterType.CLIENT)
         },
         onFilterByBranchClick = {
-            if (state.branchFilter != null)
+            if (state.filters.branch != null)
                 viewModel.setBranchFilter(null)
             else
                 showDialog = true
             viewModel.setLastFilterClicked(FilterType.BRANCH)
         },
         onFilterByStatusClick = {
-            if (state.statusFilter != null)
+            if (state.filters.status != null)
                 viewModel.setStatusFilter(null)
             else
                 showDialog = true
@@ -100,23 +101,24 @@ fun DocumentsScreen(
         onCreateDebitClick = onCreateDebitClick,
         onDocumentUpdateClick = onDocumentUpdateClick
     )
-//    if (showDialog && lastFilterClicked != null)
-//        ShowFilterDialog(
-//            companies = viewModel.availableCompanies,
-//            clients = viewModel.availableClients,
-//            branches = viewModel.availableBranches,
-//            onDismiss = { showDialog = false },
-//            onCompanySelected = viewModel::setCompanyFilter,
-//            onClientSelected = viewModel::setClientFilter,
-//            onBranchSelected = viewModel::setBranchFilter,
-//            onStatusSelected = viewModel::setStatusFilter,
-//            lastFilterClicked = lastFilterClicked!!
-//        )
+    if (showDialog && lastFilterClicked != null)
+        ShowFilterDialog(
+            companies = viewModel.availableCompanies,
+            clients = viewModel.availableClients,
+            branches = viewModel.availableBranches,
+            onDismiss = { showDialog = false },
+            onCompanySelected = viewModel::setCompanyFilter,
+            onClientSelected = viewModel::setClientFilter,
+            onBranchSelected = viewModel::setBranchFilter,
+            onStatusSelected = viewModel::setStatusFilter,
+            lastFilterClicked = lastFilterClicked!!
+        )
 }
 
 @Composable
 private fun DocumentsScreenContent(
     state: DocumentsScreenState,
+    documentsFlow: Flow<PagingData<DocumentView>>,
     onQueryChange: (String) -> Unit,
     onDocumentClick: (String) -> Unit,
     onDocumentCancelClick: (String) -> Unit,
@@ -135,7 +137,7 @@ private fun DocumentsScreenContent(
     val simpleDateFormat by remember {
         mutableStateOf(SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()))
     }
-    val documents = flowOf(state.documents).collectAsLazyPagingItems()
+    val documents = documentsFlow.collectAsLazyPagingItems()
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -145,15 +147,15 @@ private fun DocumentsScreenContent(
         item { SearchField(state, onQueryChange) }
         item { ActionsRow(onSyncDocumentsClick, state) }
         item {
-//            FiltersRow(
-//                state = state,
-//                onFilterByCompanyClick = onFilterByCompanyClick,
-//                onFilterByClientClick = onFilterByClientClick,
-//                onFilterByBranchClick = onFilterByBranchClick,
-//                onFilterByStatusClick = onFilterByStatusClick,
-//                onDatePicked = onDatePicked,
-//                dateFormat = simpleDateFormat
-//            )
+            FiltersRow(
+                state = state,
+                onFilterByCompanyClick = onFilterByCompanyClick,
+                onFilterByClientClick = onFilterByClientClick,
+                onFilterByBranchClick = onFilterByBranchClick,
+                onFilterByStatusClick = onFilterByStatusClick,
+                onDatePicked = onDatePicked,
+                dateFormat = simpleDateFormat
+            )
         }
 
         documentsList(
@@ -234,25 +236,25 @@ private fun FiltersRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         FilterChip(
-            selected = state.companyFilter != null,
+            selected = state.filters.company != null,
             onClick = onFilterByCompanyClick,
-            label = { Text(state.companyFilter?.name ?: "Company") })
+            label = { Text(state.filters.company?.name ?: "Company") })
         FilterChip(
-            selected = state.clientFilter != null,
+            selected = state.filters.client != null,
             onClick = onFilterByClientClick,
-            label = { Text(state.clientFilter?.name ?: "Client") })
+            label = { Text(state.filters.client?.name ?: "Client") })
         FilterChip(
-            selected = state.branchFilter != null,
+            selected = state.filters.branch != null,
             onClick = onFilterByBranchClick,
-            label = { Text(state.branchFilter?.name ?: "Branch") })
+            label = { Text(state.filters.branch?.name ?: "Branch") })
         FilterChip(
-            selected = state.statusFilter != null,
+            selected = state.filters.status != null,
             onClick = onFilterByStatusClick,
-            label = { Text(state.statusFilter?.name ?: "Status") })
+            label = { Text(state.filters.status?.name ?: "Status") })
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             DateFilter(
-                currentDate = state.dateFilter,
+                currentDate = state.filters.date,
                 onDatePicked = onDatePicked,
                 simpleDateFormat = dateFormat
             )
@@ -330,7 +332,7 @@ private fun SearchField(
     onQueryChange: (String) -> Unit
 ) {
     OutlinedTextField(
-        value = state.query,
+        value = state.filters.query,
         onValueChange = onQueryChange,
         label = { Text("Search") },
         leadingIcon = { Icon(imageVector = Icons.Outlined.Search, contentDescription = null) },
@@ -444,7 +446,7 @@ private fun DocumentItem(
                                 contentDescription = null
                             )
                         },
-                        enabled = isConnectedToNetwork
+                        enabled = isConnectedToNetwork && document.isSynced
                     )
                 if (document.status.isCancelable())
                     AssistChip(
@@ -458,7 +460,7 @@ private fun DocumentItem(
                                 tint = MaterialTheme.colorScheme.onErrorContainer
                             )
                         },
-                        enabled = isConnectedToNetwork
+                        enabled = isConnectedToNetwork && document.isSynced
                     )
 
                 if (document.documentType != "I") return@Row
@@ -590,18 +592,8 @@ private fun ShowStatusFilterDialog(
 @Composable
 fun DocumentsScreenPreview() {
     DocumentsScreenContent(
-        state = DocumentsScreenState(
-            documents = PagingData.from(List(50) {
-                DocumentView.empty().copy(status = DocumentStatus.Invalid, documentType = "I")
-            }),
-            query = "",
-            isSyncing = false,
-            companyFilter = null,
-            clientFilter = null,
-            branchFilter = null,
-            statusFilter = null,
-            isConnectedToNetwork = true,
-        ),
+        state = DocumentsScreenState.empty(),
+        documentsFlow = flowOf(PagingData.from(List(50) { DocumentView.empty() })),
         onQueryChange = {},
         onDocumentClick = {},
         onAddDocumentClick = {},

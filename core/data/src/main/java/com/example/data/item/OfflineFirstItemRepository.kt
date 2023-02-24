@@ -104,51 +104,43 @@ class OfflineFirstItemRepository(
 
     private suspend fun syncItems(synchronizer: Synchronizer): Boolean {
         val items = localSource.getAllItems()
-        val idMappings = HashMap<String, String>()
+        var idMappings = emptyMap<String, String?>()
         val remotelyCreatedItems = mutableListOf<String>()
         val result = synchronizer.handleSync(
-            remoteCreator = {
-                val createdItems = items.filter { it.isCreated }
-                createdItems.forEach { item ->
-                    val result = remoteSource.createItem(item.asItem())
-                    if (result is Result.Success) {
-                        idMappings[item.id] = result.data.id
-                    }
-                }
-                Result.Success(Unit)
-            },
+            remoteCreator = { idMappings = createAndGetIdMappings(items) },
             remoteUpdater = {
-                val updatedItems = items.filter { it.isUpdated }
-                updatedItems.forEach { item ->
-                    val result = remoteSource.updateItem(item.asItem())
-                    if (result is Result.Success) {
-                        localSource.updateItem(item.copy(isUpdated = false))
+                items.filter { it.isUpdated }
+                    .forEach { item ->
+                        val result = remoteSource.updateItem(item.asItem())
+                        if (result is Result.Success) {
+                            localSource.updateItem(item.copy(isUpdated = false))
+                        }
                     }
-                }
-                Result.Success(Unit)
+
             },
             remoteDeleter = {
-                val deletedItems = items.filter { it.isDeleted }
-                deletedItems.forEach { item ->
-                    val result = remoteSource.deleteItem(item.id)
-                    if (result is Result.Success) {
-                        localSource.deleteItem(item.id)
+                items.filter { it.isDeleted }
+                    .forEach { item ->
+                        val result = remoteSource.deleteItem(item.id)
+                        if (result is Result.Success) {
+                            localSource.deleteItem(item.id)
+                        }
                     }
-                }
-                Result.Success(Unit)
+
             },
             localCreator = { item ->
                 remotelyCreatedItems.add(item.id)
                 val ids = items.map { it.id }
                 if (item.id in ids)
-                    localSource.updateItem(item.asItemEntity())
+                    localSource.updateItem(item.asItemEntity().copy(isSynced = true))
                 else
-                    localSource.insertItem(item.asItemEntity())
-                Result.Success(Unit)
+                    localSource.insertItem(item.asItemEntity().copy(isSynced = true))
+
             },
 
             afterLocalCreate = {
                 idMappings.forEach { (oldId, newId) ->
+                    if (newId == null) return@forEach
                     localSource.updateInvoiceLinesItemId(oldId, newId)
                     localSource.deleteItem(oldId)
                 }
@@ -161,6 +153,27 @@ class OfflineFirstItemRepository(
         }
         return result
     }
+
+    private suspend fun createAndGetIdMappings(items: List<ItemEntity>) =
+        items.filter { it.isCreated }
+            .associateBy { item ->
+                val result = remoteSource.createItem(item.asItem())
+                if (result is Result.Success)
+                    result.data.id
+                else
+                    null.also { handleCreateError(result, item) }
+            }.map { (newId, item) ->
+                item.id to newId
+            }.toMap()
+
+    private suspend fun handleCreateError(
+        result: Result<Item>,
+        item: ItemEntity
+    ) {
+        val error = result as? Result.Error
+        localSource.updateItem(item.copy(isSynced = false, syncError = error?.exception))
+    }
+
 
     override fun getUnitTypes(): Flow<List<UnitType>> =
         localSource.getUnitTypes().map { unitTypes -> unitTypes.map { it.asUnitType() } }

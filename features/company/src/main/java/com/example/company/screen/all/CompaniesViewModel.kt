@@ -13,8 +13,7 @@ class CompaniesViewModel(companyPagingSource: GetCompanyPagingSource) : ViewMode
 
     val pager = Pager(
         config = PagingConfig(
-            pageSize = 20,
-            enablePlaceholders = false,
+            pageSize = 10,
             prefetchDistance = 5
         ),
         pagingSourceFactory = companyPagingSource

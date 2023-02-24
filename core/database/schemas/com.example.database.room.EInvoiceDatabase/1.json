@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "b2c02680edf9841a32b9133f7e9397ba",
+    "identityHash": "d0ffb30485ff19e755d1fb1dde9422e7",
     "entities": [
       {
         "tableName": "Branch",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `internalId` TEXT NOT NULL, `companyId` TEXT NOT NULL, `street` TEXT NOT NULL, `country` TEXT NOT NULL, `governate` TEXT NOT NULL, `postalCode` TEXT NOT NULL, `regionCity` TEXT NOT NULL, `buildingNumber` TEXT NOT NULL, `floor` TEXT NOT NULL, `room` TEXT NOT NULL, `landmark` TEXT NOT NULL, `additionalInformation` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`companyId`) REFERENCES `Company`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `internalId` TEXT NOT NULL, `companyId` TEXT NOT NULL, `street` TEXT NOT NULL, `country` TEXT NOT NULL, `governate` TEXT NOT NULL, `postalCode` TEXT NOT NULL, `regionCity` TEXT NOT NULL, `buildingNumber` TEXT NOT NULL, `floor` TEXT NOT NULL, `room` TEXT NOT NULL, `landmark` TEXT NOT NULL, `additionalInformation` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, `isSynced` INTEGER NOT NULL, `syncError` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`companyId`) REFERENCES `Company`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "name",
@@ -109,6 +109,18 @@
             "columnName": "id",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "isSynced",
+            "columnName": "isSynced",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "syncError",
+            "columnName": "syncError",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -248,7 +260,7 @@
       },
       {
         "tableName": "Client",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`registrationNumber` TEXT NOT NULL, `name` TEXT NOT NULL, `email` TEXT NOT NULL, `phone` TEXT NOT NULL, `businessType` TEXT NOT NULL, `status` TEXT NOT NULL, `companyId` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, `street` TEXT, `country` TEXT, `governate` TEXT, `postalCode` TEXT, `regionCity` TEXT, `buildingNumber` TEXT, `floor` TEXT, `room` TEXT, `landmark` TEXT, `additionalInformation` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`companyId`) REFERENCES `Company`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`registrationNumber` TEXT NOT NULL, `name` TEXT NOT NULL, `email` TEXT NOT NULL, `phone` TEXT NOT NULL, `businessType` TEXT NOT NULL, `status` TEXT NOT NULL, `companyId` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, `isSynced` INTEGER NOT NULL, `syncError` TEXT, `street` TEXT, `country` TEXT, `governate` TEXT, `postalCode` TEXT, `regionCity` TEXT, `buildingNumber` TEXT, `floor` TEXT, `room` TEXT, `landmark` TEXT, `additionalInformation` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`companyId`) REFERENCES `Company`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "registrationNumber",
@@ -315,6 +327,18 @@
             "columnName": "id",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "isSynced",
+            "columnName": "isSynced",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "syncError",
+            "columnName": "syncError",
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "address.street",
@@ -410,7 +434,7 @@
       },
       {
         "tableName": "Item",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `description` TEXT NOT NULL, `price` REAL NOT NULL, `status` TEXT NOT NULL, `itemCode` TEXT NOT NULL, `unitTypeCode` TEXT NOT NULL, `internalCode` TEXT NOT NULL, `branchId` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`branchId`) REFERENCES `Branch`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `description` TEXT NOT NULL, `price` REAL NOT NULL, `status` TEXT NOT NULL, `itemCode` TEXT NOT NULL, `unitTypeCode` TEXT NOT NULL, `internalCode` TEXT NOT NULL, `branchId` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, `syncError` TEXT, `isSynced` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`branchId`) REFERENCES `Branch`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "name",
@@ -482,6 +506,18 @@
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "syncError",
+            "columnName": "syncError",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isSynced",
+            "columnName": "isSynced",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -654,7 +690,7 @@
       },
       {
         "tableName": "Document",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`issuerId` TEXT NOT NULL, `receiverId` TEXT NOT NULL, `branchId` TEXT NOT NULL, `internalId` TEXT NOT NULL, `date` INTEGER NOT NULL, `referencedDocument` TEXT, `documentType` TEXT NOT NULL, `status` TEXT NOT NULL, `error` TEXT, `id` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`issuerId`) REFERENCES `Company`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`receiverId`) REFERENCES `Client`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`branchId`) REFERENCES `Branch`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`issuerId` TEXT NOT NULL, `receiverId` TEXT NOT NULL, `branchId` TEXT NOT NULL, `internalId` TEXT NOT NULL, `date` INTEGER NOT NULL, `referencedDocument` TEXT, `documentType` TEXT NOT NULL, `status` TEXT NOT NULL, `error` TEXT, `id` TEXT NOT NULL, `isCreated` INTEGER NOT NULL, `isUpdated` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `isSynced` INTEGER NOT NULL, `syncError` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`issuerId`) REFERENCES `Company`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`receiverId`) REFERENCES `Client`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`branchId`) REFERENCES `Branch`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "issuerId",
@@ -733,6 +769,18 @@
             "columnName": "isDeleted",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "isSynced",
+            "columnName": "isSynced",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "syncError",
+            "columnName": "syncError",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -902,7 +950,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b2c02680edf9841a32b9133f7e9397ba')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd0ffb30485ff19e755d1fb1dde9422e7')"
     ]
   }
 }

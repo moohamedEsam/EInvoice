@@ -21,6 +21,8 @@ data class DocumentView(
     val invoices: List<InvoiceLineView>,
     val error: String? = null,
     val status: DocumentStatus = DocumentStatus.Initial,
+    val isSynced: Boolean = false,
+    val syncError: String? = null,
 ){
     companion object
 }

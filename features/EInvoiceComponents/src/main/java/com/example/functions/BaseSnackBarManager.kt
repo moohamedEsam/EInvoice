@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 class BaseSnackBarManager : SnackBarManager {
     private val snackBarEventChannel = Channel<SnackBarEvent>()
 
-    override suspend fun showSnackBarEvent(event: SnackBarEvent) = snackBarEventChannel.send(event)
-
     override fun getReceiverChannel(): Flow<SnackBarEvent> = snackBarEventChannel.receiveAsFlow()
+    override suspend fun SnackBarManager.showSnackBarEvent(event: SnackBarEvent) = snackBarEventChannel.send(event)
 }

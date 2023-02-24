@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.example.database.models.DataEntity
 import com.example.database.models.branch.BranchEntity
 import com.example.database.models.client.ClientEntity
 import com.example.database.models.company.CompanyEntity
@@ -49,11 +50,13 @@ data class DocumentEntity(
     val documentType: String,
     val status: DocumentStatus,
     val error: String? = null,
-    @PrimaryKey val id: String = UUID.randomUUID().toString(),
-    val isCreated: Boolean = false,
-    val isUpdated: Boolean = false,
-    val isDeleted: Boolean = false,
-)
+    @PrimaryKey override val id: String = UUID.randomUUID().toString(),
+    override val isCreated: Boolean = false,
+    override val isUpdated: Boolean = false,
+    override val isDeleted: Boolean = false,
+    override val isSynced: Boolean = false,
+    override val syncError: String? = null,
+) : DataEntity
 
 
 fun DocumentEntity.asDocument() = Document(
@@ -67,6 +70,8 @@ fun DocumentEntity.asDocument() = Document(
     documentType = documentType,
     status = status,
     error = error,
+    isSynced = isSynced,
+    syncError = syncError,
 )
 
 fun Document.asDocumentEntity(

@@ -7,7 +7,6 @@ import com.example.domain.company.GetCompanyUseCase
 import com.example.domain.company.UndoDeleteCompanyUseCase
 import com.example.domain.document.DaysRange
 import com.example.domain.document.GetDocumentsByTypeInDurationUseCase
-import com.example.functions.BaseSnackBarManager
 import com.example.functions.SnackBarManager
 import com.example.models.company.CompanyView
 import com.example.models.company.empty
@@ -22,7 +21,7 @@ class CompanyDashboardViewModel(
     private val getDocumentsUseCase: GetDocumentsByTypeInDurationUseCase,
     private val deleteCompanyUseCase: DeleteCompanyUseCase,
     private val undoDeleteCompanyUseCase: UndoDeleteCompanyUseCase,
-    private val snackBarManager: BaseSnackBarManager
+    private val snackBarManager: SnackBarManager
 ) : ViewModel(), SnackBarManager by snackBarManager {
 
     private val _companyView: MutableStateFlow<CompanyView> = MutableStateFlow(CompanyView.empty())

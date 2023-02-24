@@ -64,6 +64,8 @@ fun DocumentViewEntity.asDocumentView() = DocumentView(
     referencedDocument = documentEntity.referencedDocument,
     status = documentEntity.status,
     error = documentEntity.error,
+    isSynced = documentEntity.isSynced,
+    syncError = documentEntity.syncError,
 )
 
 fun DocumentView.asDocumentViewEntity() = DocumentViewEntity(

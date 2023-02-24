@@ -16,7 +16,9 @@ data class Client(
     val businessType: BusinessType,
     val status: TaxStatus,
     val companyId: String,
-    val id: String = UUID.randomUUID().toString()
+    val id: String = UUID.randomUUID().toString(),
+    val isSynced: Boolean = false,
+    val syncError: String? = null
 ){
     companion object
 }

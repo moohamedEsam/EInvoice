@@ -29,7 +29,8 @@ class OfflineFirstBranchRepository(
 
 
     override fun getBranchView(id: String): Flow<BranchView> =
-        localSource.getBranchViewById(id).filterNotNull().map(BranchViewEntity::removeDeleted).map(BranchViewEntity::asBranchView)
+        localSource.getBranchViewById(id).filterNotNull().map(BranchViewEntity::removeDeleted)
+            .map(BranchViewEntity::asBranchView)
 
     override suspend fun createBranch(branch: Branch): Result<Branch> = tryWrapper {
         localSource.insertBranch(branch.asBranchEntity(isCreated = true))
@@ -48,7 +49,8 @@ class OfflineFirstBranchRepository(
     }
 
     override suspend fun deleteBranch(id: String): Result<Unit> = tryWrapper {
-        val branchEntity = localSource.getBranchById(id) ?: return@tryWrapper Result.Error(BRANCH_NOT_FOUND)
+        val branchEntity =
+            localSource.getBranchById(id) ?: return@tryWrapper Result.Error(BRANCH_NOT_FOUND)
         if (branchEntity.isCreated)
             localSource.deleteBranch(id)
         else
@@ -62,37 +64,12 @@ class OfflineFirstBranchRepository(
 
     override suspend fun syncWith(synchronizer: Synchronizer): Boolean {
         val branches = localSource.getAllBranches()
-        val idMappings = HashMap<String, String>()
+        var idMappings = emptyMap<String, String?>()
         val remotelyCreatedBranches = mutableListOf<String>()
         val syncResult = synchronizer.handleSync(
-            remoteCreator = {
-                val createdBranches = branches.filter { it.isCreated }
-                createdBranches.forEach { branch ->
-                    val result = remoteSource.createBranch(branch.asBranch())
-                    if (result is Result.Success) {
-                        idMappings[branch.id] = result.data.id
-                    }
-                }
-                Result.Success(Unit)
-            },
-            remoteDeleter = {
-                val deletedBranches = branches.filter { it.isDeleted }
-                deletedBranches.forEach { branch ->
-                    val result = remoteSource.deleteBranch(branch.id)
-                    if (result is Result.Success) localSource.deleteBranch(branch.id)
-                }
-                Result.Success(Unit)
-            },
-            remoteUpdater = {
-                val updatedBranches = branches.filter { it.isUpdated }
-                updatedBranches.forEach { branch ->
-                    val result = remoteSource.updateBranch(branch.asBranch())
-                    if (result is Result.Success) {
-                        localSource.updateBranch(branch.copy(isUpdated = false))
-                    }
-                }
-                Result.Success(Unit)
-            },
+            remoteCreator = { idMappings = createAndGetIdMappings(branches) },
+            remoteDeleter = { deleteBranchesRemotelyAndLocal(branches) },
+            remoteUpdater = { updateBranchesRemotelyAndLocal(branches) },
 
             localCreator = { branch ->
                 remotelyCreatedBranches.add(branch.id)
@@ -105,14 +82,14 @@ class OfflineFirstBranchRepository(
             },
             afterLocalCreate = {
                 idMappings.forEach { (old, new) ->
-                    localSource.updateItemsBranchId(old, new)
-                    localSource.updateDocumentsBranchId(old, new)
+                    if (new == null) return@forEach
+                    updateRelationKeys(old, new)
                     localSource.deleteBranch(old)
                 }
             },
             remoteFetcher = {
                 remoteSource.getBranches()
-                    .map { branches -> branches.map { it.asBranchEntity() } }
+                    .map { branches -> branches.map { it.asBranchEntity().copy(isSynced = true) } }
             },
         )
         val remotelyDeletedBranches = branches.filterNot { it.id in remotelyCreatedBranches }
@@ -121,6 +98,55 @@ class OfflineFirstBranchRepository(
         }
         return syncResult
     }
+
+    private suspend fun updateRelationKeys(old: String, new: String) {
+        localSource.updateItemsBranchId(old, new)
+        localSource.updateDocumentsBranchId(old, new)
+    }
+
+    private suspend fun updateBranchesRemotelyAndLocal(branches: List<BranchEntity>) {
+        branches.filter { it.isUpdated }
+            .forEach { branch ->
+                val result = remoteSource.updateBranch(branch.asBranch())
+                if (result is Result.Success) {
+                    localSource.updateBranch(result.data.asBranchEntity())
+                }
+            }
+    }
+
+    private suspend fun deleteBranchesRemotelyAndLocal(branches: List<BranchEntity>) {
+        branches.filter { it.isDeleted }
+            .forEach { branch ->
+                val result = remoteSource.deleteBranch(branch.id)
+                if (result is Result.Success) localSource.deleteBranch(branch.id)
+            }
+    }
+
+    private suspend fun createAndGetIdMappings(branches: List<BranchEntity>) =
+        branches.filter { it.isCreated }
+            .associateBy { branchEntity ->
+                val result = remoteSource.createBranch(branchEntity.asBranch())
+                handleCreateResult(result, branchEntity)
+            }.map { (newId, branch) ->
+                branch.id to newId
+            }.toMap()
+
+    private suspend fun handleCreateResult(
+        result: Result<Branch>,
+        branchEntity: BranchEntity
+    ) = if (result is Result.Success)
+        result.data.id
+    else
+        null.also { handleCreateError(result, branchEntity) }
+
+    private suspend fun handleCreateError(
+        result: Result<Branch>,
+        it: BranchEntity
+    ) {
+        val error = (result as? Result.Error)?.exception
+        localSource.updateBranch(it.copy(isSynced = false, syncError = error))
+    }
+
 
     override suspend fun undoDeleteBranch(id: String): Result<Unit> = tryWrapper {
         localSource.markBranchAsNotDeleted(id)

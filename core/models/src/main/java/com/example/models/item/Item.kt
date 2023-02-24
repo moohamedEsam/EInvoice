@@ -16,6 +16,8 @@ data class Item(
     val unitTypeCode: String,
     val branchId: String,
     val internalCode: String,
+    val isSynced: Boolean = false,
+    val syncError: String? = null,
 ) {
     companion object
 }

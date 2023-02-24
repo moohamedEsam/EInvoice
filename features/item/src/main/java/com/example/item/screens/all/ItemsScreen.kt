@@ -118,7 +118,10 @@ private fun ItemsScreenContent(
         onFloatingButtonClick = onItemCreate
     ) {
         this.items(items) { item ->
-            ItemCard(item = item, onClick = { onItemClick(item) })
+            ItemCard(
+                item = item,
+                onClick = { onItemClick(item) }
+            )
         }
     }
 }

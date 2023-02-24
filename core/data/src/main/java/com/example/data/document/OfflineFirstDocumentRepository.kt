@@ -15,6 +15,7 @@ import com.example.models.document.asDocument
 import com.example.models.invoiceLine.InvoiceLine
 import com.example.models.invoiceLine.asInvoiceLine
 import com.example.network.EInvoiceRemoteDataSource
+import com.example.network.models.document.NetworkDocument
 import com.example.network.models.document.asCreateDocumentDto
 import com.example.network.models.document.asNetworkDocumentView
 import com.example.network.models.document.asUpdateDocumentDto
@@ -151,7 +152,7 @@ class OfflineFirstDocumentRepository(
 
     override suspend fun syncWith(synchronizer: Synchronizer): Boolean {
         val documents = localDataSource.getAllDocuments().first()
-        val idMappings = HashMap<String, String>()
+        var idMappings = emptyMap<String, String?>()
         val remotelyCreatedDocuments = mutableListOf<String>()
         val result = synchronizer.handleSync(
             remoteFetcher = fetcher@{
@@ -167,46 +168,39 @@ class OfflineFirstDocumentRepository(
                 Result.Success(remoteDocuments)
             },
             remoteDeleter = {
-                val deletedDocumentsIds = documents.filter { it.documentEntity.isDeleted }
+                documents.filter { it.documentEntity.isDeleted }
                     .map { it.documentEntity.id }
-                deletedDocumentsIds.forEach { id ->
-                    val result = remoteDataSource.deleteDocument(id)
-                    if (result is Result.Success)
-                        localDataSource.deleteDocument(id)
-                }
-                Result.Success(Unit)
+                    .forEach { id ->
+                        val result = remoteDataSource.deleteDocument(id)
+                        result.ifSuccess {
+                            localDataSource.deleteDocument(id)
+                        }
+                    }
             },
             remoteUpdater = {
-                val updatedDocuments = documents.filter { it.documentEntity.isUpdated }
-                updatedDocuments.forEach { document ->
-                    val result = remoteDataSource.updateDocument(document.convertToUpdateDocument())
-                    result.ifSuccess {
-                        localDataSource.updateDocument(
-                            document.asDocumentEntity().copy(isUpdated = false)
-                        )
+                documents.filter { it.documentEntity.isUpdated }
+                    .forEach { document ->
+                        val result =
+                            remoteDataSource.updateDocument(document.convertToUpdateDocument())
+                        result.ifSuccess {
+                            localDataSource.updateDocument(
+                                document.asDocumentEntity().copy(isUpdated = false)
+                            )
+                        }
                     }
-                }
-                Result.Success(Unit)
             },
             remoteCreator = {
-                val createdDocuments = documents.filter { it.documentEntity.isCreated }
-                createdDocuments.forEach { document ->
-                    val result = remoteDataSource.createDocument(document.convertToCreateDocument())
-                    if (result is Result.Success) {
-                        idMappings[document.documentEntity.id] = result.data.id
-                    }
-                }
-                Result.Success(Unit)
+                idMappings = createAndGetIdMappings(documents)
             },
             localCreator = { documentView ->
                 remotelyCreatedDocuments.add(documentView.documentEntity.id)
                 if (documentView.documentEntity.id !in documents.map { it.documentEntity.id })
                     localDataSource.insertDocumentWithInvoices(
-                        documentView.documentEntity,
+                        documentView.documentEntity.copy(isSynced = true),
                         documentView.invoices.map { it.asInvoiceLineEntity() }
                     )
                 else {
-                    localDataSource.updateDocument(documentView.documentEntity)
+                    localDataSource.updateDocument(documentView.documentEntity.copy(isSynced = true))
                     localDataSource.deleteInvoicesByDocumentId(documentView.documentEntity.id)
                     localDataSource.insertInvoiceLines(documentView.invoices.map { it.asInvoiceLineEntity() })
                 }
@@ -217,13 +211,47 @@ class OfflineFirstDocumentRepository(
                 }
             },
         )
-        val remotelyDeletedDocumentsIds = documents.filterNot { it.documentEntity.id in remotelyCreatedDocuments }
-            .map { it.documentEntity.id }
+        val remotelyDeletedDocumentsIds =
+            documents.filterNot { it.documentEntity.id in remotelyCreatedDocuments }
+                .map { it.documentEntity.id }
 
         remotelyDeletedDocumentsIds.forEach { id ->
             localDataSource.deleteDocument(id)
         }
         return result
+    }
+
+    private suspend fun createAndGetIdMappings(documents: List<DocumentViewEntity>) =
+        documents.filter { it.documentEntity.isCreated }
+            .associateBy {
+                val result = remoteDataSource.createDocument(it.convertToCreateDocument())
+                handleCreateResult(result, it)
+            }.map { (newId, document) ->
+                document.documentEntity.id to newId
+            }.toMap()
+
+
+    private suspend fun handleCreateResult(
+        result: Result<NetworkDocument>,
+        documentViewEntity: DocumentViewEntity
+    ) =
+        if (result is Result.Success)
+            result.data.id
+        else
+            null.also { handleCreateError(result, documentViewEntity) }
+
+
+    private suspend fun handleCreateError(
+        result: Result<NetworkDocument>,
+        documentViewEntity: DocumentViewEntity
+    ) {
+        val error = (result as? Result.Error)?.exception
+        localDataSource.updateDocument(
+            documentViewEntity.documentEntity.copy(
+                isSynced = false,
+                syncError = error
+            )
+        )
     }
 
     private fun DocumentViewEntity.convertToUpdateDocument() =
@@ -242,3 +270,4 @@ class OfflineFirstDocumentRepository(
             null
     }
 }
+

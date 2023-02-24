@@ -3,6 +3,9 @@ package com.example.document.screens.all
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
+import com.example.domain.branch.GetBranchesPagingSourceUseCase
+import com.example.domain.client.GetClientsPagingSourceUseCase
+import com.example.domain.company.GetCompaniesUseCase
 import com.example.domain.document.*
 import com.example.domain.networkStatus.NetworkObserver
 import com.example.domain.networkStatus.NetworkStatus
@@ -12,12 +15,14 @@ import com.example.models.company.Company
 import com.example.models.document.DocumentStatus
 import com.example.models.document.DocumentView
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import java.util.*
 
 class DocumentsViewModel(
     private val getDocumentsPagingSourceUseCase: GetDocumentsPagingSourceUseCase,
+    getCompaniesUseCase: GetCompaniesUseCase,
+    private val getBranchesPagingSourceUseCase: GetBranchesPagingSourceUseCase,
+    private val getClientsPagingSourceUseCase: GetClientsPagingSourceUseCase,
     private val networkObserver: NetworkObserver,
     private val cancelDocumentUseCase: CancelDocumentUseCase,
     private val sendDocumentUseCase: SendDocumentUseCase,
@@ -33,58 +38,65 @@ class DocumentsViewModel(
     private val _lastFilterClicked: MutableStateFlow<FilterType?> = MutableStateFlow(null)
     val lastFilterClicked = _lastFilterClicked.asStateFlow()
     private val _isConnectedToNetwork = MutableStateFlow(false)
-    private val _documents = Pager(
-        config = PagingConfig(pageSize = 20),
-        pagingSourceFactory = { getDocumentsPagingSourceUseCase() }
+    val availableCompanies =
+        getCompaniesUseCase().map { PagingData.from(it) }.cachedIn(viewModelScope)
+
+    val availableBranches = Pager(
+        config = PagingConfig(pageSize = 10),
+        pagingSourceFactory = { getBranchesPagingSourceUseCase() }
     ).flow.cachedIn(viewModelScope)
 
+    val availableClients = Pager(
+        config = PagingConfig(pageSize = 10),
+        pagingSourceFactory = { getClientsPagingSourceUseCase() }
+    ).flow.cachedIn(viewModelScope)
 
-    val state = combine(
+    private val filters = combine(
         _companyFilter,
         _clientFilter,
         _branchFilter,
         _statusFilter,
-        _query,
-    ) { companyFilter, clientFilter, branchFilter, statusFilter, query ->
-        createScreenState(query, companyFilter, clientFilter, branchFilter, statusFilter)
-    }.combine(_dateFilter) { screenState, dateFilter ->
-        screenState.copy(dateFilter = dateFilter)
-    }.combine(_documents) { screenState, documents ->
-        val filteredDocuments = filterDocuments(documents, screenState)
-        screenState.copy(documents = filteredDocuments)
-    }.combine(_isSyncing) { screenState, isSyncing ->
-        screenState.copy(isSyncing = isSyncing)
-    }.combine(_isConnectedToNetwork) { screenState, isConnectedToNetwork ->
-        screenState.copy(isConnectedToNetwork = isConnectedToNetwork)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), DocumentsScreenState.empty())
+        _dateFilter
+    ) { companyFilter, clientFilter, branchFilter, statusFilter, dateFilter ->
+        DocumentsScreenState.Filters(
+            company = companyFilter,
+            client = clientFilter,
+            branch = branchFilter,
+            status = statusFilter,
+            date = dateFilter
+        )
+    }.combine(_query) { filters, query -> filters.copy(query = query) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), DocumentsScreenState.Filters())
 
-    private fun createScreenState(
-        query: String,
-        companyFilter: Company?,
-        clientFilter: Client?,
-        branchFilter: Branch?,
-        statusFilter: DocumentStatus?
-    ) = DocumentsScreenState(
-        documents = PagingData.empty(),
-        query = query,
-        isSyncing = _isSyncing.value,
-        companyFilter = companyFilter,
-        clientFilter = clientFilter,
-        branchFilter = branchFilter,
-        statusFilter = statusFilter,
-        isConnectedToNetwork = _isConnectedToNetwork.value
-    )
+    val documents = Pager(
+        config = PagingConfig(pageSize = 10),
+        pagingSourceFactory = { getDocumentsPagingSourceUseCase() }
+    ).flow.cachedIn(viewModelScope)
+        .combine(filters) { documents, filters -> filterDocuments(documents, filters) }
+
+
+    val state = combine(
+        filters,
+        _isSyncing,
+        _isConnectedToNetwork
+    ) { filters, isSyncing, isConnectedToNetwork ->
+        DocumentsScreenState(
+            filters = filters,
+            isSyncing = isSyncing,
+            isConnectedToNetwork = isConnectedToNetwork
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), DocumentsScreenState.empty())
 
     private fun filterDocuments(
         documents: PagingData<DocumentView>,
-        screenState: DocumentsScreenState
+        filters: DocumentsScreenState.Filters
     ) = documents
-        .filter { document -> filterByQuery(document, screenState) }
-        .filter { document -> filterByCompany(document, screenState) }
-        .filter { document -> filterByClient(document, screenState) }
-        .filter { document -> filterByBranch(document, screenState) }
-        .filter { document -> filterByStatus(document, screenState) }
-        .filter { document -> filterByDate(document, screenState) }
+        .filter { document -> filterByQuery(document, filters.query) }
+        .filter { document -> filters.company == null || document.company.id == filters.company.id }
+        .filter { document -> filters.client == null || document.client.id == filters.client.id }
+        .filter { document -> filters.branch == null || document.branch.id == filters.branch.id }
+        .filter { document -> filters.status == null || document.status == filters.status }
+        .filter { document -> filterByDate(document, filters.date) }
 
 
     fun setQuery(value: String) = viewModelScope.launch {
@@ -137,20 +149,20 @@ class DocumentsViewModel(
         }
     }
 
-    private fun filterByQuery(documentView: DocumentView, state: DocumentsScreenState): Boolean {
+    private fun filterByQuery(documentView: DocumentView, query: String): Boolean {
         val queryMatches = buildList {
             add(documentView.client.name)
             add(documentView.branch.name)
             addAll(documentView.invoices.map { it.item.name })
         }
-        return queryMatches.any { it.contains(state.query, true) }
+        return queryMatches.any { it.contains(query, true) }
     }
 
-    private fun filterByDate(documentView: DocumentView, state: DocumentsScreenState): Boolean {
-        return if (state.dateFilter == null) true
+    private fun filterByDate(documentView: DocumentView, dateFilter: Date?): Boolean {
+        return if (dateFilter == null) true
         else {
             val documentDate = getDayFromDate(documentView.date)
-            val filterDate = getDayFromDate(state.dateFilter)
+            val filterDate = getDayFromDate(dateFilter)
             documentDate == filterDate
         }
     }
@@ -162,27 +174,4 @@ class DocumentsViewModel(
         set(Calendar.SECOND, 0)
         set(Calendar.MILLISECOND, 0)
     }.time
-
-    private fun filterByCompany(documentView: DocumentView, state: DocumentsScreenState): Boolean {
-        return if (state.companyFilter != null)
-            documentView.company.id == state.companyFilter.id
-        else true
-    }
-
-    private fun filterByClient(documentView: DocumentView, state: DocumentsScreenState): Boolean {
-        return if (state.clientFilter == null) true
-        else documentView.client.id == state.clientFilter.id
-    }
-
-    private fun filterByBranch(documentView: DocumentView, state: DocumentsScreenState): Boolean {
-        return if (state.branchFilter == null) true
-        else documentView.branch.id == state.branchFilter.id
-
-    }
-
-    private fun filterByStatus(documentView: DocumentView, state: DocumentsScreenState): Boolean {
-        return if (state.statusFilter == null) true
-        else documentView.status == state.statusFilter
-    }
-
 }

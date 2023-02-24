@@ -9,7 +9,6 @@ import com.example.common.validators.validateWebsite
 import com.example.domain.company.CreateCompanyUseCase
 import com.example.domain.company.GetCompanyUseCase
 import com.example.domain.company.UpdateCompanyUseCase
-import com.example.functions.BaseSnackBarManager
 import com.example.functions.SnackBarManager
 import com.example.models.company.Company
 import com.example.models.company.CompanySettings
@@ -22,7 +21,7 @@ class CompanyFormViewModel(
     private val createCompanyUseCase: CreateCompanyUseCase,
     private val updateCompanyUseCase: UpdateCompanyUseCase,
     private val companyId: String,
-    private val snackBarManager: BaseSnackBarManager
+    private val snackBarManager: SnackBarManager
 ) : ViewModel(), SnackBarManager by snackBarManager {
     private val isUpdating = companyId.isNotBlank()
     private val _name = MutableStateFlow("")

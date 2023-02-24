@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 interface SnackBarManager {
     fun getReceiverChannel(): Flow<SnackBarEvent>
 
-    suspend fun showSnackBarEvent(event: SnackBarEvent)
+    suspend fun SnackBarManager.showSnackBarEvent(event: SnackBarEvent)
 }

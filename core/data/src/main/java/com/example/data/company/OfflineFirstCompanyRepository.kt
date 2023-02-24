@@ -74,9 +74,7 @@ class OfflineFirstCompanyRepository(
         val isSuccessfulSync = synchronizer.handleSync(
             remoteFetcher = remoteDataSource::getCompanies,
             remoteDeleter = { handleRemoteDelete(companies) },
-            remoteCreator = {
-                idMappings = handleRemoteCreate(companies)
-            },
+            remoteCreator = { idMappings = handleRemoteCreate(companies) },
             remoteUpdater = {
                 val updatedCompanies = companies.filter { it.isUpdated }
                 updatedCompanies.forEach { company ->
@@ -85,18 +83,17 @@ class OfflineFirstCompanyRepository(
             },
             afterLocalCreate = {
                 idMappings.forEach { (oldId, newId) ->
-                    if(newId != null)
-                        updateRelationsKeys(oldId, newId)
-
+                    if (newId == null) return@forEach
+                    updateRelationsKeys(oldId, newId)
                     localDataSource.deleteCompany(oldId)
                 }
             },
             localCreator = { company ->
                 remotelySavedCompanies.add(company.id)
                 if (company.id !in companies.map { it.id })
-                    localDataSource.insertCompany(company.asCompanyEntity())
+                    localDataSource.insertCompany(company.asCompanyEntity().copy(isSynced = true))
                 else
-                    localDataSource.updateCompany(company.asCompanyEntity())
+                    localDataSource.updateCompany(company.asCompanyEntity().copy(isSynced = true))
             }
         )
         val remotelyDeletedCompanies = companies.filterNot { it.id in remotelySavedCompanies }
@@ -108,35 +105,46 @@ class OfflineFirstCompanyRepository(
 
     private suspend fun handleRemoteCreate(
         companies: List<CompanyEntity>
-    ): Map<String, String?> {
-        return companies
-            .filter { it.isCreated }
+    ) =
+        companies.filter { it.isCreated }
             .associateBy { companyEntity ->
                 val result = remoteDataSource.createCompany(companyEntity.asCompany())
-                if (result is Result.Success)
-                    result.data.id
-                else {
-                    val error = (result as? Result.Error)?.exception
-                    localDataSource.updateCompany(
-                        companyEntity.copy(
-                            isSynced = false,
-                            syncError = error
-                        )
-                    )
-                    null
-                }
+                handleCreateResult(result, companyEntity)
             }.map { (newId, company) ->
                 company.id to newId
             }.toMap()
+
+    private suspend fun handleCreateResult(
+        result: Result<Company>,
+        companyEntity: CompanyEntity
+    ) =
+        if (result is Result.Success)
+            result.data.id
+        else
+            null.also { handleCreateError(result, companyEntity) }
+
+
+    private suspend fun handleCreateError(
+        result: Result<Company>,
+        companyEntity: CompanyEntity
+    ) {
+        val error = (result as? Result.Error)?.exception
+        localDataSource.updateCompany(
+            companyEntity.copy(
+                isSynced = false,
+                syncError = error
+            )
+        )
     }
+
 
     private suspend fun handleRemoteDelete(
         companies: List<CompanyEntity>
     ) {
-        val deletedCompanies = companies.filter { it.isDeleted }
-        deletedCompanies.forEach { company ->
-            deleteCompanyRemotelyAndLocal(company)
-        }
+        companies.filter { it.isDeleted }
+            .forEach { company ->
+                deleteCompanyRemotelyAndLocal(company)
+            }
     }
 
     private suspend fun updateRelationsKeys(oldId: String, newId: String) {

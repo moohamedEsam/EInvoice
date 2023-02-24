@@ -32,11 +32,13 @@ data class ItemEntity(
     val unitTypeCode: String,
     val internalCode: String,
     val branchId: String,
-    val isCreated: Boolean = false,
-    val isUpdated: Boolean = false,
-    val isDeleted: Boolean = false,
-    @PrimaryKey val id: String = UUID.randomUUID().toString()
-)
+    override val isCreated: Boolean = false,
+    override val isUpdated: Boolean = false,
+    override val isDeleted: Boolean = false,
+    @PrimaryKey override val id: String = UUID.randomUUID().toString(),
+    override val syncError: String? = null,
+    override val isSynced: Boolean = false
+) : DataEntity
 
 fun ItemEntity.asItem() = Item(
     name = name,
@@ -47,7 +49,9 @@ fun ItemEntity.asItem() = Item(
     unitTypeCode = unitTypeCode,
     branchId = branchId,
     id = id,
-    internalCode = internalCode
+    internalCode = internalCode,
+    isSynced = isSynced,
+    syncError = syncError
 )
 
 fun Item.asItemEntity(

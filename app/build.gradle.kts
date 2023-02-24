@@ -1,3 +1,4 @@
+import java.util.Properties
 plugins {
     id("einvoice.android.application")
     id("einvoice.android.application.compose")
@@ -13,6 +14,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val prop = Properties().apply {
+            load(rootProject.file("local.properties").inputStream())
+        }
+        manifestPlaceholders["GOOGLE_MAPS_API_KEY"] = prop.getProperty("GOOGLE_MAPS_API_KEY")
     }
 
     buildTypes {

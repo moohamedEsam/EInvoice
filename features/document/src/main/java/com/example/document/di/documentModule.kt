@@ -14,6 +14,9 @@ val documentsModule = module {
             cancelDocumentUseCase = get(),
             syncDocumentsStatusUseCase = get(),
             sendDocumentUseCase = get(),
+            getCompaniesUseCase = get(),
+            getBranchesPagingSourceUseCase = get(),
+            getClientsPagingSourceUseCase = get(),
         )
     }
     viewModel { params ->

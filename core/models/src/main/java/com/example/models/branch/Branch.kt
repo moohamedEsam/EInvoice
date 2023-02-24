@@ -22,7 +22,9 @@ data class Branch(
     val room: String,
     val landmark: String,
     val additionalInformation: String,
-    val id: String = UUID.randomUUID().toString()
+    val id: String = UUID.randomUUID().toString(),
+    val isSynced: Boolean = false,
+    val syncError: String? = null
 ){
     companion object
 }
