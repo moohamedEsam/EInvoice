@@ -96,10 +96,6 @@ class OfflineFirstCompanyRepository(
                     localDataSource.updateCompany(company.asCompanyEntity().copy(isSynced = true))
             }
         )
-        val remotelyDeletedCompanies = companies.filterNot { it.id in remotelySavedCompanies }
-        remotelyDeletedCompanies.forEach { company ->
-            localDataSource.deleteCompany(company.id) // will delete all related data
-        }
         return isSuccessfulSync
     }
 

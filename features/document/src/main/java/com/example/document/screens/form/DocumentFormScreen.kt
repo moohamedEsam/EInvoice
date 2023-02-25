@@ -29,11 +29,10 @@ import org.koin.core.parameter.parametersOf
 import java.util.*
 import kotlin.random.Random
 
-private const val UNKNOWN_ERROR = "Unknown error"
-
 @Composable
 fun DocumentFormScreen(
-    documentId: String
+    documentId: String,
+    onDocumentSaved: (String) -> Unit,
 ) {
     val viewModel: DocumentFormViewModel by viewModel { parametersOf(documentId) }
     val showInvoiceDialog by viewModel.isInvoiceDialogVisible.collectAsState()
@@ -72,9 +71,8 @@ fun DocumentFormScreen(
             viewModel.showTaxDialog(invoiceTax = invoiceTax, invoiceLineView = invoiceLineView)
         },
         isEnabled = viewModel.isEnabled,
-        isLoading = viewModel.isLoading,
-        onFormSubmit = viewModel::save
-    )
+        isLoading = viewModel.isLoading
+    ) { viewModel.save(onDocumentSaved) }
 
     if (showTaxDialog) {
         InvoiceTaxDialog(

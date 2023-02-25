@@ -76,7 +76,10 @@ fun EInvoiceNavGraph(
             onCreateDocumentClick = navController::navigateToDocumentFormScreen
         )
 
-        branchFormScreen(onLocationRequested = navController::navigateToMapScreen)
+        branchFormScreen(
+            onLocationRequested = navController::navigateToMapScreen,
+            onBranchSaved = navController::popBackStack
+        )
 
         mapScreen { lat, lng ->
             navController.previousBackStackEntry?.arguments?.putDouble(latKey, lat)
@@ -118,7 +121,12 @@ fun EInvoiceNavGraph(
             onDocumentUpdateClick = navController::navigateToDocumentFormScreen
         )
 
-        documentFormScreen()
+        documentFormScreen(
+            onDocumentSaved = {
+                navController.popBackStack()
+                navController.navigateToDocumentDetailsScreen(it)
+            },
+        )
 
         documentDetailsScreen(
             onCompanyClick = navController::navigateToCompanyDashboardScreen,

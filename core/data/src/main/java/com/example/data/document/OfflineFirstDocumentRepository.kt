@@ -19,6 +19,7 @@ import com.example.network.models.document.NetworkDocument
 import com.example.network.models.document.asCreateDocumentDto
 import com.example.network.models.document.asNetworkDocumentView
 import com.example.network.models.document.asUpdateDocumentDto
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import java.util.UUID
 
@@ -206,18 +207,12 @@ class OfflineFirstDocumentRepository(
                 }
             },
             afterLocalCreate = {
-                idMappings.forEach { (oldId, _) ->
+                idMappings.forEach { (oldId, newId) ->
+                    if(newId == null) return@forEach
                     localDataSource.deleteDocument(oldId)
                 }
             },
         )
-        val remotelyDeletedDocumentsIds =
-            documents.filterNot { it.documentEntity.id in remotelyCreatedDocuments }
-                .map { it.documentEntity.id }
-
-        remotelyDeletedDocumentsIds.forEach { id ->
-            localDataSource.deleteDocument(id)
-        }
         return result
     }
 

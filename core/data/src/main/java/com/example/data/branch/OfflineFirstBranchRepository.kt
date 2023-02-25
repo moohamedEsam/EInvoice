@@ -92,10 +92,6 @@ class OfflineFirstBranchRepository(
                     .map { branches -> branches.map { it.asBranchEntity().copy(isSynced = true) } }
             },
         )
-        val remotelyDeletedBranches = branches.filterNot { it.id in remotelyCreatedBranches }
-        remotelyDeletedBranches.forEach { branch ->
-            localSource.deleteBranch(branch.id)
-        }
         return syncResult
     }
 

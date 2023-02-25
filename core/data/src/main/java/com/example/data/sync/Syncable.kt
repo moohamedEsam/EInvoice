@@ -18,21 +18,18 @@ suspend fun <T> Synchronizer.handleSync(
     localCreator: suspend (T) -> Unit,
     afterLocalCreate: suspend () -> Unit,
 ): Boolean {
-    return withContext(dispatcher) {
-        awaitAll(
-            async { remoteDeleter() },
-            async { remoteCreator() },
-            async { remoteUpdater() }
-        )
-        val result = remoteFetcher()
-        if (result !is Result.Success) return@withContext false
+    remoteDeleter()
+    remoteCreator()
+    remoteUpdater()
+
+    val result = remoteFetcher()
+    if (result !is Result.Success) return false
 
 
-        for (record in result.data)
-            localCreator(record)
+    for (record in result.data)
+        localCreator(record)
 
-        afterLocalCreate()
+    afterLocalCreate()
 
-        true
-    }
+    return true
 }

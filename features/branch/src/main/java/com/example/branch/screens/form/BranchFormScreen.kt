@@ -35,6 +35,7 @@ fun BranchFormScreen(
     longitude: Double? = null,
     branchId: String,
     onLocationRequested: () -> Unit = {},
+    onBranchSaved: () -> Unit = {}
 ) {
     val viewModel: BranchFormViewModel by viewModel(parameters = { parametersOf(branchId) })
     if (latitude != null && longitude != null && latitude != 0.0 && longitude != 0.0) {
@@ -67,9 +68,8 @@ fun BranchFormScreen(
         optionalAddress = viewModel.optionalAddress,
         onOptionalAddressChange = viewModel::setOptionalAddress,
         isSaveButtonEnabled = viewModel.isFormValid,
-        isLoading = viewModel.isLoading,
-        onSaveClick = viewModel::saveBranch
-    )
+        isLoading = viewModel.isLoading
+    ) { viewModel.saveBranch(onBranchSaved) }
 }
 
 @Composable

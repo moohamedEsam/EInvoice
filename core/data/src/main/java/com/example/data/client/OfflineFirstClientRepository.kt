@@ -97,10 +97,6 @@ class OfflineFirstClientRepository(
                 remoteSource.getClients().map { clients -> clients.map { it.asClientEntity().copy(isSynced = true) } }
             },
         )
-        val remotelyDeletedClients = clients.filterNot { it.id in remotelyCreatedClients }
-        remotelyDeletedClients.forEach { client ->
-            localSource.deleteClient(client.id)
-        }
         return result
     }
 

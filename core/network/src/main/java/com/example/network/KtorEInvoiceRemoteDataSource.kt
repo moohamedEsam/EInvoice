@@ -2,12 +2,12 @@ package com.example.network
 
 import com.example.common.functions.tryWrapper
 import com.example.common.models.Result
-import com.example.models.branch.Branch
 import com.example.models.Client
-import com.example.models.company.Company
 import com.example.models.auth.Credentials
 import com.example.models.auth.Register
 import com.example.models.auth.Token
+import com.example.models.branch.Branch
+import com.example.models.company.Company
 import com.example.models.document.DocumentView
 import com.example.models.invoiceLine.TaxView
 import com.example.models.item.Item

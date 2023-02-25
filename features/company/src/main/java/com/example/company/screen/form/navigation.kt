@@ -4,7 +4,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 
-const val CompanyFormScreenRoute = "company form screen"
+const val CompanyFormScreenRoute = "company form"
 private const val CompanyIdKey = "companyId"
 
 fun NavGraphBuilder.companyFormScreen() {

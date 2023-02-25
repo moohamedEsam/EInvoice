@@ -78,9 +78,9 @@ class RegisterViewModel(
             _isLoading.update { true }
             val result = registerUseCase(
                 Register(
-                    email.value,
-                    password.value,
-                    username.value
+                    username = _username.value,
+                    email = _email.value,
+                    password = _password.value
                 )
             )
             _isLoading.update { false }

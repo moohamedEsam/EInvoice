@@ -419,16 +419,18 @@ class DocumentFormViewModel(
         _isInvoiceDialogVisible.update { true }
     }
 
-    fun save() {
+    fun save(onDocumentSaved: (String) -> Unit) {
         viewModelScope.launch {
             val document = getCurrentDocumentView() ?: return@launch
             val result = insertOrUpdateDocument(document)
             val event = result.getSnackBarEvent(
                 successMessage = "Document Saved Successfully",
                 errorActionLabel = "Retry",
-                errorAction = ::save
+                errorAction = { save(onDocumentSaved)}
             )
+            result.ifSuccess { _internalId.update { "" } }
             showSnackBarEvent(event)
+            result.ifSuccess { onDocumentSaved(document.id) }
         }
     }
 

@@ -10,7 +10,8 @@ const val BranchFormScreenRoute = "Branch Form"
 const val branchIdKey = "id"
 
 fun NavGraphBuilder.branchFormScreen(
-    onLocationRequested: () -> Unit = {}
+    onLocationRequested: () -> Unit = {},
+    onBranchSaved: () -> Unit = {}
 ) {
     composable("$BranchFormScreenRoute/{$branchIdKey}") {
         val lat = it.arguments?.getDouble(latKey)
@@ -20,7 +21,8 @@ fun NavGraphBuilder.branchFormScreen(
             latitude = lat,
             longitude = lng,
             branchId = id,
-            onLocationRequested = onLocationRequested
+            onLocationRequested = onLocationRequested,
+            onBranchSaved = onBranchSaved
         )
     }
 }

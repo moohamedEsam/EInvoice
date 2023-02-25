@@ -147,10 +147,6 @@ class OfflineFirstItemRepository(
             },
             remoteFetcher = remoteSource::getItems
         )
-        val remotelyDeletedItems = items.filterNot { it.id in remotelyCreatedItems }
-        remotelyDeletedItems.forEach { item ->
-            localSource.deleteItem(item.id)
-        }
         return result
     }
 

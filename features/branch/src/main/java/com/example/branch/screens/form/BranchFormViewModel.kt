@@ -215,7 +215,7 @@ class BranchFormViewModel(
         _selectedCompany.update { company }
     }
 
-    fun saveBranch() {
+    fun saveBranch(onSaved: () -> Unit) {
         viewModelScope.launch {
             _isLoading.update { true }
             val branch = Branch(
@@ -239,13 +239,15 @@ class BranchFormViewModel(
                 createBranchUseCase(branch)
 
             _isLoading.update { false }
-            result.ifFailure {
-                val event = SnackBarEvent(
-                    message = it ?: "Error",
-                    actionLabel = "Retry",
-                    action = ::saveBranch
-                )
-                showSnackBarEvent(event)
+
+            val event = result.getSnackBarEvent(
+                successMessage = "Branch saved successfully",
+                errorActionLabel = "Retry",
+                errorAction = { saveBranch(onSaved) },
+            )
+            showSnackBarEvent(event)
+            result.ifSuccess {
+                onSaved()
             }
         }
     }

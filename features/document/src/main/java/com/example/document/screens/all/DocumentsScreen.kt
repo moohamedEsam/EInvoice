@@ -8,10 +8,10 @@ import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -138,44 +138,53 @@ private fun DocumentsScreenContent(
         mutableStateOf(SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()))
     }
     val documents = documentsFlow.collectAsLazyPagingItems()
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        item { SearchField(state, onQueryChange) }
-        item { ActionsRow(onSyncDocumentsClick, state) }
-        item {
-            FiltersRow(
-                state = state,
-                onFilterByCompanyClick = onFilterByCompanyClick,
-                onFilterByClientClick = onFilterByClientClick,
-                onFilterByBranchClick = onFilterByBranchClick,
-                onFilterByStatusClick = onFilterByStatusClick,
-                onDatePicked = onDatePicked,
-                dateFormat = simpleDateFormat
+    Box {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            item { SearchField(state, onQueryChange) }
+            item { ActionsRow(onSyncDocumentsClick, state) }
+            item {
+                FiltersRow(
+                    state = state,
+                    onFilterByCompanyClick = onFilterByCompanyClick,
+                    onFilterByClientClick = onFilterByClientClick,
+                    onFilterByBranchClick = onFilterByBranchClick,
+                    onFilterByStatusClick = onFilterByStatusClick,
+                    onDatePicked = onDatePicked,
+                    dateFormat = simpleDateFormat
+                )
+            }
+
+            documentsList(
+                onDocumentClick = onDocumentClick,
+                onDocumentCancelClick = onDocumentCancelClick,
+                onCreateCreditClick = onCreateCreditClick,
+                onDocumentUpdateClick = onDocumentUpdateClick,
+                onCreateDebitClick = onCreateDebitClick,
+                onDocumentSendClick = onDocumentSendClick,
+                documents = documents,
+                isConnectedToNetwork = state.isConnectedToNetwork
             )
         }
 
-        documentsList(
-            onDocumentClick = onDocumentClick,
-            documents = documents,
-            onDocumentCancelClick = onDocumentCancelClick,
-            onAddDocumentClick = onAddDocumentClick,
-            onCreateCreditClick = onCreateCreditClick,
-            onCreateDebitClick = onCreateDebitClick,
-            onDocumentSendClick = onDocumentSendClick,
-            isConnectedToNetwork = state.isConnectedToNetwork,
-            onDocumentUpdateClick = onDocumentUpdateClick
-        )
+        FloatingActionButton(
+            onClick = onAddDocumentClick,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(8.dp)
+        ) {
+            Icon(Icons.Filled.Add, contentDescription = "Add document")
+        }
     }
 }
 
 private fun LazyListScope.documentsList(
     onDocumentClick: (String) -> Unit,
     onDocumentCancelClick: (String) -> Unit,
-    onAddDocumentClick: () -> Unit,
     onCreateCreditClick: (String) -> Unit,
     onDocumentUpdateClick: (String) -> Unit,
     onCreateDebitClick: (String) -> Unit,
@@ -185,18 +194,7 @@ private fun LazyListScope.documentsList(
 ) {
 
     item {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(text = "Documents", style = MaterialTheme.typography.headlineSmall)
-            IconButton(onClick = onAddDocumentClick) {
-                Icon(
-                    imageVector = Icons.Outlined.Add,
-                    contentDescription = "Add"
-                )
-            }
-        }
+        Text(text = "Documents", style = MaterialTheme.typography.headlineSmall)
     }
 
     items(documents) { document ->
@@ -419,62 +417,86 @@ private fun DocumentItem(
                 )
             }
             Divider()
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                if (document.status.isUpdatable())
-                    AssistChip(
-                        onClick = { onDocumentUpdateClick(document.id) },
-                        label = { Text("Update") },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Filled.Edit,
-                                contentDescription = null
-                            )
-                        }
-                    )
-                if (document.status.isSendable())
-                    AssistChip(
-                        onClick = { onDocumentSendClick(document.id) },
-                        label = { Text("Send") },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Filled.Upload,
-                                contentDescription = null
-                            )
-                        },
-                        enabled = isConnectedToNetwork && document.isSynced
-                    )
-                if (document.status.isCancelable())
-                    AssistChip(
-                        onClick = { onDocumentCancelClick(document.id) },
-                        label = { Text("Cancel") },
-                        colors = AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.errorContainer),
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Filled.Cancel,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onErrorContainer
-                            )
-                        },
-                        enabled = isConnectedToNetwork && document.isSynced
-                    )
-
-                if (document.documentType != "I") return@Row
-                AssistChip(
-                    onClick = { onCreateCreditClick(document.id) },
-                    label = { Text("Create Credit") }
-                )
-
-                AssistChip(
-                    onClick = { onCreateDebitClick(document.id) },
-                    label = { Text("Create Debit") }
-                )
-            }
+            DocumentActionRow(
+                document = document,
+                onDocumentUpdateClick = onDocumentUpdateClick,
+                onDocumentSendClick = onDocumentSendClick,
+                isConnectedToNetwork = isConnectedToNetwork,
+                onDocumentCancelClick = onDocumentCancelClick,
+                onCreateCreditClick = onCreateCreditClick,
+                onCreateDebitClick = onCreateDebitClick
+            )
         }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun DocumentActionRow(
+    document: DocumentView,
+    onDocumentUpdateClick: (String) -> Unit,
+    onDocumentSendClick: (String) -> Unit,
+    isConnectedToNetwork: Boolean,
+    onDocumentCancelClick: (String) -> Unit,
+    onCreateCreditClick: (String) -> Unit,
+    onCreateDebitClick: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        if (document.status.isUpdatable())
+            AssistChip(
+                onClick = { onDocumentUpdateClick(document.id) },
+                label = { Text("Update") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.Edit,
+                        contentDescription = null
+                    )
+                }
+            )
+        if (document.status.isSendable())
+            AssistChip(
+                onClick = { onDocumentSendClick(document.id) },
+                label = { Text("Send") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.Upload,
+                        contentDescription = null
+                    )
+                },
+                enabled = isConnectedToNetwork && document.isSynced
+            )
+        if (document.status.isCancelable())
+            AssistChip(
+                onClick = { onDocumentCancelClick(document.id) },
+                label = { Text("Cancel") },
+                colors = AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.Cancel,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                },
+                enabled = isConnectedToNetwork && document.isSynced
+            )
+
+        if (document.documentType != "I") return
+        AssistChip(
+            onClick = { onCreateCreditClick(document.id) },
+            label = { Text("Create Credit") },
+            enabled = document.status == DocumentStatus.Valid
+        )
+
+        AssistChip(
+            onClick = { onCreateDebitClick(document.id) },
+            label = { Text("Create Debit") },
+            enabled = document.status == DocumentStatus.Valid
+        )
     }
 }
 

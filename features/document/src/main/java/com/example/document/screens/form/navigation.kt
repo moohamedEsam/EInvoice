@@ -8,13 +8,15 @@ import androidx.navigation.navArgument
 const val DocumentFormScreenRoute = "document form"
 
 
-fun NavGraphBuilder.documentFormScreen() {
+fun NavGraphBuilder.documentFormScreen(
+    onDocumentSaved: (String) -> Unit
+) {
     composable(
         route = "$DocumentFormScreenRoute/{documentId}/{status}",
         arguments = getScreenNavigationArguments()
     ) {
         val documentId = it.arguments?.getString("documentId") ?: " "
-        DocumentFormScreen(documentId = documentId)
+        DocumentFormScreen(documentId = documentId, onDocumentSaved = onDocumentSaved)
     }
 }
 
